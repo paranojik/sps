@@ -1,0 +1,25 @@
+[07-Jun-2012 21:05:26 UTC] PHP Warning:  PHP Startup: Unable to load dynamic library '/usr/local/Cellar/php/5.3.10/lib/php/extensions/no-debug-non-zts-20090626/midgard.so' - dlopen(/usr/local/Cellar/php/5.3.10/lib/php/extensions/no-debug-non-zts-20090626/midgard.so, 9): Library not loaded: /usr/local/lib/libmidgard.2008.dylib
+  Referenced from: /usr/local/Cellar/php/5.3.10/lib/php/extensions/no-debug-non-zts-20090626/midgard.so
+  Reason: image not found in Unknown on line 0
+[07-Jun-2012 21:05:26 UTC] PHP Warning:  require_once(PHPUnit/Framework.php): failed to open stream: No such file or directory in /Users/indytechcook/projects/lsd_csi/tests/Test.php on line 4
+[07-Jun-2012 21:05:26 UTC] PHP Stack trace:
+[07-Jun-2012 21:05:26 UTC] PHP   1. {main}() /private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php:0
+[07-Jun-2012 21:05:26 UTC] PHP   2. IDE_PHPUnit_TextUI_Command::main($exit = *uninitialized*) /private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php:434
+[07-Jun-2012 21:05:26 UTC] PHP   3. PHPUnit_TextUI_Command->run($argv = array (0 => '/private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php', 1 => '--no-configuration', 2 => 'AddTest', 3 => '/Users/indytechcook/projects/lsd_csi/tests/Test.php'), $exit = TRUE) /private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php:95
+[07-Jun-2012 21:05:26 UTC] PHP   4. PHPUnit_Runner_BaseTestRunner->getTest($suiteClassName = 'AddTest', $suiteClassFile = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/TextUI/Command.php:150
+[07-Jun-2012 21:05:26 UTC] PHP   5. PHPUnit_Runner_BaseTestRunner->loadSuiteClass($suiteClassName = 'AddTest', $suiteClassFile = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Runner/BaseTestRunner.php:104
+[07-Jun-2012 21:05:26 UTC] PHP   6. PHPUnit_Runner_StandardTestSuiteLoader->load($suiteClassName = 'AddTest', $suiteClassFile = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Runner/BaseTestRunner.php:168
+[07-Jun-2012 21:05:26 UTC] PHP   7. PHPUnit_Util_Fileloader::checkAndLoad($filename = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Runner/StandardTestSuiteLoader.php:78
+[07-Jun-2012 21:05:26 UTC] PHP   8. PHPUnit_Util_Fileloader::load($filename = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Util/Fileloader.php:79
+[07-Jun-2012 21:05:26 UTC] PHP   9. include_once() /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Util/Fileloader.php:95
+[07-Jun-2012 21:05:26 UTC] PHP Fatal error:  require_once(): Failed opening required 'PHPUnit/Framework.php' (include_path='.:/usr/local/Cellar/php/5.3.10/lib/php') in /Users/indytechcook/projects/lsd_csi/tests/Test.php on line 4
+[07-Jun-2012 21:05:26 UTC] PHP Stack trace:
+[07-Jun-2012 21:05:26 UTC] PHP   1. {main}() /private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php:0
+[07-Jun-2012 21:05:26 UTC] PHP   2. IDE_PHPUnit_TextUI_Command::main($exit = *uninitialized*) /private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php:434
+[07-Jun-2012 21:05:26 UTC] PHP   3. PHPUnit_TextUI_Command->run($argv = array (0 => '/private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php', 1 => '--no-configuration', 2 => 'AddTest', 3 => '/Users/indytechcook/projects/lsd_csi/tests/Test.php'), $exit = TRUE) /private/var/folders/rs/xd0gw3415fvg5bz1djp6tssh0000gn/T/ide-phpunit.php:95
+[07-Jun-2012 21:05:26 UTC] PHP   4. PHPUnit_Runner_BaseTestRunner->getTest($suiteClassName = 'AddTest', $suiteClassFile = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/TextUI/Command.php:150
+[07-Jun-2012 21:05:26 UTC] PHP   5. PHPUnit_Runner_BaseTestRunner->loadSuiteClass($suiteClassName = 'AddTest', $suiteClassFile = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Runner/BaseTestRunner.php:104
+[07-Jun-2012 21:05:26 UTC] PHP   6. PHPUnit_Runner_StandardTestSuiteLoader->load($suiteClassName = 'AddTest', $suiteClassFile = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Runner/BaseTestRunner.php:168
+[07-Jun-2012 21:05:26 UTC] PHP   7. PHPUnit_Util_Fileloader::checkAndLoad($filename = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Runner/StandardTestSuiteLoader.php:78
+[07-Jun-2012 21:05:26 UTC] PHP   8. PHPUnit_Util_Fileloader::load($filename = '/Users/indytechcook/projects/lsd_csi/tests/Test.php') /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Util/Fileloader.php:79
+[07-Jun-2012 21:05:26 UTC] PHP   9. include_once() /usr/local/Cellar/php/5.3.10/lib/php/PHPUnit/Util/Fileloader.php:95
