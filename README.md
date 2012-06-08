@@ -1,6 +1,4 @@
 lsd-csi
 =======
 
-Mirror of http://drupal.org/sandbox/indytechcook/1621176 for Travis testing
-
-Hi mom
+Please see 7.x-1.x branch
