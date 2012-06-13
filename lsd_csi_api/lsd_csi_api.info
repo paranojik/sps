@@ -1,0 +1,4 @@
+name = LSD CSI Framework
+description = The framework for the Content Staging System
+package = LSD
+core = 7.x
