@@ -1,0 +1,16 @@
+<?php
+
+
+sps_register();
+
+/**
+ * Configure autoloader
+ */
+function sps_register() {
+  $finder = new xautoload_ClassFinder_NamespaceOrPrefix();
+  $finder->registerNamespaceDeep('SPS', __DIR__ . '/lib/SPS');
+
+  $loader = new xautoload_ClassLoader($finder);
+  $loader->register();
+}
+

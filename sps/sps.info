@@ -1,0 +1,9 @@
+name = Site Preview System
+description = The framework for the Content Staging System
+
+core = 7.x
+php = 5.3
+
+dependencies[] = xautoload
+
+files[] = tests/*.test
