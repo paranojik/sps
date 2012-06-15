@@ -14,3 +14,17 @@ function sps_register() {
   $loader->register();
 }
 
+/**
+ * Get the Site Manager
+ *
+ * @return SPS\Manager
+ */
+function sps_get_manager() {
+  static $manager;
+
+  if (!isset($manager)) {
+    $manager = new SPS\Manager();
+  }
+
+  return $manager;
+}
