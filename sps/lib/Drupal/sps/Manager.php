@@ -1,8 +1,6 @@
 <?php
 
-namespace SPS;
-
-use SPS\SiteState;
+namespace Drupal\sps;
 
 class Manager {
 

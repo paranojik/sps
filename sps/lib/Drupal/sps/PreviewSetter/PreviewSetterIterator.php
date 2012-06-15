@@ -1,6 +1,6 @@
 <?php
 
-namespace SPS\PreviewSetter;
+namespace Drupal\sps\PreviewSetter;
 
 use IteratorAggregate;
 

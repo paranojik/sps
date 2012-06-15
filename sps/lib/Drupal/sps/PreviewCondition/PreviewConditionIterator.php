@@ -1,6 +1,6 @@
 <?php
 
-namespace SPS\PreviewCondition;
+namespace Drupal\sps\PreviewCondition;
 
 use IteratorAggregate;
 

@@ -1,29 +1,16 @@
 <?php
 
 
-sps_register();
-
-/**
- * Configure autoloader
- */
-function sps_register() {
-  $finder = new xautoload_ClassFinder_NamespaceOrPrefix();
-  $finder->registerNamespaceDeep('SPS', __DIR__ . '/lib/SPS');
-
-  $loader = new xautoload_ClassLoader($finder);
-  $loader->register();
-}
-
 /**
  * Get the Site Manager
  *
- * @return SPS\Manager
+ * @return Drupal\sps\Manager
  */
 function sps_get_manager() {
   static $manager;
 
   if (!isset($manager)) {
-    $manager = new SPS\Manager();
+    $manager = new Drupal\sps\Manager();
   }
 
   return $manager;

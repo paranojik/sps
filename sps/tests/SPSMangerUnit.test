@@ -11,12 +11,12 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
   }
 
   public function testClassAutoLoading() {
-    $this->assertTrue(class_exists('SPS\\Manager'), "Manager Class exists", 'SPS');
-    $this->assertTrue(class_exists('SPS\\SiteState\\SiteState'), "Site State Class exists", 'SPS');
-    $this->assertTrue(interface_exists('SPS\\PreviewCondition\\PreviewConditionInterface'), "Preview Condition Interface exists", 'SPS');
-    $this->assertTrue(class_exists('SPS\\PreviewCondition\\PreviewConditionIterator'), "Preview Iterator Collection Class exists", 'SPS');
-    $this->assertTrue(interface_exists('SPS\\PreviewSetter\\PreviewSetterInterface'), "Preview Setter Interface exists", 'SPS');
-    $this->assertTrue(class_exists('SPS\\PreviewSetter\\PreviewSetterIterator'), "Preview Setter Iterator Class exists", 'SPS');
+    $this->assertTrue(class_exists('Drupal\\sps\\Manager'), "Manager Class exists", 'SPS');
+    $this->assertTrue(class_exists('Drupal\\sps\\SiteState\\SiteState'), "Site State Class exists", 'SPS');
+    $this->assertTrue(interface_exists('Drupal\\sps\\PreviewCondition\\PreviewConditionInterface'), "Preview Condition Interface exists", 'SPS');
+    $this->assertTrue(class_exists('Drupal\\sps\\PreviewCondition\\PreviewConditionIterator'), "Preview Iterator Collection Class exists", 'SPS');
+    $this->assertTrue(interface_exists('Drupal\\sps\\PreviewSetter\\PreviewSetterInterface'), "Preview Setter Interface exists", 'SPS');
+    $this->assertTrue(class_exists('Drupal\\sps\\PreviewSetter\\PreviewSetterIterator'), "Preview Setter Iterator Class exists", 'SPS');
   }
 
   public function testClassLoading() {
