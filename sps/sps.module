@@ -15,3 +15,15 @@ function sps_get_manager() {
 
   return $manager;
 }
+
+/**
+ * Find and load the plugin if it exists
+ *
+ * @param $plugin_type
+ *  The name of the plugin type
+ * @param $plugin_name
+ *  The name of the plugin to get.  This is optional.  If omitted then the plugin type object is returned.
+ */
+function sps_get_plugin($plugin_type, $plugin_name = NULL) {
+
+}

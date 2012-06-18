@@ -1,0 +1,61 @@
+<?php
+
+class SPSPluginUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Plugin Unit Tests',
+      'description' => 'SPS Plugin Tests.',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testPluginLoading() {
+    try {
+      $plugin = sps_get_plugin('not_valid_type', 'not_valid_key');
+      $this->fail("Plugin Not Loaded", "SPS");
+
+    } catch (\Drupal\sps\Exception\InvalidPluginException $e) {
+      $this->pass("Plugin Not Loaded", "SPS");
+    }
+
+    try {
+      $plugin = sps_get_plugin('TestType', 'TestType1');
+      $this->pass("Plugin Loaded", "SPS");
+    } catch (Drupal\sps\Exception\InvalidPluginException $e) {
+      $this->fail("Plugin loaded", "SPS");
+    }
+
+    $this->assertIsPlugin($plugin);
+    $this->assertTrue($plugin instanceof Drupal\sps\Plugins\TestType\TestType1,
+        "Correct plugin class loaded", "SPS");
+
+
+    $plugins = sps_get_plugin('TestType');
+    $this->assertTrue($plugins instanceof \Drupal\sps\Plugin\PluginCollection\PluginCollection,
+      "Plugin Collection Class loaded");
+
+    foreach ($plugins as $i => $plugin) {
+      $this->assertTrue($plugin);
+      $class_name = "Drupal\\sps\\Plugins\\TestType\\TestType$i";
+      $this->assertIsPluginType($plugin, "TestType");
+      $this->assertTrue($plugin instanceof $class_name, "Incorrect Plugin Class Loaded: $class_name", "SPS");
+    }
+  }
+
+  /**
+   * Reuse this in other plugin test to verify the plugin interface is correct
+   *
+   * @param $plugin
+   */
+  protected function assertIsPlugin($plugin) {
+    $this->assertCheckInterface("Drupal\\sps\\Plugin\\PluginInterface", $plugin, "Invalid Plugin");
+  }
+
+  /**
+   * Check if the class is a certain plugin type
+   */
+  protected function assertIsPluginType($plugin, $type) {
+    $interface = 'Drupal\\sps\\Plugin\\Type\\' . $type . "Interface";
+    $this->assertCheckInterface($interface, $plugin, "Plugin is of type $type");
+  }
+}

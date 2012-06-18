@@ -9,4 +9,12 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
     spl_autoload_unregister('drupal_autoload_class');
     spl_autoload_unregister('drupal_autoload_interface');
   }
+
+  protected function assertCheckInterface($interface, $object, $message) {
+    $ref_class = new ReflectionClass($object);
+    if (in_array($interface, $ref_class->getInterfaceNames())) {
+      $this->pass($message, 'SPS');
+    }
+    $this->fail($message, 'SPS');
+  }
 }

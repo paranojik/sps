@@ -4,8 +4,8 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
 
   static function getInfo() {
     return array(
-      'name' => 'SPS Site State Unit Tests',
-      'description' => 'SPS Site State Unit Tests.',
+      'name' => 'SPS Manager Unit Tests',
+      'description' => 'SPS Manager Unit Tests.',
       'group' => 'SPS',
     );
   }
@@ -36,13 +36,5 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $this->assertTrue($conditions instanceof SPS\PreviewCondition\PreviewConditionIterator, "Site Manager Loaded the correct Preview Iterator Class");
     $this->assertTrue($setters instanceof SPS\PreviewSetter\PreviewSetterIterator, "Site Manager Loaded the correct Setter Iterator Class");
     */
-  }
-
-  protected function checkInterface($interface, $object) {
-    $ref_class = new ReflectionClass($object);
-    if (in_array($interface, $ref_class->getInterfaceNames())) {
-      return TRUE;
-    }
-    return FALSE;
   }
 }
