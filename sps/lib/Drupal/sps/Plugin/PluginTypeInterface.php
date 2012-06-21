@@ -3,24 +3,29 @@
 namespace Drupal\sps\Plugin;
 
 interface PluginTypeInterface {
+  /**
+   * Constrcutor
+   *
+   * @param $definition
+   *  The plugin definition
+   */
+  public function __construct($definition);
 
   /**
-   * Info about the plugin
+   * Get all of the plugins
    *
-   *  returns array(
-   *    'name' => Unique name of the plugin type Required
-   *    'interface' => Interface name to use.
-   *
-   *
-   * @abstract
-   * @return array
+   * @return \Drupal\sps\Plugin\PluginCollection
    */
-  public static function info();
+  public function getCollection();
 
   /**
-   * Required elements in the info array
-   *
-   * @return array
+   * Get a value for the definition
    */
-  public static function requiredInfo();
+  public function getDefinition($param = NULL);
+
+  /**
+   * Get the info for all of plugins
+   */
+  public function getPluginInfo($plugin_name = NULL);
+
 }

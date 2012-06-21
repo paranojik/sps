@@ -25,5 +25,42 @@ function sps_get_manager() {
  *  The name of the plugin to get.  This is optional.  If omitted then the plugin type object is returned.
  */
 function sps_get_plugin($plugin_type, $plugin_name = NULL) {
+  //return sps_get_plugin_factory()->getPlugins()
 
 }
+
+/**
+ * Load the Plugin Type
+ *
+ * @param $plugin_type_name
+ *  The name of the plugin type
+ * @return Drupal\sps\Plugin\PluginTypeInterface
+ */
+function sps_get_plugin_type ($plugin_type_name) {
+  return sps_get_plugin_factory()->loadPluginType($plugin_type_name);
+}
+
+/**
+ * Load the factor
+ *
+ * @return \Drupal\sps\Plugin\PluginFactory
+ */
+function sps_get_plugin_factory() {
+  static $factory;
+
+  if (!isset($factory)) {
+    try {
+      $factory = new \Drupal\sps\Plugin\PluginFactory();
+    } catch (Exception $e) {
+      throw new \Drupal\sps\Exception\ClassLoadException("Factory was not loaded");
+    }
+
+    if (!isset($factory)) {
+      throw new \Drupal\sps\Exception\ClassLoadException("Factory was not loaded");
+    }
+
+  }
+
+  return $factory;
+}
+

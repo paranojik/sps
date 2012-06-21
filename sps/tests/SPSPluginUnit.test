@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\sps\Exception as SPSException;
+
 class SPSPluginUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
@@ -8,6 +10,40 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
       'group' => 'SPS',
     );
   }
+
+  public function testPluginFactory() {
+    try {
+      $factory = sps_get_plugin_factory();
+      $this->pass('Plugin Factory Loaded', "SPS");
+      return;
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->fail('Plugin Factory Loaded', "SPS");
+      return;
+    } catch (Exception $e) {
+      $this->fail('Plugin Factory Loaded', "SPS");
+      $this->fail('Plugin Factory Exception was not used', "SPS");
+      return;
+    }
+  }
+
+  public function testPluginTypes() {
+    try {
+      $plugin_type = sps_get_plugin_type("fake_plugin");
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->pass("Fake Plugin Type not Loaded", "SPS");
+    }
+
+    try {
+      $plugin_type = sps_get_plugin_type("test_type");
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->fail("Load Plugin Type", "SPS");
+    }
+
+    $this->assertCheckInterface("Drupal\\sps\\Plugin\\PluginTypeInterface",
+      $plugin_type, "Plugin Type is using the correct interface");
+
+  }
+
 
   public function testPluginLoading() {
     try {
@@ -19,27 +55,26 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
     }
 
     try {
-      $plugin = sps_get_plugin('TestType', 'TestType1');
+      $plugin = sps_get_plugin('test_type', 'test_type_1');
       $this->pass("Plugin Loaded", "SPS");
     } catch (Drupal\sps\Exception\InvalidPluginException $e) {
       $this->fail("Plugin loaded", "SPS");
     }
 
+    $plugin_type = sps_get_plugin_type('test_type');
+    $plugin_2 = sps_get_plugin('test_type', 'test_type_2');
+    $this->assertTrue($plugin_2 instanceof $plugin_type->getDefaultPluginClass(), "Default Plugin Loaded");
+
     $this->assertIsPlugin($plugin);
-    $this->assertTrue($plugin instanceof Drupal\sps\Plugins\TestType\TestType1,
-        "Correct plugin class loaded", "SPS");
+    $this->assertIsPlugin($plugin_2);
 
+    $plugins = sps_get_plugin('test_type');
+    $this->assertTrue($plugins instanceof \Drupal\sps\Plugin\PluginCollection,
+      "Plugin Collection Class loaded via function");
 
-    $plugins = sps_get_plugin('TestType');
-    $this->assertTrue($plugins instanceof \Drupal\sps\Plugin\PluginCollection\PluginCollection,
-      "Plugin Collection Class loaded");
-
-    foreach ($plugins as $i => $plugin) {
-      $this->assertTrue($plugin);
-      $class_name = "Drupal\\sps\\Plugins\\TestType\\TestType$i";
-      $this->assertIsPluginType($plugin, "TestType");
-      $this->assertTrue($plugin instanceof $class_name, "Incorrect Plugin Class Loaded: $class_name", "SPS");
-    }
+    $plugins = $plugin_type->getPlugins();
+    $this->assertTrue($plugins instanceof \Drupal\sps\Plugin\PluginCollection,
+      "Plugin Collection Class loaded via function");
   }
 
   /**
