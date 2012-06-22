@@ -12,6 +12,8 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
   }
 
   public function testPluginFactory() {
+    $factory = new Drupal\sps\Plugin\PluginFactory();
+
     try {
       $factory = sps_get_plugin_factory();
       $this->pass('Plugin Factory Loaded', "SPS");
@@ -63,18 +65,34 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
 
     $plugin_type = sps_get_plugin_type('test_type');
     $plugin_2 = sps_get_plugin('test_type', 'test_type_2');
-    $this->assertTrue($plugin_2 instanceof $plugin_type->getDefaultPluginClass(), "Default Plugin Loaded");
+    $class_name = $plugin_type->getDefaultPluginClass();
+    if ($plugin_2 instanceof $class_name) {
+      $this->pass("Default Plugin Loaded", "SPS");
+    }
+    else {
+      $this->fail("Default Plugin Loaded", "SPS");
+    }
 
     $this->assertIsPlugin($plugin);
     $this->assertIsPlugin($plugin_2);
 
     $plugins = sps_get_plugin('test_type');
-    $this->assertTrue($plugins instanceof \Drupal\sps\Plugin\PluginCollection,
-      "Plugin Collection Class loaded via function");
+    if ($plugins instanceof Drupal\sps\Plugin\PluginCollection) {
+      $this->pass("Plugin Collection Class loaded via function", "SPS");
+    }
+    else {
+      $this->fail("Plugin Collection Class loaded via function", "SPS");
+    }
+
 
     $plugins = $plugin_type->getPlugins();
-    $this->assertTrue($plugins instanceof \Drupal\sps\Plugin\PluginCollection,
-      "Plugin Collection Class loaded via function");
+    if ($plugins instanceof Drupal\sps\Plugin\PluginCollection) {
+      $this->pass("Plugin Collection Class loaded via function", "SPS");
+    }
+    else {
+      $this->fail("Plugin Collection Class loaded via function", "SPS");
+    }
+
   }
 
   /**
