@@ -5,51 +5,23 @@ Running Tests:  run the following command from Drupal root:  php scripts/run-tes
 SPS (Site Preview System)
 
 Primary Namespace is Drupal\\sps
+Files are autoloaded using the xautoload module.
+We
 
 Plugins
 #######
 
-Anything under the Drupal\sps\Plugins\<pluginname>\*.php that implement the plugins interface
 
-- PluginTypeInterface:  Each Plugin Type Class Must implement this interface
-- AbstractPluginType:  This is a Abstract class to base the Plugin Type Classes ON
-- PluginInterface:  Each Plugin Instance MUST implement this interface
-- PluginCollection:  A collection of Plugins
-- PluginFactor:  Instantiates plugin objects
+# Define Plugin Types
 
-## Rules
-- Each plugin Type must define a Type Class that implements PluginTypeInterface
-- Each Plugin MUST implement PluginInterface
-- The plugin type name must must be Drupal\sps\Plugin\Type\<TypeName>
-- THe plugins themselves are at Drupal\sps\Plugins\<TypeName>\<PluginName>
-
-Example
-
-Plugin Type name "TestType"
-
-## Plugin Type
-Class: Drupal\sps\Plugin\Type\TestType\TestType
-File: <module_root>/lib/Drupal/sps/Plugin/Type/TestType/TestType.php
-Extends AbstractPluginType
-
-## Plugin Definition for TestType
-Interface: Drupal\sps\Plugin\Type\TestType\TestTypeInterface
-- File: <module_root>/lib/Drupal/sps/Plugin/Type/TestType/TestTypeInterface.php
-Abstract Class: Drupal\sps\Plugin\Type\TestType\AbstractPlugin implements TestTypeInterface and PluginInterface
-- File: <module_root>/lib/Drupal/sps/Plugin/Type/TestType/AbstractTestType.php
-
-## Plugin:  TestType1
-Class: Drupal\sps\Plugins\TestType\TestType1 extends AbstractTestType
-File: <module_root>/lib/Drupal/sps/Plugins/TestType/TestType1.php
-
-## Plugin:  TestType2
-Class: Drupal\sps\Plugins\TestType\TestType2 extends AbstractTestType
-File: <module_root>/lib/Drupal/sps/Plugins/TestType/TestType2.php
-
-
-
-SPS Manager
-###########
-
-Class:  SPS\Manager
-Purpose:  Control the loading and caching of objects in SPS
+hook_sps_plugin_types
+- returns an array of plugins keyed by key
+- elements
+-- class:  Class used for the plugin type
+    (Defaults to Drupal\sps\Plugin\PluginType)
+-- plugin_class:  The class that the plugin will use
+     (Defaults to Drupal\sps\Plugin\Plugin)
+-- interface:  The interface that the plugin will use.
+     Defaults to Drupal\sps\Plugin\PluginInterface
+     This is used for validation in class loading.
+-- defaults: an array of default values to use for the plugin def.
