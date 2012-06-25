@@ -1,0 +1,90 @@
+<?php
+class SPSSiteStateUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS SiteState Unit Tests',
+      'description' => 'Test the public interface to the SiteState Object',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testTest_StorageController() {
+    $control = new Drupal\sps\Test\StorageController();
+    $this->assertCheckInterface('Drupal\sps\StorageControllerInterface', $control, "Test Storage Controller should implement Drupal\sps\StorageControllerInterface");
+    $control = new Drupal\sps\Test\StorageController();
+    $table = array(
+      array(
+        'type' => 'thing',
+        'id' => 1,
+        'revision_id' => 5,
+      ),
+      array(
+        'type' => 'thing',
+        'id' => 3,
+        'revision_id' => 7,
+      ),
+    );
+    $control->save($table);
+    $this->assertEqual($control->getMap(), $table, 'StorageController:: save sould store the array to be retrieved by ::getMap', 'SPS');
+    $this->assertEqual(
+      $control->getRevisionId($table[0]['type'], $table[0]['id']), 
+      $table[0]['revision_id'], 
+      'StorageController::getRevisionID should search table that was stored by save', 'SPS');
+  }
+  public function testTestOverride() {
+    $table = array(
+      array('type' => 'thing','id' => 1,'revision_id' => 5),
+      array('type' => 'thing','id' => 3,'revision_id' => 7),
+    );
+    $override = new \Drupal\sps\Test\Override($table);
+    $this->assertEqual($override->getOverrides(), $table, 'Override should take in a table and return it for overrides', 'SPS');
+
+  }
+  public function testSiteStateConstructor() {
+    
+    $this->assertThrows(
+      function() {
+        $control = new stdClass();
+        $override = new  \Drupal\sps\Test\Override(array());
+        $site_state = new Drupal\sps\SiteState($control, $override);
+      }, 
+      'Drupal\sps\Exception\DoesNotImplementException', 
+      'Expects Drupal\sps\StorageControllerInterface for $cache_controller',
+      "SiteState should throw DoesNotImplementException if first param is not a StorageController"
+    );
+    $this->assertThrows(
+      function() {
+        $override = new stdClass();
+        $control = new Drupal\sps\Test\StorageController();
+        $site_state = new Drupal\sps\SiteState($control, $override);
+      }, 
+      'Drupal\sps\Exception\DoesNotImplementException', 
+      'Expects Drupal\sps\OverrideInterface for $override',
+      "SiteState should throw DoesNotImplementException if second param is not an Override"
+    );
+
+
+  }
+  public function testSiteState() {
+    $control = new Drupal\sps\Test\StorageController();
+    $table = array(
+      array('type' => 'thing','id' => 3,'revision_id' => 7),
+      array('type' => 'thing','id' => 2, 'revision_id' =>97),
+    );
+    $override_a = new  \Drupal\sps\Test\Override($table);
+    $site_state = new Drupal\sps\SiteState($control, $override_a);
+    $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should return table given up by controller");
+    $override_a->table[0]['id'] = 6;
+    $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should be cached so that changing the controller table should not effect output");
+  }
+
+  public function testassertThrows() {
+    /*
+    $this->assertThrows(function() {
+      throw new Drupal\sps\Exception\DoesNotImplementException("baseball");
+    ;}, 'Drupal\sps\Exception\DoesNotImplementException', NULL, "message");
+    $this->assertThrows(function() {
+    ;}, 'Drupal\sps\Exception\DoesNotImplementException', NULL, "message");
+    */
+  }
+}
