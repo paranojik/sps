@@ -33,43 +33,18 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
   }
   public function testTestOverride() {
     $table = array(
-      array('type' => 'thing','id' => 1,'revision_id' => 5),
-      array('type' => 'thing','id' => 3,'revision_id' => 7),
+      array('type' => 'thing', 'id' => 1, 'revision_id' => 5),
+      array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
     );
     $override = new \Drupal\sps\Test\Override($table);
     $this->assertEqual($override->getOverrides(), $table, 'Override should take in a table and return it for overrides', 'SPS');
 
   }
-  public function testSiteStateConstructor() {
-    
-    $this->assertThrows(
-      function() {
-        $control = new stdClass();
-        $override = new  \Drupal\sps\Test\Override(array());
-        $site_state = new Drupal\sps\SiteState($control, $override);
-      }, 
-      'Drupal\sps\Exception\DoesNotImplementException', 
-      'Expects Drupal\sps\StorageControllerInterface for $cache_controller',
-      "SiteState should throw DoesNotImplementException if first param is not a StorageController"
-    );
-    $this->assertThrows(
-      function() {
-        $override = new stdClass();
-        $control = new Drupal\sps\Test\StorageController();
-        $site_state = new Drupal\sps\SiteState($control, $override);
-      }, 
-      'Drupal\sps\Exception\DoesNotImplementException', 
-      'Expects Drupal\sps\OverrideInterface for $override',
-      "SiteState should throw DoesNotImplementException if second param is not an Override"
-    );
-
-
-  }
   public function testSiteState() {
     $control = new Drupal\sps\Test\StorageController();
     $table = array(
-      array('type' => 'thing','id' => 3,'revision_id' => 7),
-      array('type' => 'thing','id' => 2, 'revision_id' =>97),
+      array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
+      array('type' => 'thing', 'id' => 2, 'revision_id' => 97),
     );
     $override_a = new  \Drupal\sps\Test\Override($table);
     $site_state = new Drupal\sps\SiteState($control, $override_a);
@@ -77,7 +52,6 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
     $override_a->table[0]['id'] = 6;
     $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should be cached so that changing the controller table should not effect output");
   }
-
   public function testassertThrows() {
     /*
     $this->assertThrows(function() {

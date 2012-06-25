@@ -10,45 +10,34 @@ class SiteState {
    * SiteState::__construct
    *
    *
-   * PARAM cache_controller: a object that implements Drupal\sps\StorageControllerInterface
-   * PARAM override: a object that implements Drupal\sps\OverrideInterface
+   * @PARAM $cache_controller: a object that implements Drupal\sps\StorageControllerInterface
+   * @PARAM $override: a object that implements Drupal\sps\OverrideInterface
    */
-  public function __construct($cache_controller, $override) {
+  public function __construct(\Drupal\sps\StorageControllerInterface $cache_controller, \Drupal\sps\OverrideInterface $override) {
     $this->setCacheController($cache_controller);
     $this->setOverride($override);
   }
 
-  /*
+  /**
    * SiteState::setCacheController
-   * PARAM controller: an object that implements Drupal\sps\StorageControllerInterface
+   * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
    */ 
-  protected function setCacheController($controller) {
-    if($controller instanceof \Drupal\sps\StorageControllerInterface) {
-      $this->cache_controller = $controller;
-    }
-    else { 
-      throw new \Drupal\sps\Exception\DoesNotImplementException('Expects Drupal\sps\StorageControllerInterface for $cache_controller');
-    }
+  protected function setCacheController(\Drupal\sps\StorageControllerInterface $controller) {
+    $this->cache_controller = $controller;
   }
 
-  /*
+  /**
    * SiteState::setOverride
-   * PARAM override: an object that implements Drupal\sps\OverrideInterface
+   * @PARAM $override: an object that implements Drupal\sps\OverrideInterface
    */ 
-  protected function setOverride($override) {
+  protected function setOverride(\Drupal\sps\OverrideInterface $override) {
     $this->override = $override;
-    if($override instanceof \Drupal\sps\OverrideInterface) {
-      $this->override = $override;
-    }
-    else { 
-      throw new \Drupal\sps\Exception\DoesNotImplementException('Expects Drupal\sps\OverrideInterface for $override');
-    }
   }
 
-  /*
+  /**
    * SiteState:getOverrides
    *
-   * RETURN array of assoc arrays
+   * @RETURN array of assoc arrays
    */
   public function getOverride() {
     if(!$this->cache_controller->hasValidCache()) {
