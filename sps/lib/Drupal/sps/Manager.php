@@ -14,14 +14,14 @@ function test_sps_get_config() {
         'widget' => 'live_date',
         'overide' => 'view_live_date_override',
       ),
-    );
-  )
+    ),
+  );
   return $sps_config;
 }
 
 
 class Manager {
-  protected $controller_key = 'sps_site_state_key'
+  protected $controller_key = 'sps_site_state_key';
   protected $site_state_controller;
   protected $config_controller;
   protected $override_controller;
@@ -31,7 +31,7 @@ class Manager {
    * @param $cache_controller a \Drupal\sps\StorageControllerInterface object used to build site state
    * @param $cache_persistent_controller a \Drupal\sps\PersistentStorageControllerInterface used to stor and retrieve the current site state
    */
-  public function __construct(StorageControllerInterface $site_state_controller, StorageControllerInterface $override_controller, ConfigControllerInterface $config_controller) {
+  public function __construct(StorageControllerInterface $site_state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller) {
     $this->setSiteStateController($site_state_controller);
     $this->setOverrideController($override_controller);
     $this->setConfigController($config_controller);
@@ -62,7 +62,7 @@ class Manager {
    *
    * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
    */ 
-  protected function setOverridController(StorageControllerInterface $controller) {
+  protected function setOverrideController(StorageControllerInterface $controller) {
     $this->override_controller = $controller;
     return $this;
   }
@@ -90,7 +90,10 @@ class Manager {
    */
   public function setSiteState(\Drupal\sps\OverrideInterface $override) {
     $site_state = new SiteState($this->override_controller, $override);
-    $this->site_state_controller->set($this->controllerkey, $site_state);
+    $this->site_state_controller->set($this->controller_key, $site_state);
     return $this;
+  }
+  public function getControllerKey() {
+    return $this->controller_key;
   }
 }

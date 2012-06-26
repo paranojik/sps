@@ -3,8 +3,9 @@
 namespace Drupal\sps;
 
 class SiteState {
+  protected $controller_key = "sps_override_controller";
   protected $override;
-  protected $cache_controller;
+  protected $override_controller;
 
   /**
    * SiteState::__construct
@@ -12,19 +13,19 @@ class SiteState {
    * @param $cache_controller StorageControllerInterface
    * @param $override OverrideInterface
    */
-  public function __construct(StorageControllerInterface $cache_controller, OverrideInterface $override) {
-    $this->setCacheController($cache_controller);
+  public function __construct(StorageControllerInterface $controller, OverrideInterface $override) {
+    $this->setOverrideController($controller);
     $this->setOverride($override);
   }
 
   /**
-   * SiteState::setCacheController
+   * SiteState::setOverrideController
    *
    * @param $controller StorageControllerInterface
    * @return SiteState
    */
-  protected function setCacheController(StorageControllerInterface $controller) {
-    $this->cache_controller = $controller;
+  protected function setOverrideController(StorageControllerInterface $controller) {
+    $this->override_controller = $controller;
 
     return $this;
   }
@@ -48,10 +49,10 @@ class SiteState {
    *   of assoc arrays
    */
   public function getOverride() {
-    if(!$this->cache_controller->hasValidCache()) {
+    if(!$this->override_controller->is_set($this->controller_key)) {
       $this->cacheOverride();
     }
-    return $this->cache_controller->getMap();
+    return $this->override_controller->get($this->controller_key);
   }
 
   /**
@@ -60,7 +61,7 @@ class SiteState {
    * @return SiteState
    */
   protected function cacheOverride() {
-    $this->cache_controller->save($this->override->getOverrides());
+    $this->override_controller->set($this->controller_key, $this->override->getOverrides());
 
     return $this;
   }
