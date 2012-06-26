@@ -1,5 +1,6 @@
 <?php
 namespace Drupal\sps;
+
 interface StorageControllerInterface {
  /**
   * Cache away a object

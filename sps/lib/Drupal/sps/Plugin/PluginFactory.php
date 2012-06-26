@@ -32,7 +32,7 @@ class PluginFactory {
             'module' => $module,
             'name' => $plugin_type_name,
             'class' => "Drupal\\sps\\Plugin\\PluginType",
-            'plugin_class' => "Drupal\\sps\\Plugin\Plugin",
+            'plugin_class' => "Drupal\\sps\\Plugin\\Plugin",
             'interface' => "Drupal\\sps\\Plugin\\PluginInterface",
             'defaults' => array(),
           );
