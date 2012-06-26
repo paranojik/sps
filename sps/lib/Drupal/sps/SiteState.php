@@ -5,39 +5,47 @@ namespace Drupal\sps;
 class SiteState {
   protected $override;
   protected $cache_controller;
-  
+
   /**
    * SiteState::__construct
    *
-   *
-   * @PARAM $cache_controller: a object that implements Drupal\sps\StorageControllerInterface
-   * @PARAM $override: a object that implements Drupal\sps\OverrideInterface
+   * @param $cache_controller StorageControllerInterface
+   * @param $override OverrideInterface
    */
-  public function __construct(\Drupal\sps\StorageControllerInterface $cache_controller, \Drupal\sps\OverrideInterface $override) {
+  public function __construct(StorageControllerInterface $cache_controller, OverrideInterface $override) {
     $this->setCacheController($cache_controller);
     $this->setOverride($override);
   }
 
   /**
    * SiteState::setCacheController
-   * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
-   */ 
-  protected function setCacheController(\Drupal\sps\StorageControllerInterface $controller) {
+   *
+   * @param $controller StorageControllerInterface
+   * @return SiteState
+   */
+  protected function setCacheController(StorageControllerInterface $controller) {
     $this->cache_controller = $controller;
+
+    return $this;
   }
 
   /**
    * SiteState::setOverride
-   * @PARAM $override: an object that implements Drupal\sps\OverrideInterface
-   */ 
-  protected function setOverride(\Drupal\sps\OverrideInterface $override) {
+   *
+   * @param $override OverrideInterface
+   * @return SiteState
+   */
+  protected function setOverride(OverrideInterface $override) {
     $this->override = $override;
+
+    return $this;
   }
 
   /**
    * SiteState:getOverrides
    *
-   * @RETURN array of assoc arrays
+   * @param array
+   *   of assoc arrays
    */
   public function getOverride() {
     if(!$this->cache_controller->hasValidCache()) {
@@ -48,12 +56,14 @@ class SiteState {
 
   /**
    * SiteState::cacheOverrides
+   *
+   * @return SiteState
    */
   protected function cacheOverride() {
     $this->cache_controller->save($this->override->getOverrides());
+
+    return $this;
   }
-
-
 }
 
 
