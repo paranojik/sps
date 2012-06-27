@@ -12,7 +12,7 @@ class PluginFactory {
   protected $plugins = array();
   // The info array for the plugin type definitions
   protected $plugin_type_info = array();
-  // Array of the Plugin Type Objectgs
+  // Array of the Plugin Type Objects
   protected $plugin_types = array();
 
   /**
@@ -33,9 +33,14 @@ class PluginFactory {
             'interface' => "Drupal\\sps\\Plugin\\PluginInterface",
             'defaults' => array(),
           );
+
           $this->plugin_type_info[$plugin_type_name] = $plugin_type_info;
         }
       }
+    }
+
+    if (empty($this->plugin_type_info[$type])) {
+      throw new InvalidPluginException("Plugin Type $type Does not exist");
     }
 
     return $this->plugin_type_info[$type];
@@ -43,6 +48,9 @@ class PluginFactory {
 
   /**
    * Load the Plugin Type
+   *
+   * @param $type string
+   *  The name of the plugin type
    *
    * @return PluginType
    */
@@ -71,11 +79,11 @@ class PluginFactory {
    * @param $type
    * @param $plugin_name
    *
-   * @return PluginTypeInterface
+   * @return mixed
+   *  The class returned will depend on the plugin type
    */
   public function getPlugin($type, $plugin_name) {
-    $this->checkPluginType($type);
-    return $this->plugins[$type][$plugin_name];
+    return $this->checkPluginType($type)->plugins[$type][$plugin_name];
   }
 
   /**
@@ -83,8 +91,7 @@ class PluginFactory {
    * @return PluginCollection
    */
   public function getPlugins($type) {
-    $this->checkPluginType($type);
-    return $this->plugins[$type];
+    return $this->checkPluginType($type)->plugins[$type];
   }
 
   /**
@@ -94,6 +101,8 @@ class PluginFactory {
     if (empty($this->plugins[$type])) {
       $this->plugins[$type] = $this->loadPluginType($type)->getCollection();
     }
+
+    return $this;
   }
 
   /**
@@ -105,7 +114,7 @@ class PluginFactory {
    * @return bool
    */
   public static function checkInterface($object, $interface) {
-    $ref_class = new ReflectionClass($object);
+    $ref_class = new \ReflectionClass($object);
     if (in_array($interface, $ref_class->getInterfaceNames())) {
       return TRUE;
     }

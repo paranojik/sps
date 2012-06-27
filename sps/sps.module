@@ -1,5 +1,7 @@
 <?php
 
+use Drupal\sps;
+use Drupal\sps\Exception;
 
 /**
  * Get the Site Manager
@@ -10,7 +12,7 @@ function sps_get_manager() {
   static $manager;
 
   if (!isset($manager)) {
-    $manager = new Drupal\sps\Manager();
+    $manager = new Manager();
   }
 
   return $manager;
@@ -23,9 +25,18 @@ function sps_get_manager() {
  *  The name of the plugin type
  * @param $plugin_name
  *  The name of the plugin to get.  This is optional.  If omitted then the plugin type object is returned.
+ *
+ * @return mixed|\Drupal\sps\Plugin\PluginCollection
+ *  If no plugin name is passed then PluginCollection is returned.
+ *  If a plugin is asked for then the plugin object will be returned.
+ *
  */
 function sps_get_plugin($plugin_type, $plugin_name = NULL) {
-  //return sps_get_plugin_factory()->getPlugins()
+  if (isset($plugin_name)) {
+    return sps_plugin_factory()->getPlugin($plugin_type, $plugin_name);
+  }
+
+  return sps_plugin_factory()->getPlugins($plugin_type);
 
 }
 
@@ -37,7 +48,7 @@ function sps_get_plugin($plugin_type, $plugin_name = NULL) {
  * @return Drupal\sps\Plugin\PluginTypeInterface
  */
 function sps_get_plugin_type($plugin_type_name) {
-  return sps_get_plugin_factory()->loadPluginType($plugin_type_name);
+  return sps_plugin_factory()->loadPluginType($plugin_type_name);
 }
 
 /**
@@ -45,18 +56,18 @@ function sps_get_plugin_type($plugin_type_name) {
  *
  * @return \Drupal\sps\Plugin\PluginFactory
  */
-function sps_get_plugin_factory() {
+function sps_plugin_factory() {
   static $factory;
 
   if (!isset($factory)) {
     try {
       $factory = new \Drupal\sps\Plugin\PluginFactory();
-    } catch (Exception $e) {
-      throw new \Drupal\sps\Exception\ClassLoadException("Factory was not loaded");
+    } catch (\Exception $e) {
+      throw new Exception\ClassLoadException("Factory was not loaded");
     }
 
     if (!isset($factory)) {
-      throw new \Drupal\sps\Exception\ClassLoadException("Factory was not loaded");
+      throw new Exception\ClassLoadException("Factory was not loaded");
     }
 
   }

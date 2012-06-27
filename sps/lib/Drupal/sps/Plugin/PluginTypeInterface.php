@@ -7,7 +7,7 @@ interface PluginTypeInterface {
    * Constrcutor
    *
    * @param $definition
-   *  The plugin definition
+   *  The plugin Type definition
    */
   public function __construct($definition);
 
@@ -25,6 +25,8 @@ interface PluginTypeInterface {
 
   /**
    * Get the info for all of plugins
+   *
+   * @return array
    */
   public function getPluginInfo($plugin_name = NULL);
 

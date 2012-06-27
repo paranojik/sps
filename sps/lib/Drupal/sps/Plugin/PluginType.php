@@ -57,6 +57,7 @@ class PluginType implements PluginTypeInterface {
             'class' => $this->getDefinition('plugin_class'),
             'defaults' => array(),
           );
+
           $this->plugin_definitions[$plugin_name] = $plugin_name_info;
         }
       }

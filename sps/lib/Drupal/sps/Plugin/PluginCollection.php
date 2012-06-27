@@ -4,14 +4,13 @@ namespace Drupal\sps\Plugin;
 
 class PluginCollection implements \Iterator, \Countable, \ArrayAccess {
   protected $plugins;
-  protected $type;
+  protected $type = array();
 
   /**
    * @param $type PluginTypeInterface
    */
   public function __construct(PluginTypeInterface $type) {
     $this->type = $type;
-    $this->plugins = array();
 
     foreach ($this->type->getPluginInfo() as $plugin) {
       $this->plugins[$plugin['name']] = $plugin['class'];
@@ -20,16 +19,29 @@ class PluginCollection implements \Iterator, \Countable, \ArrayAccess {
 
   protected function checkCurrentPluginClass() {
     if (is_string(current($this->plugins))) {
-      $class_name = current($this->plugins);
-      $this->plugins[key($this->plugins)] = new $class_name($this->type->getPluginInfo(key($this->plugins)));
+      try {
+        $class_name = current($this->plugins);
+        $this->plugins[key($this->plugins)] = new $class_name($this->type->getPluginInfo(key($this->plugins)));
+      }
+      catch(\Exception $e) {
+        throw new \Drupal\sps\Exception\ClassLoadException("Plugin Class was not loaded");
+      }
     }
+
+    return $this;
   }
 
   protected function checkPluginClass($plugin_name) {
+    if (!isset($this->plugins[$plugin_name])) {
+      throw new \Drupal\sps\Exception\InvalidPluginException("Plugin $plugin_name Does not Exist");
+    }
+
     if (is_string($this->plugins[$plugin_name])) {
       $class_name = $this->plugins[$plugin_name];
       $this->plugins[$plugin_name] = new $class_name($this->type->getPluginInfo($plugin_name));
     }
+
+    return $this;
   }
 
   /**
