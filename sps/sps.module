@@ -31,7 +31,7 @@ function sps_get_manager() {
  *  If a plugin is asked for then the plugin object will be returned.
  *
  */
-function sps_get_plugin($plugin_type, $plugin_name = NULL) {
+function sps_plugin($plugin_type, $plugin_name = NULL) {
   if (isset($plugin_name)) {
     return sps_plugin_factory()->getPlugin($plugin_type, $plugin_name);
   }
@@ -47,7 +47,7 @@ function sps_get_plugin($plugin_type, $plugin_name = NULL) {
  *  The name of the plugin type
  * @return Drupal\sps\Plugin\PluginTypeInterface
  */
-function sps_get_plugin_type($plugin_type_name) {
+function sps_plugin_type($plugin_type_name) {
   return sps_plugin_factory()->loadPluginType($plugin_type_name);
 }
 

@@ -40,7 +40,7 @@ class PluginFactory {
     }
 
     if (empty($this->plugin_type_info[$type])) {
-      throw new InvalidPluginException("Plugin Type $type Does not exist");
+      throw new \Drupal\sps\Exception\InvalidPluginException("Plugin Type $type Does not exist");
     }
 
     return $this->plugin_type_info[$type];
@@ -66,8 +66,14 @@ class PluginFactory {
       else {
         $plugin_type_class_name = "Drupal\\sps\\Plugin\\PluginType";
       }
+      try {
+        $this->plugin_types[$type] = new $plugin_type_class_name($plugin_info);
+      }
+      catch (\Exception $e) {
+        throw new \Drupal\sps\Exception\ClassLoadException("Plugin Type Class $plugin_type_class_name was not loaded");
+      }
 
-      $this->plugin_types[$type] = new $plugin_type_class_name($plugin_info);
+
     }
 
     return $this->plugin_types[$type];
