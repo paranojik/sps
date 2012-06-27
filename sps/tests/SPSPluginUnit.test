@@ -28,25 +28,6 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
     }
   }
 
-  public function testPluginTypes() {
-    try {
-      $plugin_type = sps_get_plugin_type("fake_plugin");
-    } catch (\SPSException\ClassLoadException $e) {
-      $this->pass("Fake Plugin Type not Loaded", "SPS");
-    }
-
-    try {
-      $plugin_type = sps_get_plugin_type("test_type");
-    } catch (\SPSException\ClassLoadException $e) {
-      $this->fail("Load Plugin Type", "SPS");
-    }
-
-    $this->assertCheckInterface("Drupal\\sps\\Plugin\\PluginTypeInterface",
-      $plugin_type, "Plugin Type is using the correct interface");
-
-  }
-
-
   public function testPluginLoading() {
     try {
       $plugin = sps_get_plugin('not_valid_type', 'not_valid_key');
@@ -83,7 +64,39 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
     else {
       $this->fail("Plugin Collection Class loaded via function", "SPS");
     }
+  }
 
+  public function testPluginType() {
+    try {
+      $plugin_type = sps_get_plugin_type("fake_plugin");
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->pass("Fake Plugin Type not Loaded", "SPS");
+    }
+
+    try {
+      $plugin_type = sps_get_plugin_type("test_type");
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->fail("Load Plugin Type", "SPS");
+    }
+
+    $this->assertCheckInterface("Drupal\\sps\\Plugin\\PluginTypeInterface",
+      $plugin_type, "Plugin Type is using the correct interface");
+
+    $custom_plugin_type = sps_get_plugin_type('custom_type');
+
+    if ($custom_plugin_type instanceof Drupal\sps_test\SPS\Plugin\PluginType) {
+      $this->pass('Custom Plugin Type Class Loaded');
+    }
+    else {
+      $this->fail('Custom Plugin Type Loaded');
+    }
+
+    if ($plugin_type instanceof Drupal\sps\Plugin\PluginType) {
+      $this->pass('Default Plugin Type Class Loaded');
+    }
+    else {
+      $this->fail('Default Plugin Type Class Loaded');
+    }
 
     $plugins = $plugin_type->getPlugins();
     if ($plugins instanceof Drupal\sps\Plugin\PluginCollection) {
@@ -93,6 +106,28 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
       $this->fail("Plugin Collection Class loaded via function", "SPS");
     }
 
+    $this->_pluginTypeDefinitions($plugin_type, 'test_type');
+    $this->_pluginTypeDefinitions($custom_plugin_type, 'custom_type');
+  }
+
+  protected function _pluginTypeDefinitions($plugin_type, $type_name) {
+    $plugin_types_info = sps_sps_plugin_types();
+
+    $info_keys = array(
+      'module',
+      'name',
+      'class',
+      'plugin_class',
+      'interface',
+      'defaults',
+    );
+
+    $plugin_info = array();
+    foreach($info_keys as $key) {
+      $plugin_info[$key] = $plugin_type->getDefinition($key);
+    }
+
+    $this->assertEqual($plugin_info, $plugin_types_info[$type_name], "Plugin Type Definition Loaded", "SPS");
   }
 
   /**

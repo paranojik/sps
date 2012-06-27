@@ -1,0 +1,18 @@
+<?php
+
+/**
+ * Implements hook_sps_plugin_types().
+ */
+function sps_sps_plugin_types() {
+  return array(
+    'test_type' => array(
+      'class' => "Drupal\\sps_test\\SPS\\Plugin\\PluginType",
+      'plugin_class' => "Drupal\\sps_test\\SPS\\Plugin\\Plugin",
+      'interface' => "Drupal\\sps_test\\SPS\\Plugin\\PluginInterface",
+      'defaults' => array(
+        'test_1' => 'a',
+        'test_2' => 'b',
+      ),
+    )
+  );
+}

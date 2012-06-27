@@ -8,15 +8,12 @@ use Drupal\sps\Exception\InvalidPluginException;
 use Drupal\sps\Plugin\PluginType;
 
 class PluginFactory {
-  protected $plugins;
-  protected $plugin_type_info;
-  protected $plugin_types;
-
-  public function __construct() {
-    $this->plugin_types = array();
-    $this->plugin_type_info = array();
-    $this->plugins = array();
-  }
+  // Array of Collection of plugins
+  protected $plugins = array();
+  // The info array for the plugin type definitions
+  protected $plugin_type_info = array();
+  // Array of the Plugin Type Objectgs
+  protected $plugin_types = array();
 
   /**
    * Load the Plugin Type Info
