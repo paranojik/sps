@@ -1,13 +1,16 @@
 <?php
-namespace Drupal\sps;
-interface OverrideInterface {
-  /**
+namespace Drupal\sps\Override;
+
+use Drupal\sps\OverrideInterface;
+
+abstract class Override implements OverrideInterface{
+	/**
    * Construct an array of override arrays.
    *
    * @return
    *    An array of override arrays
    */
-  public function getOverrides();
+  abstract public function getOverrides();
 
   /**
    * Set the data for this override.
@@ -19,7 +22,7 @@ interface OverrideInterface {
    *    The data in the format specified by this overrides implementation
    *    of getDataConsumerApi().
    */
-  public function setData($variables);
+  abstract public function setData($variables);
 
   /**
    * Report which data api this Override can consume.
@@ -30,5 +33,5 @@ interface OverrideInterface {
    * @return
    *    A string designating the data api this override accepts
    */
-  public function getDataConsumerApi();
+  abstract public function getDataConsumerApi();
 }
