@@ -9,7 +9,7 @@ interface PluginControllerInterface {
    * @param $name the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @return an array of meta data for the plugin
    */
-  public function getPlugin($type, $name);
+  public function getPlugin($type, $name, $manager);
 
   /**
    * get meta info on a plugin
