@@ -20,7 +20,7 @@ function test_sps_get_config() {
 
 
 class Manager {
-  protected $controller_key = 'sps_site_state_key';
+  protected $state_controller_site_state_key = 'sps_site_state_key';
   protected $state_controler;
   protected $config_controller;
   protected $override_controller;
@@ -30,7 +30,7 @@ class Manager {
    * @param $cache_controller a \Drupal\sps\StorageControllerInterface object used to build site state
    * @param $cache_persistent_controller a \Drupal\sps\PersistentStorageControllerInterface used to stor and retrieve the current site state
    */
-  public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, $plugin_controller) {
+  public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginController $plugin_controller) {
     $this->setStateController($state_controler);
     $this->setOverrideController($override_controller);
     $this->setConfigController($config_controller);
@@ -72,7 +72,7 @@ class Manager {
    *
    * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
    */ 
-  protected function setPluginController(StorageControllerInterface $controller) {
+  protected function setPluginController(PluginControllerInterface $controller) {
     $this->plugin_controller = $controller;
     return $this;
   }
@@ -93,8 +93,8 @@ class Manager {
    * @return SiteState | NULL
    */
   public function getSiteState() {
-    if($this->state_controller->is_set($this->controller_key)) {
-      return $this->state_controller->get($this->controller_key);
+    if($this->state_controller->is_set($this->state_controller_site_state_key)) {
+      return $this->state_controller->get($this->state_controller_site_state_key);
     }
   }
 
@@ -122,7 +122,7 @@ class Manager {
    */
   public function setSiteState(\Drupal\sps\OverrideInterface $override) {
     $site_state = new SiteState($this->override_controller, $override);
-    $this->state_controler->set($this->controller_key, $site_state);
+    $this->state_controler->set($this->state_controller_site_state_key, $site_state);
     return $this;
   }
 
@@ -133,8 +133,8 @@ class Manager {
    *
    * @return the controller key, a string
    */
-  public function getControllerKey() {
-    return $this->controller_key;
+  public function getStateControllerSiteStateKey() {
+    return $this->state_controller_site_state_key;
   }
 
   /**
