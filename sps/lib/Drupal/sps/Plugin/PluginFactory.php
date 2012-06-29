@@ -7,7 +7,7 @@ use Drupal\sps\Plugin\PluginTypeInterface;
 use Drupal\sps\Exception\InvalidPluginException;
 use Drupal\sps\Plugin\PluginType;
 
-class PluginFactory {
+class PluginFactory implements  \Drupal\sps\PluginControllerInterface {
   // Array of Collection of plugins
   protected $plugins = array();
   // The info array for the plugin type definitions
@@ -52,7 +52,8 @@ class PluginFactory {
    * @param $type string
    *  The name of the plugin type
    *
-   * @return PluginType
+   * @throws \Drupal\sps\Exception\ClassLoadException
+   * @return \Drupal\sps\Plugin\PluginType
    */
   public function loadPluginType($type) {
     if (empty($this->plugin_types[$type])) {
@@ -126,4 +127,18 @@ class PluginFactory {
     }
     return FALSE;
   }
-}
+
+  /**
+   * get meta info on a plugin
+   *
+   * @param $type
+   *  the type of plugin as defined in hook_sps_plugin_types_info
+   * @param $name
+   *  the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
+   *
+   * @return array
+   *  an array of meta data for the plugin or an array of plugin arrays
+   */
+  public function getPluginInfo($type, $name = NULL) {
+    // TODO: Implement getPluginInfo() method.
+  }}

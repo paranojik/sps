@@ -13,7 +13,7 @@ class SiteState {
    * @param $cache_controller StorageControllerInterface
    * @param $override OverrideInterface
    */
-  public function __construct(StorageControllerInterface $controller, OverrideInterface $override) {
+  public function __construct(StorageControllerInterface $controller, Plugins\OverrideInterface $override) {
     $this->setOverrideController($controller);
     $this->setOverride($override);
   }
@@ -36,7 +36,7 @@ class SiteState {
    * @param $override OverrideInterface
    * @return SiteState
    */
-  protected function setOverride(OverrideInterface $override) {
+  protected function setOverride(Plugins\OverrideInterface $override) {
     $this->override = $override;
 
     return $this;

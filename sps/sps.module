@@ -1,5 +1,8 @@
 <?php
 
+define('SPS_CONFIG_PREVIEW_FORM_PLUGIN_KEY', "sps_config_preview_form_plugin_key");
+define('SPS_CONFIG_PREVIEW_FORM_SETTINGS', "sps_config_preview_form_settings");
+
 use Drupal\sps;
 use Drupal\sps\Exception;
 
@@ -38,17 +41,6 @@ function sps_plugin($plugin_type, $plugin_name = NULL) {
 
   return sps_plugin_factory()->getPlugins($plugin_type);
 
-}
-
-/**
- * Load the Plugin Type
- *
- * @param $plugin_type_name
- *  The name of the plugin type
- * @return Drupal\sps\Plugin\PluginTypeInterface
- */
-function sps_plugin_type($plugin_type_name) {
-  return sps_plugin_factory()->loadPluginType($plugin_type_name);
 }
 
 /**
