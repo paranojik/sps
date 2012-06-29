@@ -1,5 +1,10 @@
 <?php
 namespace Drupal\sps;
 interface OverrideInterface {
- public function getOverrides();
+  /**
+   * construct an array of override arrays
+   *
+   * @return an array of override arrays
+   */
+  public function getOverrides();
 }
