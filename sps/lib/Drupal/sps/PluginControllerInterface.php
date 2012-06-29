@@ -25,6 +25,7 @@ interface PluginControllerInterface {
    *   an array of meta data for the plugin or an array of plugin arrays
    */
   public function getPluginInfo($type, $name=NULL);
+
  /**
    * get meta info on a plugin
    *

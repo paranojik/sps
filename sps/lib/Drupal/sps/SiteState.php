@@ -8,22 +8,27 @@ class SiteState {
   protected $override_controller;
 
   /**
-   * SiteState::__construct
-   *
-   * @param $cache_controller StorageControllerInterface
-   * @param $override OverrideInterface
-   */
+  * Constructor for SiteState
+  *
+  * @param $controller
+  *   The StorageController to use for storing overrides
+  * @param $override
+  *   The Override to use to generate overrides
+  */
   public function __construct(StorageControllerInterface $controller, Plugins\OverrideInterface $override) {
     $this->setOverrideController($controller);
     $this->setOverride($override);
   }
 
   /**
-   * SiteState::setOverrideController
-   *
-   * @param $controller StorageControllerInterface
-   * @return SiteState
-   */
+  * Set the Controller for storing overrrides
+  *
+  * @param $controller
+  *   The StorageController to use for storing Overrides
+  *
+  * @return 
+  *   Self
+  */
   protected function setOverrideController(StorageControllerInterface $controller) {
     $this->override_controller = $controller;
 
@@ -31,10 +36,12 @@ class SiteState {
   }
 
   /**
-   * SiteState::setOverride
+   * Store the Override to use for generating overrides
    *
-   * @param $override OverrideInterface
-   * @return SiteState
+   * @param $override 
+   *   The Override to use to generate overrides
+   * @return 
+   *   Self
    */
   protected function setOverride(Plugins\OverrideInterface $override) {
     $this->override = $override;
@@ -43,11 +50,11 @@ class SiteState {
   }
 
   /**
-   * SiteState:getOverrides
-   *
-   * @param array
-   *   of assoc arrays
-   */
+  * Retrive Stored Overrides
+  *
+  * @return 
+  *   Array of overrides
+  */
   public function getOverride() {
     if(!$this->override_controller->is_set($this->controller_key)) {
       $this->cacheOverride();
@@ -56,9 +63,10 @@ class SiteState {
   }
 
   /**
-   * SiteState::cacheOverrides
+   * Generate overrides from the stored Override and save it to the Override Controller
    *
-   * @return SiteState
+   * @return
+   *   Self
    */
   protected function cacheOverride() {
     $this->override_controller->set($this->controller_key, $this->override->getOverrides());
