@@ -179,9 +179,4 @@ class Manager {
     $plugins = $this->getPluginInfo($type);
     return array_filter(function($plugin) use($property, $value) { return (isset($plugin[$property]) && ($plugin[$property] == $value));}, $plugins);
   }
-
 }
-/*
-    $info = $this->getPluginInfo($type, $name);
-    return new {$info['class']}($info['instance_settings'], $this);
- */
