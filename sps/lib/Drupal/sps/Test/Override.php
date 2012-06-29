@@ -1,6 +1,6 @@
 <?php
 namespace Drupal\sps\Test;
-class Override extends \Drupal\sps\Override\Override {
+class Override extends \Drupal\sps\Plugins\Override\Override {
   public $table = array();
 
   public function getOverrides() {

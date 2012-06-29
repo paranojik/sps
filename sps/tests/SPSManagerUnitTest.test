@@ -18,37 +18,40 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $this->assertEqual($control->get("test"), $obj, "Test StorageController's set and get should set and retrieve the same obj.", "SPS");
   }
   public function testManager_getNullSiteState() {
-    $site_state_controller = new Drupal\sps\Test\StorageController();
+    $state_controller = new Drupal\sps\Test\StorageController();
     $override_controller = new Drupal\sps\Test\StorageController();
     $config_controller = new Drupal\sps\Test\StorageController();
-    $manager = new Drupal\sps\Manager($site_state_controller, $override_controller, $config_controller);
+    $plugin_controller = new Drupal\sps\Test\PluginController();
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
     $this->assertNull($manager->getSiteState(), "Manager::getSiteState should return null if there is no state", "SPS");
   }
   public function testManager_getPersistentSiteState() {
-    $site_state_controller = new Drupal\sps\Test\StorageController();
+    $state_controller = new Drupal\sps\Test\StorageController();
     $override_controller = new Drupal\sps\Test\StorageController();
     $config_controller = new Drupal\sps\Test\StorageController();
-    $manager = new Drupal\sps\Manager($site_state_controller, $override_controller, $config_controller);
+    $plugin_controller = new Drupal\sps\Test\PluginController();
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
     $override = new Drupal\sps\Test\Override($table);
     $site_state = new Drupal\sps\SiteState($override_controller, $override);
 
-    $site_state_controller->set($manager->getControllerKey(), $site_state);
+    $state_controller->set($manager->getStateControllerSiteStateKey(), $site_state);
     $this->assertEqual($manager->getSiteState(), $site_state, "Manager::getSiteState returns a site_state storred in the persistent data", "SPS");
   }
   public function testManager_setSiteState() {
-    $site_state_controller = new Drupal\sps\Test\StorageController();
+    $state_controller = new Drupal\sps\Test\StorageController();
     $override_controller = new Drupal\sps\Test\StorageController();
     $config_controller = new Drupal\sps\Test\StorageController();
-    $manager = new Drupal\sps\Manager($site_state_controller, $override_controller, $config_controller);
+    $plugin_controller = new Drupal\sps\Test\PluginController();
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
     $override = new Drupal\sps\Test\Override($table);
     $manager->setSiteState($override);
 
     $site_state = new Drupal\sps\SiteState($override_controller, $override);
-    $this->assertEqual($site_state_controller->get($manager->getControllerKey()), $site_state, "Manager::setSiteState construct the site_state and put it in site_state_controller", "SPS");
+    $this->assertEqual($state_controller->get($manager->getStateControllerSiteStateKey()), $site_state, "Manager::setSiteState construct the site_state and put it in site_state_controller", "SPS");
 
   }
 }

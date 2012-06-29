@@ -30,7 +30,7 @@ class Manager {
    * @param $cache_controller a \Drupal\sps\StorageControllerInterface object used to build site state
    * @param $cache_persistent_controller a \Drupal\sps\PersistentStorageControllerInterface used to stor and retrieve the current site state
    */
-  public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginController $plugin_controller) {
+  public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
     $this->setStateController($state_controler);
     $this->setOverrideController($override_controller);
     $this->setConfigController($config_controller);
@@ -43,7 +43,7 @@ class Manager {
    * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
    */ 
   protected function setStateController(StorageControllerInterface $controller) {
-    $this->state_controler = $controller;
+    $this->state_controller = $controller;
     return $this;
   }
 
@@ -120,9 +120,9 @@ class Manager {
    * This might get made private
    * @PARAM $override : a \Drupal\sps\OverrideInterface object
    */
-  public function setSiteState(\Drupal\sps\OverrideInterface $override) {
+  public function setSiteState(\Drupal\sps\Plugins\OverrideInterface $override) {
     $site_state = new SiteState($this->override_controller, $override);
-    $this->state_controler->set($this->state_controller_site_state_key, $site_state);
+    $this->state_controller->set($this->state_controller_site_state_key, $site_state);
     return $this;
   }
 
@@ -176,7 +176,7 @@ class Manager {
    */
   public function getPluginByMeta($type, $property, $value) {
     $plugins = $this->getPluginInfo($type);
-    return array_filter(function($plugin) use($property, $value) { return (isset($plugin[$property]) && ($plugin[$property] == $value);}, $plugins);
+    return array_filter(function($plugin) use($property, $value) { return (isset($plugin[$property]) && ($plugin[$property] == $value));}, $plugins);
   }
 
 }
