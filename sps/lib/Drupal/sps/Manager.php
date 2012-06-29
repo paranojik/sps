@@ -27,8 +27,10 @@ class Manager {
   /**
    * Manger::__construct
    *
-   * @param $cache_controller a \Drupal\sps\StorageControllerInterface object used to build site state
-   * @param $cache_persistent_controller a \Drupal\sps\PersistentStorageControllerInterface used to stor and retrieve the current site state
+   * @param $cache_controller 
+   *   a \Drupal\sps\StorageControllerInterface object used to build site state
+   * @param $cache_persistent_controller 
+   *   a \Drupal\sps\PersistentStorageControllerInterface used to stor and retrieve the current site state
    */
   public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
     $this->setStateController($state_controler);
@@ -40,7 +42,8 @@ class Manager {
   /**
    * store the state controller
    *
-   * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
+   * @param $controller 
+   *   an object that implements Drupal\sps\StorageControllerInterface
    */ 
   protected function setStateController(StorageControllerInterface $controller) {
     $this->state_controller = $controller;
@@ -50,7 +53,8 @@ class Manager {
   /**
    * store the config controller
    *
-   * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
+   * @param $controller 
+   *   an object that implements Drupal\sps\StorageControllerInterface
    */ 
   protected function setConfigController(StorageControllerInterface $controller) {
     $this->config_controller = $controller;
@@ -60,7 +64,8 @@ class Manager {
   /**
    * store the override controller
    *
-   * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
+   * @param $controller 
+   *   an object that implements Drupal\sps\StorageControllerInterface
    */ 
   protected function setOverrideController(StorageControllerInterface $controller) {
     $this->override_controller = $controller;
@@ -70,7 +75,8 @@ class Manager {
   /**
    * store the override controller
    *
-   * @PARAM $controller: an object that implements Drupal\sps\StorageControllerInterface
+   * @param $controller  
+   *   an object that implements Drupal\sps\StorageControllerInterface
    */ 
   protected function setPluginController(PluginControllerInterface $controller) {
     $this->plugin_controller = $controller;
@@ -78,19 +84,11 @@ class Manager {
   }
 
   /**
-   * Manager::getSiteState
-   *
    * Pull the site state from site state controller
    * Note the state controller is resposible for resonable caching of the site state
    *
-   * @return SiteState | NULL
-  /**
-   * Manager::getSiteState
-   *
-   * Pull the site state from site state controller
-   * Note the state controller is resposible for resonable caching of the site state
-   *
-   * @return SiteState | NULL
+   * @return 
+   *   SiteState | NULL
    */
   public function getSiteState() {
     if($this->state_controller->is_set($this->state_controller_site_state_key)) {
@@ -102,7 +100,8 @@ class Manager {
    * Get which 
    * Note the state controller is resposible for resonable caching of the site state
    *
-   * @return SiteState | NULL
+   * @return 
+   *   SiteState | NULL
    */
   public function getPreviewForm() {
     $preview_form_plugin = $this->config_controller->get(SPS_CONFIG_PREVIEW_FORM_PLUGIN_KEY);
@@ -111,14 +110,15 @@ class Manager {
     $preview_form->setConfig($this->config($preview_form_settings));
   }
 
-
   /**
    * Manager::setSiteState
    *
    * Create A SiteState from an override, and store it.
    *
    * This might get made private
-   * @PARAM $override : a \Drupal\sps\OverrideInterface object
+   *
+   * @PARAM $override 
+   *   a \Drupal\sps\OverrideInterface object
    */
   public function setSiteState(\Drupal\sps\Plugins\OverrideInterface $override) {
     $site_state = new SiteState($this->override_controller, $override);
@@ -131,7 +131,8 @@ class Manager {
    *
    * This is mostly used for tests
    *
-   * @return the controller key, a string
+   * @return 
+   *   the controller key, a string
    */
   public function getStateControllerSiteStateKey() {
     return $this->state_controller_site_state_key;
@@ -140,9 +141,12 @@ class Manager {
   /**
    * call a reaction rect method
    *
-   * @param $reaction the name of a reaction plugin;
-   * @param $data Vary, data to be passed to the react method
-   * @return Vary 
+   * @param $reaction 
+   *   the name of a reaction plugin;
+   * @param $data 
+   *   Vary, data to be passed to the react method
+   * @return 
+   *   Vary 
    */
   public function react($reaction, $data) {
     return $this->getPlugin("reaction", $reaction)->react($data);
@@ -151,31 +155,43 @@ class Manager {
   /**
    * factory for building a plugin object
    *
-   * @param $type the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $name the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
-   * @return an array of meta data for the plugin
+   * @param $type 
+   *   the type of plugin as defined in hook_sps_plugin_types_info
+   * @param $name 
+   *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
+   * @return 
+   *   an array of meta data for the plugin
    */
   public function getPlugin($type, $name) {
-    return $this->plugin_controller->getPlugin($type, $name);
+    return $this->plugin_controller->getPlugin($type, $name, $this);
   }
+
   /**
    * get meta info on a plugin
-   * @param $type the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $name the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
-   * @return an array of meta data for the plugin
+   * @param $type 
+   *   the type of plugin as defined in hook_sps_plugin_types_info
+   * @param $name 
+   *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
+   * @return 
+   *   an array of meta data for the plugin
    */
   public function getPluginInfo($type, $name=NULL) {
     return $this->plugin_controller->getPluginInfo($type, $name);
   }
+
   /**
    * get meta info on a plugin
-   * @param $type the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $property the meta property to compare to the value
-   * @param $value the value to compare to the meta property
-   * @return an array of meta data for the plugins
+   *
+   * @param $type 
+   *   the type of plugin as defined in hook_sps_plugin_types_info
+   * @param $property 
+   *   the meta property to compare to the value
+   * @param $value 
+   *   the value to compare to the meta property
+   * @return 
+   *   an array of meta data for the plugins
    */
   public function getPluginByMeta($type, $property, $value) {
-    $plugins = $this->getPluginInfo($type);
-    return array_filter(function($plugin) use($property, $value) { return (isset($plugin[$property]) && ($plugin[$property] == $value));}, $plugins);
+    return $this->plugin_controller->getPluginInfoByMeta($type);
   }
 }
