@@ -4,9 +4,10 @@ namespace Drupal\sps\Plugins;
 
 interface PluginInterface {
   /**
-   * the construct that is expect by the plugin system
-   * @Param $setting
-   * @param $manager Drupal\sps\Manager
+   * The construct that is expect by the plugin system
+   *
+   * @param $settings array
+   * @param $manager \Drupal\sps\Manager
    */
   public function __construct($settings, \Drupal\sps\Manager $manager);
 }

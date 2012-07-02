@@ -4,6 +4,7 @@ namespace Drupal\sps;
 
 use Drupal\sps\Exception\InvalidPluginException;
 use Drupal\sps\Exception\ClassLoadException;
+use Drupal\sps\Exception\DoesNotImplementException;
 
 /**
  * The plugin factory will load the plugins objects and info
@@ -63,6 +64,7 @@ class PluginFactory implements PluginControllerInterface {
    *
    * @throws \Drupal\sps\Exception\InvalidPluginException
    * @throws \Drupal\sps\Exception\ClassLoadException
+   * @throws \Drupal\sps\Exception\DoesNotImplementException
    */
   public function getPlugin($type, $name, Manager $manager) {
     $plugin_type_info = $this->getPluginInfo($type);
@@ -77,14 +79,18 @@ class PluginFactory implements PluginControllerInterface {
       throw new ClassLoadException("Plugin $name was not loaded");
     }
 
-    if (!self::checkInterface($plugin_obj, $plugin_type_info['interface'])) {
-      throw new InvalidPluginException("Plugin $name was not using the correct interface");
+    if (!(self::checkInterface($plugin_obj, $plugin_type_info['interface'])
+      && self::checkInterface($plugin_obj, "Drupal\\sps\\Plugins\\PluginInterface"))) {
+
+      throw new DoesNotImplementException("Plugin $name was not using the correct interface");
     }
 
     return $plugin_obj;
   }
 
   /**
+   * Load the Plugin info into the objects cache
+   *
    * @param $plugin_type
    *
    * @return PluginFactory
@@ -250,10 +256,45 @@ class PluginFactory implements PluginControllerInterface {
    * @param $value
    *   the value to compare to the meta property
    *
-   * @return
+   * @return array
    *   an array of meta data for the plugins
    */
   public function getPluginByMeta($type, $property, $value) {
-    // TODO: Implement getPluginByMeta() method.
+    $this->loadPluginInfo($type);
+
+    $plugin_matches = array();
+    foreach ($this->plugin_info as $plugin => $info) {
+      if ($this->checkPluginMeta($info, $property, $value)) {
+        $plugin_matches[$plugin] = $info;
+      }
+    }
+
+    return $plugin_matches;
+  }
+
+  /**
+   * Recursive function to search the meta data
+   *
+   * @param $plugin_info
+   * @param $property
+   * @param $value
+   *
+   * @return bool
+   */
+  protected function checkPluginMeta($plugin_info, $property, $value) {
+    foreach ($plugin_info as $plugin_info_key => $plugin_info_value) {
+      if (is_array($plugin_info_value)) {
+        return $this->checkPluginMeta($plugin_info[$plugin_info_key], $property, $value);
+      }
+
+      if ($plugin_info_key == $property && $plugin_info_value == $value) {
+        return TRUE;
+      }
+      else {
+        return FALSE;
+      }
+    }
+
+    return FALSE;
   }
 }
