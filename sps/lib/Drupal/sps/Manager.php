@@ -38,7 +38,7 @@ class Manager {
   * @param \Drupal\sps\PluginControllerInterface $plugin_controller
   *   The control to use when accessing plugins
   *
-  * @return 
+  * @return
   */
   public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
     $this->setStateController($state_controler);
@@ -54,7 +54,7 @@ class Manager {
    *   The control to use when accessing State info (like site state)
    * @return \Drupal\sps\Manager
    *   Self
-   */ 
+   */
   protected function setStateController(StorageControllerInterface $controller) {
     $this->state_controller = $controller;
     return $this;
@@ -67,7 +67,7 @@ class Manager {
    *   the control to be used when accessing config
    * @return \Drupal\sps\Manager
    *   Self
-   */ 
+   */
   protected function setConfigController(StorageControllerInterface $controller) {
     $this->config_controller = $controller;
     return $this;
@@ -80,7 +80,7 @@ class Manager {
    *   the control to use when accessing overrides
    * @return \Drupal\sps\Manager
    *   Self
-   */ 
+   */
   protected function setOverrideController(StorageControllerInterface $controller) {
     $this->override_controller = $controller;
     return $this;
@@ -93,7 +93,7 @@ class Manager {
    *   The control to use when accessing plugins
    * @return \Drupal\sps\Manager
    *   Self
-   */ 
+   */
   protected function setPluginController(PluginControllerInterface $controller) {
     $this->plugin_controller = $controller;
     return $this;
@@ -150,13 +150,13 @@ class Manager {
   * @param $form_state
   *   The form_state array as used in hook_form
   *
-  * @return 
+  * @return
   *   A drupal form array created but the root condition
   */
   public function getPreviewForm(&$form, &$form_state) {
     $root_condition = $this->getRootCondition();
     return $root_condition->getElement($form, $form_state);
-    
+
   }
 
   /**
@@ -167,7 +167,7 @@ class Manager {
   * @param $form_state
   *   The form_state array passed to drupal validate functions
   *
-  * @return 
+  * @return
   *   Self
   */
   public function validatePreviewForm($form, &$form_state) {
@@ -186,7 +186,7 @@ class Manager {
   * @param $form_state
   *   The form_state array passed to drupal submit functions
   *
-  * @return 
+  * @return
   *   Self
   */
   public function submitPreviewForm($form, &$form_state) {
@@ -195,7 +195,7 @@ class Manager {
     $this->setSiteState($root_condition->getOVerrides());
     return $this;
   }
-  
+
   /**
   * Helper method for getting and causing the root Condition
   *
