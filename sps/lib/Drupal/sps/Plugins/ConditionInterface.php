@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sps;
+namespace Drupal\sps\Plugins
 
 interface ConditionInterface {
   /**

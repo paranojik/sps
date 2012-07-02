@@ -24,6 +24,7 @@ class Manager {
   protected $state_controler;
   protected $config_controller;
   protected $override_controller;
+  protected $root_condition;
 
   /**
   * Constructor for \Drupal\sps\Manager
@@ -138,6 +139,82 @@ class Manager {
    */
   public function getStateControllerSiteStateKey() {
     return $this->state_controller_site_state_key;
+  }
+
+
+  /**
+  * Passthrough from Drupal form to the correct condition for building the preview form
+  *
+  * @param $form
+  *   The form array used in hook_form
+  * @param $form_state
+  *   The form_state array as used in hook_form
+  *
+  * @return 
+  *   A drupal form array created but the root condition
+  */
+  public function getPreviewForm(&$form, &$form_state) {
+    $root_condition = $this->getRootCondition();
+    return $root_condition->getElement($form, $form_state);
+    
+  }
+
+  /**
+  * Passthrough fro Drupal form to the correct condition used for validate a preview form
+  *
+  * @param $form
+  *   The form array passed to drupal validate functions
+  * @param $form_state
+  *   The form_state array passed to drupal validate functions
+  *
+  * @return 
+  *   Self
+  */
+  public function validatePreviewForm($form, &$form_state) {
+    $root_condition = $this->getRootCondition();
+    $root_condition->validateElement($form, $form_state);
+    return $this;
+  }
+
+  /**
+  * Passthrough from Drupal form to the correct condition's submit method.
+  *
+  * Also save the correct override after submit.
+  *
+  * @param $form
+  *   The form array passed to drupal submit functions
+  * @param $form_state
+  *   The form_state array passed to drupal submit functions
+  *
+  * @return 
+  *   Self
+  */
+  public function submitPreviewForm($form, &$form_state) {
+    $root_condition = $this->getRootCondition();
+    $root_condition->submitElement($form, $form_state);
+    $this->setSiteState($root_condition->getOVerrides());
+    return $this;
+  }
+  
+  /**
+  * Helper method for getting and causing the root Condition
+  *
+  * The Root condition is the use as the basis for the constructing the preview form
+  * It can be expect that it will be much more comilicated then the other conditions
+  *
+  * This method select the condition and its config using the config controller.
+  *
+  * @return Drupal\sps\Plugins\ConditionInterface
+  *   the current root condition object
+  */
+  protected function getRootCondition() {
+    if(!isset($this->root_condition_plugin)) {
+      $settings = $this->config_controller->get(SPS_CONFIG_ROOT_CONDITION);
+      $root_condition_plugin = $settings['name'];
+      $this->root_condition_plugin = $this->getPlugin('condition', $root_condition_plugin);
+      $this->root_condition_plugin->setConfig($settings['config']);
+    }
+    return $this->root_condition_plugin;
   }
 
   /**
