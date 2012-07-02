@@ -24,12 +24,9 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
         'revision_id' => 7,
       ),
     );
-    $control->save($table);
-    $this->assertEqual($control->getMap(), $table, 'StorageController:: save sould store the array to be retrieved by ::getMap', 'SPS');
-    $this->assertEqual(
-      $control->getRevisionId($table[0]['type'], $table[0]['id']), 
-      $table[0]['revision_id'], 
-      'StorageController::getRevisionID should search table that was stored by save', 'SPS');
+    $key = "test_key";
+    $control->set($key, $table);
+    $this->assertEqual($control->get($key), $table, 'StorageController:: set stores the array to be retrieved by get', 'SPS');
   }
   public function testTestOverride() {
     $table = array(

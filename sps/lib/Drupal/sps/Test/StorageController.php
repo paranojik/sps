@@ -1,19 +1,44 @@
 <?php
 namespace Drupal\sps\Test;
 class StorageController implements \Drupal\sps\StorageControllerInterface{
-  protected $table;
-  public function save($table) {
-    $this->table = $table;
+  protected $cache = array();
+  /**
+  * Cache away a object
+  *
+  * @param $name
+  *   A string name use for retrieval
+  * @param $cache
+  *   an object to be cached
+  * @return NULL
+  */
+  public function set($name, $cache) {
+    $this->cache[$name] = $cache;
   }
-  public function getRevisionId($type, $id) {
-    return array_reduce($this->table, function($result, $item) use ($type, $id) { 
-      if(($item['id'] == $id) && ($item['type'] == $type)) {
-        $result = $item['revision_id'];
-      }
-      return $result;
-    });
-  }
-  public function getMap() { return $this->table; }
-  public function hasValidCache() { return (bool) $this->table ;}
 
+/**
+  * Test if we have an object cached
+  * This should be less expensive then using get
+  *
+  * @param $name
+  *   A string name use for retrieval
+  * @return bool
+  */
+  public function is_set($name) {
+    return isset($this->cache[$name]);
+  }
+
+ /**
+  * Retrieve a cached object
+  *
+  * @param $name
+  *   A string name use for retrieval
+  * @return the object that was cached
+  */
+  public function get($name) {
+    if ($this->is_set($name)) {
+      return $this->cache[$name];
+    }
+    throw new \Exception("Drupal\\sps\\Test\\PersistentStorageController does not have $name cached");
+  }
+  
 }
