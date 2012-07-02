@@ -192,7 +192,7 @@ class Manager {
   public function submitPreviewForm($form, &$form_state) {
     $root_condition = $this->getRootCondition();
     $root_condition->submitElement($form, $form_state);
-    $this->setSiteState($root_condition->getOVerrides());
+    $this->setSiteState($root_condition->getOverride());
     return $this;
   }
   
