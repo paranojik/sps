@@ -33,7 +33,7 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
       array('type' => 'thing', 'id' => 1, 'revision_id' => 5),
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
     );
-    $override = new \Drupal\sps\Test\Override();
+    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
     $override->setData($table);
     $this->assertEqual($override->getOverrides(), $table, 'Override should take in a table and return it for overrides', 'SPS');
 
@@ -44,7 +44,7 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
       array('type' => 'thing', 'id' => 2, 'revision_id' => 97),
     );
-    $override_a = new  \Drupal\sps\Test\Override();
+    $override_a = new \Drupal\sps\Test\Override(array(), new stdClass());
     $override_a->setData($table);
     $site_state = new Drupal\sps\SiteState($control, $override_a);
     $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should return table given up by controller");

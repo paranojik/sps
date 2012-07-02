@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps;
+namespace Drupal\sps\Plugins;
 interface WidgetInterface {
   /**
    * Provide the widget's preview form to be aggregated into the

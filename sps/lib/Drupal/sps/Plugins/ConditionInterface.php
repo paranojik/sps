@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sps\Condition;
+namespace Drupal\sps\Plugins;
 
 interface ConditionInterface {
   /**
@@ -10,7 +10,7 @@ interface ConditionInterface {
    *  An associative array of configuration, generally provided by the
    *  manager
    * @return
-   *  null
+   *  Self
    */
   public function setConfig($config);
 
@@ -50,7 +50,7 @@ interface ConditionInterface {
    *  that values my be treed as described by $elements #parent key
    *
    * @return
-   *  null
+   *  Self
    */
   public function validateElement($element, &$form_state);
 
@@ -67,7 +67,7 @@ interface ConditionInterface {
    *  that values my be treed as described by $elements #parent key
    *
    * @return
-   *  null
+   *  Self
    */
   public function submitElement($element, &$form_state);
 }

@@ -1,0 +1,52 @@
+<?php
+class SPSTestConditionUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Test Condition Unit Tests',
+      'description' => 'Test the public interface to the Test Condition object',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testTestCondition() {
+    $manager = new stdClass();
+    $settings = array(
+      'element_form' => array(
+        'test' => array(
+          '#markup' => 'This is Test Markup',
+        ),
+      ),
+      'validate_fail_message' => "There was an error",
+      'validate_fail_name' => "error_item",
+      'override' => new \Drupal\sps\Test\Override(array(), $manager),
+    );
+    $condition = new \Drupal\sps\Test\Condition($settings, $manager);
+    $form = array();
+    $form_state = array();
+    $this->assertEqual(
+      $condition->getElement($form, $form_state), 
+      $settings['element_form'], 
+      "TestCondition::getElement should return the element_form from settings", 'SPS'
+    );
+    $this->assertEqual(
+      $condition->getOverride(), 
+      NULL, 
+      "TestCondition::getOverride should return NULL if the submit has not yet been called", 'SPS'
+    );
+
+    form_clear_error();
+    $condition->validateElement($form, $form_state);
+    $this->assertEqual(
+      form_get_errors(), 
+      array($settings['validate_fail_name'] => $settings['validate_fail_message']), 
+      "TestCondition::validateElement should log a form error if validate_fail_message or validate_Fail_name are set", 'SPS'
+    );
+    $condition->submitElement($form, $form_state);
+    $this->assertEqual(
+      $condition->getOverride(), 
+      $settings['override'], 
+      "TestCondition::getOverride should return the override in settings if submitElement has been called", 'SPS'
+    );
+  }
+
+}

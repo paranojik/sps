@@ -1,0 +1,90 @@
+<?php
+class SPSManagerUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Manager Unit Tests',
+      'description' => 'Test the public interface to the Manager object',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testTestStorageController() {
+    $control = new Drupal\sps\Test\StorageController();
+    $obj = new stdClass();
+    $obj->param = "PARAM";
+    $control->set("test", $obj);
+    $this->assertTrue($control->is_set("test"), "Test StorageController is_set is True when a name has been set", "SPS"); 
+    $this->assertFalse($control->is_set("not set"), "Test StorageController is_set is False when a name has been set", "SPS"); 
+    $this->assertEqual($control->get("test"), $obj, "Test StorageController's set and get should set and retrieve the same obj.", "SPS");
+  }
+  public function testManager_getNullSiteState() {
+    $state_controller = new Drupal\sps\Test\StorageController();
+    $override_controller = new Drupal\sps\Test\StorageController();
+    $config_controller = new Drupal\sps\Test\StorageController();
+    $plugin_controller = new Drupal\sps\Test\PluginController(array());
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
+    $this->assertNull($manager->getSiteState(), "Manager::getSiteState should return null if there is no state", "SPS");
+  }
+  public function testManager_getPersistentSiteState() {
+    $state_controller = new Drupal\sps\Test\StorageController();
+    $override_controller = new Drupal\sps\Test\StorageController();
+    $config_controller = new Drupal\sps\Test\StorageController();
+    $plugin_controller = new Drupal\sps\Test\PluginController(array());
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
+
+    $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
+    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $override->setData($table);
+    $site_state = new Drupal\sps\SiteState($override_controller, $override);
+
+    $state_controller->set($manager->getStateControllerSiteStateKey(), $site_state);
+    $this->assertEqual($manager->getSiteState(), $site_state, "Manager::getSiteState returns a site_state storred in the persistent data", "SPS");
+  }
+  public function testManager_setSiteState() {
+    $state_controller = new Drupal\sps\Test\StorageController();
+    $override_controller = new Drupal\sps\Test\StorageController();
+    $config_controller = new Drupal\sps\Test\StorageController();
+    $plugin_controller = new Drupal\sps\Test\PluginController(array());
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
+
+    $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
+    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $override->setData($table);
+    $manager->setSiteState($override);
+
+    $site_state = new Drupal\sps\SiteState($override_controller, $override);
+    $this->assertEqual($state_controller->get($manager->getStateControllerSiteStateKey()), $site_state, "Manager::setSiteState construct the site_state and put it in site_state_controller", "SPS");
+
+  }
+  public function testManager_PluginAccess() {
+    $state_controller = new Drupal\sps\Test\StorageController();
+    $override_controller = new Drupal\sps\Test\StorageController();
+    $config_controller = new Drupal\sps\Test\StorageController();
+    $info = array(
+      'widget' => array(
+        'test_widget' => array(
+          'class' => '\Drupal\sps\Test\Override',
+          'instance_settings' => array(),
+        ),
+      ),
+    );
+    $plugin_controller = new Drupal\sps\Test\PluginController(array());
+    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
+    $this->assertEqual(
+      $manager->getPluginInfo('widget'), 
+      $info['widget'], 
+      "TestStorageController::getPluginInfo should get me all of the plugin infos for that type if i only pass it one param", 'SPS'
+    );
+    $this->assertEqual(
+      $manger->getPluginInfo('widget', 'test_widget'), 
+      $info['widget']['test_widget'], 
+      'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
+    );
+    $this->assertEqual(
+      $manager->getPlugin('widget', 'test_widget'), 
+      new \Drupal\sps\Test\Override(array(), new StdClass()),
+      'TestStorageController::getPlugin should build a obj from the plugin info', 'SPS'
+    );
+
+  }
+}
