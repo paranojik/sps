@@ -14,7 +14,7 @@ interface WidgetInterface {
    * @return
    *   A FAPI array.
    */
-  public function getPreviewForm(&$form, &$form_state);
+  public function getPreviewForm($form, &$form_state);
 
   /**
    * Validate the form section for this widget.  Use form_set_error()
