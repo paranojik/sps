@@ -1,8 +1,20 @@
 <?php
+namespace Drupal\sps\Test;
 
-namespace Drupal\sps\Plugins;
+class Condition implements \Drupal\sps\Plugins\ConditionInterface {
+  protected $element_form;
+  protected $validate_fail_message;
+  protected $validate_fail_name;
+  protected $override;
+  protected $override_set = FALSE;
 
-interface ConditionInterface {
+  public function __construct($settings, $manager) {
+    $this->element_form = $settings['element_form'];
+    $this->validate_fail_message = isset($settings['validate_fail_message']) ? $settings['validate_fail_message'] : NULL;
+    $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
+    $this->override = $settings['override'];
+  }
+
   /**
    * Provide the config to allow this Condition to construct itself.
    *
@@ -12,7 +24,9 @@ interface ConditionInterface {
    * @return
    *  Self
    */
-  public function setConfig($config);
+  public function setConfig($config) {
+    return $this;
+  }
 
   /**
    * Returns the consolidated Override for this Condition
@@ -20,7 +34,11 @@ interface ConditionInterface {
    * @return
    *  An instance of a class which implements OverrideInterface
    */
-  public function getOverride();
+  public function getOverride() {
+    if ($this->override_set) {
+      return $this->override;
+    }
+  }
 
   /**
    * Returns the consolidated preview form for this Condition.
@@ -35,7 +53,9 @@ interface ConditionInterface {
    * @return
    *  A FAPI array containing the form for this condition.
    */
-  public function getElement(&$element, &$form_state);
+  public function getElement(&$element, &$form_state) {
+    return $this->element_form;
+  }
 
   /**
    * Validates this Conditions preview form.
@@ -52,7 +72,12 @@ interface ConditionInterface {
    * @return
    *  Self
    */
-  public function validateElement($element, &$form_state);
+  public function validateElement($element, &$form_state) {
+    if ($this->validate_fail_message || $this->validate_fail_name) {
+      form_set_error($this->validate_fail_name, $this->validate_fail_message);
+    }
+    return $this;
+  }
 
   /**
    * Submit this Conditions preview form.
@@ -69,5 +94,8 @@ interface ConditionInterface {
    * @return
    *  Self
    */
-  public function submitElement($element, &$form_state);
+  public function submitElement($element, &$form_state) {
+    $this->override_set = TRUE;
+    return $this;
+  }
 }
