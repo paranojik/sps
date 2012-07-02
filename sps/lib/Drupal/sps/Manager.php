@@ -28,13 +28,13 @@ class Manager {
   /**
   * Constructor for \Drupal\sps\Manager
   *
-  * @param $state_controler \Drupal\sps\StorageControllerInterface
+  * @param \Drupal\sps\StorageControllerInterface $state_controler
   *   The control to use when accessing State info (like site state)
-  * @param $override_controller \Drupal\sps\StorageControllerInterface
+  * @param \Drupal\sps\StorageControllerInterface $override_controller
   *   the control to use when accessing overrides
-  * @param $config_controller \Drupal\sps\StorageControllerInterface
+  * @param \Drupal\sps\StorageControllerInterface $config_controller
   *   the control to be used when accessing config
-  * @param $plugin_controller \Drupal\sps\PluginControllerInterface
+  * @param \Drupal\sps\PluginControllerInterface $plugin_controller
   *   The control to use when accessing plugins
   *
   * @return 
@@ -49,7 +49,7 @@ class Manager {
   /**
    * store the state controller
    *
-   * @param $controller Drupal\sps\StorageControllerInterface
+   * @param Drupal\sps\StorageControllerInterface $controller
    *   The control to use when accessing State info (like site state)
    * @return \Drupal\sps\Manager
    *   Self
@@ -62,7 +62,7 @@ class Manager {
   /**
    * store the config controller
    *
-   * @param $config_controller \Drupal\sps\StorageControllerInterface
+   * @param \Drupal\sps\StorageControllerInterface $config_controller
    *   the control to be used when accessing config
    * @return \Drupal\sps\Manager
    *   Self
@@ -75,7 +75,7 @@ class Manager {
   /**
    * store the override controller
    *
-   * @param $override_controller \Drupal\sps\StorageControllerInterface
+   * @param \Drupal\sps\StorageControllerInterface $override_controller
    *   the control to use when accessing overrides
    * @return \Drupal\sps\Manager
    *   Self
@@ -88,7 +88,7 @@ class Manager {
   /**
    * store the override controller
    *
-   * @param $plugin_controller \Drupal\sps\PluginControllerInterface
+   * @param \Drupal\sps\PluginControllerInterface $plugin_controller
    *   The control to use when accessing plugins
    * @return \Drupal\sps\Manager
    *   Self
@@ -117,7 +117,7 @@ class Manager {
    *
    * This might get made private
    *
-   * @param $override \Drupal\sps\OverrideInterface 
+   * @param \Drupal\sps\OverrideInterface  $override
    *   the override to use when creating the SiteState
    * @return \Drupal\sps\Manager
    *   Self
@@ -143,9 +143,9 @@ class Manager {
   /**
    * call a reaction rect method
    *
-   * @param $reaction String
+   * @param String $reaction
    *   the name of a reaction plugin;
-   * @param $data Vary
+   * @param Vary $data
    *   data to be passed to the react method
    * @return Vary
    *   Data used by the item calling raction
@@ -157,9 +157,9 @@ class Manager {
   /**
    * factory for building a plugin object
    *
-   * @param $type String
+   * @param String $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $name String
+   * @param String $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @return \Drupal\sps\PluginInterface
    *   An instance of the requested Plugin
@@ -170,9 +170,9 @@ class Manager {
 
   /**
    * get meta info on a plugin
-   * @param $type String
+   * @param String $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $name String | Null
+   * @param String | Null $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @return Array
    *   an array of meta data for the plugin
@@ -184,11 +184,11 @@ class Manager {
   /**
    * get meta info on a plugin
    *
-   * @param $type String
+   * @param String $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $property String
+   * @param String $property
    *   the meta property to compare to the value
-   * @param $value Vary
+   * @param Vary $value
    *   the value to compare to the meta property
    * @return Array
    *   an array of meta data for the plugins
