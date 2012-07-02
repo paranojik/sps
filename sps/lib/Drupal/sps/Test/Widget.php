@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Test;
 
-class Widget extends \Drupal\sps\Widget\Widget {
+class Widget extends \Drupal\sps\Plugins\Widget\Widget {
   /**
    * Implements WidgetInterface::getPreviewForm().
    *
@@ -25,7 +25,7 @@ class Widget extends \Drupal\sps\Widget\Widget {
    */
   public function validatePreviewForm($form, &$form_state) {
     if (empty($form_state['values']['text_input'])) {
-      form_set_error('text_input', t('Text Input may not be empty.');
+      form_set_error('text_input', t('Text Input may not be empty.'));
     }
   }
 
