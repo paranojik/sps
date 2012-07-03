@@ -1,5 +1,6 @@
 <?php
 namespace Drupal\sps;
+
 function test_sps_get_config() {
   $sps_config = array(
     'conditions' => array(
@@ -21,7 +22,7 @@ function test_sps_get_config() {
 
 class Manager {
   protected $state_controller_site_state_key = 'sps_site_state_key';
-  protected $state_controler;
+  protected $state_controller;
   protected $config_controller;
   protected $override_controller;
   protected $root_condition;
@@ -29,7 +30,7 @@ class Manager {
   /**
   * Constructor for \Drupal\sps\Manager
   *
-  * @param \Drupal\sps\StorageControllerInterface $state_controler
+  * @param \Drupal\sps\StorageControllerInterface $state_controller
   *   The control to use when accessing State info (like site state)
   * @param \Drupal\sps\StorageControllerInterface $override_controller
   *   the control to use when accessing overrides
@@ -40,18 +41,19 @@ class Manager {
   *
   * @return
   */
-  public function __construct(StorageControllerInterface $state_controler, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
-    $this->setStateController($state_controler);
-    $this->setOverrideController($override_controller);
-    $this->setConfigController($config_controller);
-    $this->setPluginController($plugin_controller);
+  public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
+    $this->setStateController($state_controller)
+      ->setOverrideController($override_controller)
+      ->setConfigController($config_controller)
+      ->setPluginController($plugin_controller);
   }
 
   /**
    * store the state controller
    *
-   * @param Drupal\sps\StorageControllerInterface $controller
+   * @param \Drupal\sps\StorageControllerInterface $controller
    *   The control to use when accessing State info (like site state)
+   *
    * @return \Drupal\sps\Manager
    *   Self
    */
@@ -63,8 +65,9 @@ class Manager {
   /**
    * store the config controller
    *
-   * @param \Drupal\sps\StorageControllerInterface $config_controller
+   * @param StorageControllerInterface $controller
    *   the control to be used when accessing config
+   *
    * @return \Drupal\sps\Manager
    *   Self
    */
@@ -78,6 +81,7 @@ class Manager {
    *
    * @param \Drupal\sps\StorageControllerInterface $override_controller
    *   the control to use when accessing overrides
+   *
    * @return \Drupal\sps\Manager
    *   Self
    */
