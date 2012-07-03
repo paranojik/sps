@@ -122,9 +122,30 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       $override->getOverrides(), 
       "Manager::submitPreviewForm summits the from to the root condition, as the former for the override and builds the site state with that override.", 'SPS'
     );
-;
-
   }
+
+  public function testManager_react() {
+    $controllers = _sps_test_get_basic_controllers();
+    $settings = array(
+      'callback' => function($data) { return $data + 1;},
+    );
+    $info = array(
+      'reaction' => array(
+        'test_reaction' => array(
+          'class' => '\Drupal\sps\Test\Reaction',
+          'instance_settings' => $settings,
+        ),
+      ),
+    );
+    $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($info);
+    $manager = _sps_test_get_new_manager($controllers);
+    $this->assertEqual(
+      $manager->react("test_reaction", 4), 
+      5, 
+      "Manager::react should return based on the react method of the plugin", 'SPS'
+    );
+  }
+
 }
 
 /**

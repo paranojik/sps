@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps\Plugins
+namespace Drupal\sps\Plugins;
 
 interface ReactionInterface {
   /**

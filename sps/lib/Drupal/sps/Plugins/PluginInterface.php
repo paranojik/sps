@@ -8,5 +8,5 @@ interface PluginInterface {
    * @Param setting 
    * @param $manager an object of class Drupal\sps\Manager
    */
-  public function __contructor($settings, $manager);
+  public function __construct($settings, $manager);
 }
