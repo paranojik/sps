@@ -8,36 +8,37 @@ class PluginController implements \Drupal\sps\PluginControllerInterface{
   /**
    * factory for building a plugin object
    *
-   * @param $type 
+   * @param $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $name 
+   * @param $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
-   * @return 
-   *   an array of meta data for the plugin
+   * @return
+   *   an array of meta data for the plugin or FALSE if the plugin is not found
    */
-  public function getPlugin($type, $name, $manager) {
+  public function getPlugin($type, $name, \Drupal\sps\Manager $manager) {
     $info = $this->getPluginInfo($type, $name);
-    $class = $info['class'];
-    $r = new \ReflectionClass($info['class']);
-    return $r->newInstanceArgs(array($info['instance_settings'], $manager));
-
-
+    if (!empty($info['class'])) {
+      $class = $info['class'];
+      $r = new \ReflectionClass($info['class']);
+      return $r->newInstanceArgs(array($info['instance_settings'], $manager));
+    }
+    return FALSE;
   }
 
   /**
    * get meta info on a plugin
    *
-   * @param $type 
+   * @param $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $name 
+   * @param $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
-   * @return 
+   * @return
    *   an array of meta data for the plugin or an array of plugin arrays
    */
   public function getPluginInfo($type, $name=NULL) {
-    $type = $this->infos[$type];
+    $type = isset($this->infos[$type]) ? $this->infos[$type] : array();
     if($name) {
-      return $type[$name];
+      return isset($type[$name]) ? $type[$name] : array();
     }
     else {
       return $type;
@@ -47,13 +48,13 @@ class PluginController implements \Drupal\sps\PluginControllerInterface{
   /**
    * get meta info on a plugin
    *
-   * @param $type 
+   * @param $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
-   * @param $property 
+   * @param $property
    *   the meta property to compare to the value
-   * @param $value 
+   * @param $value
    *   the value to compare to the meta property
-   * @return 
+   * @return
    *   an array of meta data for the plugins
    */
   public function getPluginByMeta($type, $property, $value) {

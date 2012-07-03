@@ -26,7 +26,7 @@ class SiteState {
   * @param $controller
   *   The StorageController to use for storing Overrides
   *
-  * @return 
+  * @return
   *   Self
   */
   protected function setOverrideController(StorageControllerInterface $controller) {
@@ -38,9 +38,9 @@ class SiteState {
   /**
    * Store the Override to use for generating overrides
    *
-   * @param $override 
+   * @param $override
    *   The Override to use to generate overrides
-   * @return 
+   * @return
    *   Self
    */
   protected function setOverride(Plugins\OverrideInterface $override) {
@@ -52,7 +52,7 @@ class SiteState {
   /**
   * Retrive Stored Overrides
   *
-  * @return 
+  * @return
   *   Array of overrides
   */
   public function getOverride() {
