@@ -2,6 +2,7 @@
 namespace Drupal\sps\Plugins
 
 interface ReactionInterface {
+  
   /**
    * React in some way
    * This could be to alter the $data, or return some data, or even a sideeffect of some kind
@@ -9,5 +10,7 @@ interface ReactionInterface {
    * @param $data Vary
    * @return Vary
    */
-  function react($data);
+  function react($data) {
+    
+  }
 }
