@@ -53,7 +53,7 @@ function sps_plugin_factory() {
 
   if (!isset($factory)) {
     try {
-      $factory = new \Drupal\sps\Plugin\PluginFactory();
+      $factory = new \Drupal\sps\PluginFactory();
     } catch (\Exception $e) {
       throw new Exception\ClassLoadException("Factory was not loaded");
     }

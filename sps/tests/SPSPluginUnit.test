@@ -12,7 +12,7 @@ class SPSPluginUnitTest extends SPSBaseUnitTest {
   }
 
   public function testPluginFactory() {
-    $factory = new Drupal\sps\Plugin\PluginFactory();
+    $factory = new Drupal\sps\PluginFactory();
 
     try {
       $factory = sps_plugin_factory();
