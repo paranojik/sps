@@ -2,6 +2,7 @@
 namespace Drupal\sps\StorageController;
 /**
  * Defines a PersistentStorage Controller that uses ctools_object_cache
+ */
 class CToolsObjectCache implements PersistentStorageControllerInterface {
  protected static $obj = 'sps-ctools-object-cache';
  /**

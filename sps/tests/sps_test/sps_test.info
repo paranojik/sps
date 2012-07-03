@@ -1,0 +1,8 @@
+name = SPS Test Module
+description = SPS Test Module
+package = "ELC"
+
+core = 7.x
+package = "SPS"
+
+dependencies[] = sps
