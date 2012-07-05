@@ -243,13 +243,13 @@ class Manager {
   * @param $form_state
   *   The form_state array as used in hook_form
   *
-  * @return 
+  * @return
   *   A drupal form array created but the root condition
   */
   public function getPreviewForm(&$form, &$form_state) {
     $root_condition = $this->getRootCondition();
     return $root_condition->getElement($form, $form_state);
-    
+
   }
 
   /**
@@ -260,7 +260,7 @@ class Manager {
   * @param $form_state
   *   The form_state array passed to drupal validate functions
   *
-  * @return 
+  * @return
   *   Self
   */
   public function validatePreviewForm($form, &$form_state) {
@@ -279,7 +279,7 @@ class Manager {
   * @param $form_state
   *   The form_state array passed to drupal submit functions
   *
-  * @return 
+  * @return
   *   Self
   */
   public function submitPreviewForm($form, &$form_state) {
@@ -288,7 +288,7 @@ class Manager {
     $this->setSiteState($root_condition->getOverride());
     return $this;
   }
-  
+
   /**
   * Helper method for getting and causing the root Condition
   *
