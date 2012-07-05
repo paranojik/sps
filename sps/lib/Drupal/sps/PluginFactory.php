@@ -76,8 +76,8 @@ class PluginFactory implements PluginControllerInterface {
     try {
       $plugin_obj = new $class_name($plugin_info['instance_settings'], $manager);
     }
-    catch (\Exception $e) {
-      throw new ClassLoadException("Plugin $name was not loaded");
+    catch (\Excepion $e) {
+     throw new ClassLoadException("Plugin $name was not loaded");
     }
 
     if (!(self::checkInterface($plugin_obj, $plugin_type_info['interface'])
