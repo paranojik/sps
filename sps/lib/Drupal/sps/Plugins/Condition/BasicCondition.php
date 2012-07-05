@@ -21,7 +21,7 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    * @param $manager
    *  The current instance of the sps manager.
    */
-  public function __construct($config, \Drupal\sps\Manager $manager) {
+  public function __construct($config, $manager) {
     $this->overrides = $manager->getPluginByMeta('Override', 'condition', $config['name']);
 
     if (!empty($config['widget']) && is_string($config['widget'])) {
@@ -89,7 +89,6 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    * $form_state.
    */
   public function submitElement($element, &$form_state) {
-    $this->handleWidgetForm($element, $form_state, 'submitPreviewForm');
     $values = $this->handleWidgetForm($element, $form_state, 'extractValues');
 
     foreach($this->overrides as $key=>$override) {

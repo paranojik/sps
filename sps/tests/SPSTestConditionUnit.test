@@ -53,7 +53,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     $manager = self::getManager();
 
     $settings = array(
-      'override' => new \Drupal\sps\Test\Override(array(), $manager),
+      'name' => 'BasicCondition',
       'widget' => new \Drupal\sps\Test\Widget(array(), $manager)
     );
 
@@ -77,7 +77,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     }
 
     //BasicCondition should validate the form through the widget
-    $condition->validateElement($element, array());
+    $condition->validateElement($element, $state);
 
     $errors = form_get_errors();
     if (empty($errors)) {
@@ -164,7 +164,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
 
     $aggregator = new \Drupal\sps\Plugins\Override\AggregatorOverride();
     $aggregator->setData(array($override1, $override2, $override3));
-    $this->assertEqual($aggregator->getOverride(), $endGoal, 'AggregatorOverride should combine overrides.');
+    $this->assertEqual($aggregator->getOverrides(), $endGoal, 'AggregatorOverride should combine overrides.');
   }
   /**
    * Helper function to return a manager object for passing into plugins

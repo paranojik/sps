@@ -327,6 +327,6 @@ class Manager {
    *   an array of meta data for the plugins
    */
   public function getPluginByMeta($type, $property, $value) {
-    return $this->plugin_controller->getPluginInfoByMeta($type, $property, $meta);
+    return $this->plugin_controller->getPluginByMeta($type, $property, $value);
   }
 }

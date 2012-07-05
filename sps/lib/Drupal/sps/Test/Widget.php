@@ -8,7 +8,7 @@ class Widget extends \Drupal\sps\Plugins\Widget\Widget {
   /**
    * Construct a new test widget.
    */
-  public function __construct($settings, \Drupal\sps\Manager $manager) {
+  public function __construct($settings, $manager) {
     $this->settings = $settings;
     $this->manager = $manager;
   }

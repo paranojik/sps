@@ -8,7 +8,7 @@ class Condition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\sps\Pl
   protected $override;
   protected $override_set = FALSE;
 
-  public function __construct($settings, \Drupal\sps\Manager $manager) {
+  public function __construct($settings, $manager) {
     $this->element_form = $settings['element_form'];
     $this->validate_fail_message = isset($settings['validate_fail_message']) ? $settings['validate_fail_message'] : NULL;
     $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
