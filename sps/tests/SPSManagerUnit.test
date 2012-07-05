@@ -68,7 +68,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $plugin_controller = new Drupal\sps\Test\PluginController(array());
+    $plugin_controller = new Drupal\sps\Test\PluginController($info);
     $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
     $this->assertEqual(
       $manager->getPluginInfo('widget'), 
@@ -76,7 +76,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       "TestStorageController::getPluginInfo should get me all of the plugin infos for that type if i only pass it one param", 'SPS'
     );
     $this->assertEqual(
-      $manger->getPluginInfo('widget', 'test_widget'), 
+      $manager->getPluginInfo('widget', 'test_widget'), 
       $info['widget']['test_widget'], 
       'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
     );
