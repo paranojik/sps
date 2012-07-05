@@ -50,15 +50,10 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-<<<<<<< HEAD
-    $plugin_controller = new Drupal\sps\Test\PluginController($info);
-    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
-=======
     $controllers = _sps_test_get_basic_controllers();
     $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($info);
     $manager = _sps_test_get_new_manager($controllers);
 
->>>>>>> 1623128
     $this->assertEqual(
       $manager->getPluginInfo('widget'), 
       $info['widget'], 
