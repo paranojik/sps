@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps\Plugins
+namespace Drupal\sps\Plugins;
 
 interface ReactionInterface {
   /**
@@ -10,15 +10,4 @@ interface ReactionInterface {
    * @return Vary
    */
   function react($data);
-  /**
-   * Get the FormAPI preview form for the condition.
-   *
-   * @param $form
-   *   the form structure array passed in by drupal_get_form().
-   * @param $form_state 
-   *   the array of state data for the form.
-   *
-   * @return 
-   *   a FAPI render array
-   */
 }

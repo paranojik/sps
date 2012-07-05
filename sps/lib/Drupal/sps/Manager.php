@@ -1,24 +1,96 @@
 <?php
 namespace Drupal\sps;
-function test_sps_get_config() {
-  $sps_config = array(
-    'conditions' => array(
-      'collection' => array(
-        'title' => 'Collection',
-        'widget' => 'collection_select',
-        'override' => 'view_collection_override',
-      ),
-      'date' => array(
-        'title' => 'Live Date',
-        'widget' => 'live_date',
-        'override' => 'view_live_date_override',
-      ),
-    ),
-  );
-  return $sps_config;
-}
 
-
+/**
+ * The Manager is the heart of the SPS system, taking inputs from different 
+ * parts of the system and pushing them to the correct object for processing 
+ * it can be orginized in to a few different sections
+ *
+ * Controller Access
+ * The Manager managest access to drupal systems via different controllers. The 
+ * SPS system use the manger to access there when they need access to Drupal
+ *  .---------------------------------------------------------------.
+ *  |                            Systems                            |
+ *  '---------------------------------------------------------------'
+ *                                  |
+ *                                  v
+ *                             .---------.
+ *                             | Manager |
+ *                             |---------|
+ *                             '---------'
+ * .---------------------------.    |
+ * |     State Controller      |    |    .---------------------------.
+ * |---------------------------|    |    |     Plugin Controller     |
+ * | Controls the interface    |    |    |---------------------------|
+ * | to the State cache        |<---|    | Controls the interface    |
+ * | used to hold the current  |    '--->| to the plugin system      |
+ * | site state                |    |    | holds method for getting  |
+ * '---------------------------'    |    | pluign info and objects   |
+ * .---------------------------.    |    '---------------------------'
+ * |     Config Controller     |    |
+ * |---------------------------|    |    .---------------------------.
+ * | Controls the interface    |    |    |    Override Controller    |
+ * | to the config for sps     |<---|    |---------------------------|
+ * | hold the root condition   |    '--->| Controls the interface    |
+ * | and infomation of plugins |         | to the store of the       |
+ * '---------------------------'         | current overrides         |
+ *                                       '---------------------------'
+ *
+ * Site State
+ * THe Manager can create a site state object, and uses the State Controller 
+ * to keep it around from page load to page load. When creating site state it 
+ * hand off the Override Controller So that the Site state can Compile the 
+ * override data and store it in the Override Controller
+ *  
+ *  @TODO this part of the system should be reviews when we start needing 
+ *  access to the site state
+ *
+ *
+ *
+ * Preview Form
+ * The Manager is the interface between the form hooks in the sps module 
+ * and the Root Conditon that does most of the Form creation and processing 
+ * .-----------------------------------------.
+ * |    preview form hooks in sps.module     |
+ * |-----------------------------------------|
+ * | sps_preview_form()                      |
+ * | sps_preview_form_validate()             |
+ * | sps_preview_form_submit()               |
+ * '-----------------------------------------'
+ *                      |
+ *                      |
+ *                      v
+ * .-----------------------------------------.
+ * |                 Manager                 |
+ * |-----------------------------------------|
+ * | getPreviewForm($form, $form_state)      |
+ * | validatePreviewForm($form, $form_state) |
+ * | submitPreviewForm($form, $form_state)   |
+ * '-----------------------------------------'
+ *                      |
+ *                      |
+ *                      v
+ * .-----------------------------------------.
+ * |            Condition (Root)             |
+ * |-----------------------------------------|
+ * | getElement($form, $form_state)          |
+ * | validateElement($form, $form_state)     |
+ * | submitElement($form, $form_state)       |
+ * '-----------------------------------------'
+ * 
+ *
+ * Reactions
+ * The manager is use as an interface for Drupal hooks that need to have a
+ * reaction react
+ *                    .-----------------------.   .--------------.
+ * .--------------.   |        Manager        |   |   Reaction   |
+ * | Drupal hooks |-->|-----------------------|-->|--------------|
+ * '--------------'   | react($plugin, $data) |   | react($data) |
+ *                    '-----------------------'   '--------------'
+ *
+ * Plugins
+ * The Manager is a passthough to the plugin controller
+ */
 class Manager {
   protected $state_controller_site_state_key = 'sps_site_state_key';
   protected $state_controler;
@@ -100,7 +172,7 @@ class Manager {
   }
 
   /**
-   * Pull the site state from site state controller
+   * Pull the site state form site state controller
    *
    * Note the state controller is resposible for resonable caching of the site state
    *
@@ -108,13 +180,13 @@ class Manager {
    *   SiteState | NULL
    */
   public function getSiteState() {
-    if($this->state_controller->is_set($this->state_controller_site_state_key)) {
+    if($this->state_controller->exists($this->state_controller_site_state_key)) {
       return $this->state_controller->get($this->state_controller_site_state_key);
     }
   }
 
   /**
-   * Create A SiteState from an override, and store it.
+   * Create A SiteState form an override, and store it.
    *
    * This might get made private
    *
@@ -160,7 +232,7 @@ class Manager {
   }
 
   /**
-  * Passthrough fro Drupal form to the correct condition used for validate a preview form
+  * Passthrough from Drupal form to the correct condition used for validate a preview form
   *
   * @param $form
   *   The form array passed to drupal validate functions
@@ -192,7 +264,7 @@ class Manager {
   public function submitPreviewForm($form, &$form_state) {
     $root_condition = $this->getRootCondition();
     $root_condition->submitElement($form, $form_state);
-    $this->setSiteState($root_condition->getOVerrides());
+    $this->setSiteState($root_condition->getOverride());
     return $this;
   }
 

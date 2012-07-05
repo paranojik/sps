@@ -56,7 +56,7 @@ class SiteState {
   *   Array of overrides
   */
   public function getOverride() {
-    if(!$this->override_controller->is_set($this->controller_key)) {
+    if(!$this->override_controller->exists($this->controller_key)) {
       $this->cacheOverride();
     }
     return $this->override_controller->get($this->controller_key);

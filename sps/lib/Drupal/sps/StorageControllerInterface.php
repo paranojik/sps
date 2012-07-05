@@ -24,7 +24,7 @@ interface StorageControllerInterface {
    * @return 
    *   bool
    */
-  public function is_set($name);
+  public function exists($name);
  
   /**
    * Retrieve a cached object
