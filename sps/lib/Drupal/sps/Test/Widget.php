@@ -2,6 +2,17 @@
 namespace Drupal\sps\Test;
 
 class Widget extends \Drupal\sps\Plugins\Widget\Widget {
+  private $manager;
+  private $settings;
+
+  /**
+   * Construct a new test widget.
+   */
+  public function __construct($settings, \Drupal\sps\Manager $manager) {
+    $this->settings = $settings;
+    $this->manager = $manager;
+  }
+
   /**
    * Implements WidgetInterface::getPreviewForm().
    *

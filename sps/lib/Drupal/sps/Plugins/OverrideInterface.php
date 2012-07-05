@@ -15,11 +15,11 @@ interface OverrideInterface {
    * This method should be called before get overrides and provides the
    * data which the override will use to find the available overrides.
    *
-   * @param $variables
+   * @param $data
    *    The data in the format specified by this overrides implementation
    *    of getDataConsumerApi().
    */
-  public function setData($variables);
+  public function setData($data);
 
   /**
    * Report which data api this Override can consume.

@@ -147,56 +147,37 @@ class Manager {
 
 
   /**
-  * Passthrough from Drupal form to the correct condition for building the preview form
-  *
-  * @param $form
-  *   The form array used in hook_form
-  * @param $form_state
-  *   The form_state array as used in hook_form
-  *
-  * @return
-  *   A drupal form array created but the root condition
-  */
-  public function getPreviewForm(&$form, &$form_state) {
+   * Passthrough from Drupal form to the correct condition for building the preview form
+   *
+   * sps_condition_preview_form is a function defined in our .module which calls our callback
+   *
+   * @param $form
+   *   The form array used in hook_form
+   * @param $form_state
+   *   The form_state array as used in hook_form
+   *
+   * @return
+   *   A drupal form array created but the root condition
+   *
+   * @see sps_condition_preview_form
+   */
+  public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
-    return $root_condition->getElement($form, $form_state);
-
+    $getForm = function($form, &$form_state) {
+      return $root_condition->getElement($form, $form_state);
+    };
+    drupal_get_form('sps_condition_preview_form', $getForm);
   }
 
   /**
-  * Passthrough fro Drupal form to the correct condition used for validate a preview form
-  *
-  * @param $form
-  *   The form array passed to drupal validate functions
-  * @param $form_state
-  *   The form_state array passed to drupal validate functions
+  * Notify the manager that the preview form submission is complete.
   *
   * @return
   *   Self
   */
-  public function validatePreviewForm($form, &$form_state) {
+  public function previewFormSubmitted() {
     $root_condition = $this->getRootCondition();
-    $root_condition->validateElement($form, $form_state);
-    return $this;
-  }
-
-  /**
-  * Passthrough from Drupal form to the correct condition's submit method.
-  *
-  * Also save the correct override after submit.
-  *
-  * @param $form
-  *   The form array passed to drupal submit functions
-  * @param $form_state
-  *   The form_state array passed to drupal submit functions
-  *
-  * @return
-  *   Self
-  */
-  public function submitPreviewForm($form, &$form_state) {
-    $root_condition = $this->getRootCondition();
-    $root_condition->submitElement($form, $form_state);
-    $this->setSiteState($root_condition->getOVerrides());
+    $this->setSiteState($root_condition->getOverride());
     return $this;
   }
 
@@ -275,6 +256,6 @@ class Manager {
    *   an array of meta data for the plugins
    */
   public function getPluginByMeta($type, $property, $value) {
-    return $this->plugin_controller->getPluginInfoByMeta($type);
+    return $this->plugin_controller->getPluginInfoByMeta($type, $property, $meta);
   }
 }

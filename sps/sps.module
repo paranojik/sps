@@ -67,3 +67,24 @@ function sps_plugin_factory() {
   return $factory;
 }
 
+/**
+ * A form callback for use by drupal_get_form().
+ *
+ * When called like:
+ * drupal_get_form('sps_condition_preview_form', array($this, 'getPreviewForm'))
+ * by the manager or a condition, it will return that form.
+ *
+ * @return
+ *  A FAPI array for drupal_get_form if a callback is provided, or NULL
+ *
+ * @see Manager::getPreviewForm();
+ */
+function sps_condition_preview_form($form, &$form_state) {
+  if (!empty($form_state['build_info']['args'][0])) {
+    $form_function = $form_state['build_info']['args'][0];
+    if(is_callable($form_function)) {
+      $form_function($form, $form_state);
+    }
+  }
+}
+

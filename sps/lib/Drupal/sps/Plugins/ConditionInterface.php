@@ -4,21 +4,11 @@ namespace Drupal\sps\Plugins;
 
 interface ConditionInterface {
   /**
-   * Provide the config to allow this Condition to construct itself.
-   *
-   * @param $config
-   *  An associative array of configuration, generally provided by the
-   *  manager
-   * @return
-   *  Self
-   */
-  public function setConfig($config);
-
-  /**
    * Returns the consolidated Override for this Condition
    *
    * @return
-   *  An instance of a class which implements OverrideInterface
+   *  An instance of a class which implements OverrideInterface or FALSE
+   *  if the condition's element has not been submitted yet.
    */
   public function getOverride();
 
@@ -35,7 +25,7 @@ interface ConditionInterface {
    * @return
    *  A FAPI array containing the form for this condition.
    */
-  public function getElement(&$element, &$form_state);
+  public function getElement($element, &$form_state);
 
   /**
    * Validates this Conditions preview form.

@@ -38,42 +38,6 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
     $this->assertEqual($override->getOverrides(), $table, 'Override should take in a table and return it for overrides', 'SPS');
 
   }
-  public function testTestWidget() {
-    $state = array(
-      'values' => array(
-        'text_input' => 'default',
-      ),
-    );
-
-    $widget = new \Drupal\sps\Test\Widget();
-    $form = $widget->getPreviewForm(array(), $state);
-    $this->assertEqual($form['text_input']['#default_value'], 'default', 'Widget properly sets default value.');
-
-    form_clear_error();
-    $bad_state = array();
-    $widget->validatePreviewForm($form, $bad_state);
-    $errors = form_get_errors();
-    if (empty($errors['text_input'])) {
-      $this->fail('Widget validate did not detect empty value.');
-    }
-    else {
-      $this->pass('Widget properly set an error.');
-    }
-
-    form_clear_error();
-    $widget->validatePreviewForm($form, $state);
-    $errors = form_get_errors();
-    if (empty($errors)) {
-      $this->pass('Widget properly passes validate.');
-    }
-    else {
-      $this->fail('Widget validate detects error in good state.');
-    }
-
-    form_clear_error();
-    $values = $widget->extractValues($form, $state);
-    $this->assertEqual($values, $state['values'], 'Widget extract values should be consistant with form state.');
-  }
 
   public function testSiteState() {
     $control = new Drupal\sps\Test\StorageController();
@@ -88,6 +52,7 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
     $override_a->table[0]['id'] = 6;
     $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should be cached so that changing the controller table should not effect output");
   }
+
   public function testassertThrows() {
     /*
     $this->assertThrows(function() {

@@ -1,14 +1,14 @@
 <?php
 namespace Drupal\sps\Test;
 
-class Condition implements \Drupal\sps\Plugins\ConditionInterface {
+class Condition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\sps\Plugins\PluginInterface {
   protected $element_form;
   protected $validate_fail_message;
   protected $validate_fail_name;
   protected $override;
   protected $override_set = FALSE;
 
-  public function __construct($settings, $manager) {
+  public function __construct($settings, \Drupal\sps\Manager $manager) {
     $this->element_form = $settings['element_form'];
     $this->validate_fail_message = isset($settings['validate_fail_message']) ? $settings['validate_fail_message'] : NULL;
     $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
@@ -38,6 +38,7 @@ class Condition implements \Drupal\sps\Plugins\ConditionInterface {
     if ($this->override_set) {
       return $this->override;
     }
+    return FALSE;
   }
 
   /**
@@ -53,7 +54,7 @@ class Condition implements \Drupal\sps\Plugins\ConditionInterface {
    * @return
    *  A FAPI array containing the form for this condition.
    */
-  public function getElement(&$element, &$form_state) {
+  public function getElement($element, &$form_state) {
     return $this->element_form;
   }
 
