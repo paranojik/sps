@@ -13,8 +13,8 @@ class SPSTestStorageControllerUnitTest extends SPSBaseUnitTest {
     $obj = new stdClass();
     $obj->param = "PARAM";
     $control->set("test", $obj);
-    $this->assertTrue($control->is_set("test"), "Test StorageController is_set is True when a name has been set", "SPS"); 
-    $this->assertFalse($control->is_set("not set"), "Test StorageController is_set is False when a name has been set", "SPS"); 
+    $this->assertTrue($control->exists("test"), "Test StorageController is_set is True when a name has been set", "SPS"); 
+    $this->assertFalse($control->exists("not set"), "Test StorageController is_set is False when a name has been set", "SPS"); 
     $this->assertEqual($control->get("test"), $obj, "Test StorageController's set and get should set and retrieve the same obj.", "SPS");
   }
 }

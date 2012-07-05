@@ -1,22 +1,5 @@
 <?php
 namespace Drupal\sps;
-function test_sps_get_config() {
-  $sps_config = array(
-    'conditions' => array(
-      'collection' => array(
-        'title' => 'Collection',
-        'widget' => 'collection_select',
-        'override' => 'view_collection_override',
-      ),
-      'date' => array(
-        'title' => 'Live Date',
-        'widget' => 'live_date',
-        'override' => 'view_live_date_override',
-      ),
-    ),
-  );
-  return $sps_config;
-}
 
 /**
  * The Manager is the heart of the SPS system, taking inputs from different 
@@ -189,7 +172,7 @@ class Manager {
   }
 
   /**
-   * Pull the site state from site state controller
+   * Pull the site state form site state controller
    *
    * Note the state controller is resposible for resonable caching of the site state
    *
@@ -197,13 +180,13 @@ class Manager {
    *   SiteState | NULL
    */
   public function getSiteState() {
-    if($this->state_controller->is_set($this->state_controller_site_state_key)) {
+    if($this->state_controller->exists($this->state_controller_site_state_key)) {
       return $this->state_controller->get($this->state_controller_site_state_key);
     }
   }
 
   /**
-   * Create A SiteState from an override, and store it.
+   * Create A SiteState form an override, and store it.
    *
    * This might get made private
    *
@@ -249,7 +232,7 @@ class Manager {
   }
 
   /**
-  * Passthrough fro Drupal form to the correct condition used for validate a preview form
+  * Passthrough from Drupal form to the correct condition used for validate a preview form
   *
   * @param $form
   *   The form array passed to drupal validate functions
