@@ -9,5 +9,5 @@ interface PluginInterface {
    * @param $settings array
    * @param $manager \Drupal\sps\Manager
    */
-  public function __construct($settings, \Drupal\sps\Manager $manager);
+  public function __construct($settings, $manager);
 }

@@ -1,11 +1,5 @@
 <?php
-
-define('SPS_CONFIG_PREVIEW_FORM_PLUGIN_KEY', "sps_config_preview_form_plugin_key");
-define('SPS_CONFIG_PREVIEW_FORM_SETTINGS', "sps_config_preview_form_settings");
-
-use Drupal\sps;
-use Drupal\sps\Exception;
-
+define('SPS_CONFIG_ROOT_CONDITION', "sps_config_root_condition_settings");
 /**
  * Get the Site Manager
  *

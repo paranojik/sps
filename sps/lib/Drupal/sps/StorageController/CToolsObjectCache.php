@@ -2,6 +2,12 @@
 namespace Drupal\sps\StorageController;
 /**
  * Defines a PersistentStorage Controller that uses ctools_object_cache
+ *
+ *
+ * TODO This class is not functional, and more work is need to be done
+ * here. the current code is just for helping to describe direction.
+ *
+ */
 class CToolsObjectCache implements PersistentStorageControllerInterface {
  protected static $obj = 'sps-ctools-object-cache';
  /**
@@ -13,7 +19,7 @@ class CToolsObjectCache implements PersistentStorageControllerInterface {
   *   an object to be cached
   * @return NULL
   */
- public function set($name, $cache) {
+public function set($name, $cache) {
    $_SESSION[$this->obj]['name'] = TRUE;
    ctools_object_cache_set($this->obj, $name, $cache);
  }
@@ -25,8 +31,9 @@ class CToolsObjectCache implements PersistentStorageControllerInterface {
   *   A string name use for retrieval
   * @return bool
   */
- public function is_set($name);
+ public function exists($name) {
    return isset($_SESSION[$this->obj]['name']) && $_SESSION[$this->obj]['name'];
+ }
  /**
   * Retrieve a cached object
   *
@@ -34,6 +41,7 @@ class CToolsObjectCache implements PersistentStorageControllerInterface {
   *   A string name use for retrieval
   * @return the object that was cached
   */
- public function get($name);
+ public function get($name) {
    return ctools_object_cache_get($this->obj, $name);
+ }
 }
