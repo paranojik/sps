@@ -69,6 +69,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     $state = array();
     $element = $condition->getElement(array(), $state);
     //for right now, we're just assuming the widget's form will be a sub array of the condition form, we should refine this
+    $widget['#tree'] = TRUE;
     if (!in_array($widget, $element)) {
       $this->fail('BasicCondition should construct the correct widget from the settings and properly return its form.');
     }
@@ -90,7 +91,9 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
 
     $good_state = array(
       'values' => array(
-        'text_input' => 'value'
+        'widget' => array(
+          'text_input' => 'value'
+        ),
       )
     );
 
@@ -110,8 +113,11 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     //BasicCondition should submit the form properly and pass the values to the override.
     $condition->submitElement($element, $good_state);
     $override = $condition->getOverride();
-
-    $this->assertEqual($override->getOverrides(), $good_state['values'],
+    echo json_encode($override->getOverrides());
+    $this->assertEqual($override->getOverrides(), array(
+        'node' => 'value',
+        'box' => 'value',
+      ),
       'BasicCondition should properly extract values from widget and pass them to Override after submit.');
   }
 
@@ -165,15 +171,68 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     $aggregator = new \Drupal\sps\Plugins\Override\AggregatorOverride();
     $aggregator->setData(array($override1, $override2, $override3));
     $this->assertEqual($aggregator->getOverrides(), $endGoal, 'AggregatorOverride should combine overrides.');
+
+    $override4 = new \Drupal\sps\Test\Override(array(), $manager);
+    $override4->setData($table1);
+
+    $this->assertThrows(function() use ($override1, $override2, $override3, $override4) {
+      $aggregator2 = new \Drupal\sps\Plugins\Override\AggregatorOverride();
+      $aggregator2->setData(array($override1, $override2, $override3, $override4));
+    }, '\Drupal\sps\Exception\InvalidOverrideException',
+    'AggregatorOverride may not be passed two overrides that handle the same type.',
+    'AggregatorOverride should thrown an exception if 2 overrides with the same type are given.');
   }
   /**
    * Helper function to return a manager object for passing into plugins
    */
   protected static function getManager() {
+    $plugins = array(
+      'Override' => array(
+        'test1' => array(
+          'name' => 'test1',
+          'condition' => 'BasicCondition',
+          'class' => '\Drupal\sps\Test\Override',
+          'instance_settings' => array(
+            'type' => 'node',
+          ),
+        ),
+        'test2' => array(
+          'name' => 'test2',
+          'condition' => 'BasicCondition',
+          'class' => '\Drupal\sps\Test\Override',
+          'instance_settings' => array(
+            'type' => 'box',
+          ),
+        ),
+        'test3' => array(
+          'name' => 'test3',
+          'condition' => 'client',
+          'class' => '\Drupal\sps\Test\Override',
+          'instance_settings' => array(),
+        ),
+      ),
+      'Condition' => array(
+        'basic' => array(
+          'name' => 'basic',
+          'class' => '\Drupal\sps\Plugins\Condition\BasicCondition',
+          'instance_settings' => array(
+            'widget' => 'basicWidget',
+            'name' => 'basic',
+          ),
+        ),
+      ),
+      'Widget' => array(
+        'basicWidget' => array(
+          'name' => 'basicWidget',
+          'class' => '\Drupal\sps\Test\Widget',
+        ),
+      )
+    );
+
     $state_controller = new Drupal\sps\Test\StorageController();
     $override_controller = new Drupal\sps\Test\StorageController();
     $config_controller = new Drupal\sps\Test\StorageController();
-    $plugin_controller = new Drupal\sps\Test\PluginController(array());
+    $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
     return new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
   }
 }

@@ -68,6 +68,7 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
 
     $element['#validate'] = array($this, 'validateElement');
     $element['#submit'] = array($this, 'submitElement');
+    return $element;
   }
 
   /**
@@ -90,11 +91,12 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    */
   public function submitElement($element, &$form_state) {
     $values = $this->handleWidgetForm($element, $form_state, 'extractValues');
-
     foreach($this->overrides as $key=>$override) {
-      $override = $this->manager->getPlugin('Override', $override);
-      $override->setData($values);
-      $this->overrides[$key] = $override;
+      $override = $this->manager->getPlugin('Override', $override['name']);
+      if (!empty($override)) {
+        $override->setData($values);
+        $this->overrides[$key] = $override;
+      }
     }
 
     $this->override_set = TRUE;
@@ -118,9 +120,19 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    */
   protected function handleWidgetForm($element, &$form_state, $method) {
     $widget_el = $element['widget'];
-
-    $full_values = $form_state['values'];
-    $form_state['values'] = $form_state['values']['widget'];
+    if (isset($form_state['values'])) {
+      $full_values = $form_state['values'];
+      if (isset($form_state['values']['widget'])) {
+        $form_state['values'] = $form_state['values']['widget'];
+      }
+      else {
+        $form_state['values'] = array();
+      }
+    }
+    else {
+      $full_values = array();
+      $form_state['values'] = array();
+    }
 
     $return = $this->widget->{$method}($widget_el, $form_state);
 

@@ -59,7 +59,9 @@ class PluginController implements \Drupal\sps\PluginControllerInterface{
    */
   public function getPluginByMeta($type, $property, $value) {
     $plugins = $this->getPluginInfo($type);
-    return array_filter(function($plugin) use($property, $value) { return (isset($plugin[$property]) && ($plugin[$property] == $value));}, $plugins);
+    return array_filter($plugins, function($plugin) use($property, $value) {
+      return (isset($plugin[$property]) && ($plugin[$property] == $value));
+   });
   }
 
 }

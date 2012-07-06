@@ -5,6 +5,7 @@ class AggregatorOverride implements \Drupal\sps\Plugins\OverrideInterface {
   protected $override_table = array();
   protected $overrides_set = FALSE;
 
+  public function __construct() {}
   /**
    * Implementation of OverrideInterface::setData().
    *
@@ -17,11 +18,13 @@ class AggregatorOverride implements \Drupal\sps\Plugins\OverrideInterface {
    *  If 2 overrides passed as data contain overrides for the same type.
    */
   public function setData($data) {
+    $this->override_table = array();
     foreach ($data as $override) {
       $overrides = $override->getOverrides();
       foreach ($overrides as $type => $items) {
         if (!empty($this->override_table[$type]) && !empty($items)) {
-          throw new \Drupal\sps\Exception\InvalidOverrideException('AggregatorOverride may not be passed two overrides that handle the same type.');
+          throw new \Drupal\sps\Exception\InvalidOverrideException(
+            'AggregatorOverride may not be passed two overrides that handle the same type.');
         }
         $this->override_table[$type] = $items;
       }

@@ -2,11 +2,22 @@
 namespace Drupal\sps\Test;
 class Override extends \Drupal\sps\Plugins\Override\Override {
   public $table = array();
+  private $type = FALSE;
   public function __construct($settings, $manager) {
+    if (isset($settings['type'])) {
+      $this->type = $settings['type'];
+    }
   }
 
   public function getOverrides() {
-    return $this->table;
+    if ($this->type) {
+      return array(
+        $this->type => $this->table,
+      );
+    }
+    else {
+      return $this->table;
+    }
   }
 
   public function setData($table) {
