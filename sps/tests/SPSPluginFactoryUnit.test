@@ -1,0 +1,13 @@
+<?php
+
+class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Plugin Factory Unit Tests',
+      'description' => 'Test the Plugin Factory',
+      'group' => 'SPS',
+    );
+  }
+
+
+}
