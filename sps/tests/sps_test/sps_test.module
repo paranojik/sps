@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * Implements hook_sps_plugin_types().
+ */
+function sps_test_sps_plugin_types() {
+  return array(
+    'default_type' => array(
+      'defaults' => array(
+        'test_1' => 'a',
+        'test_2' => 'b',
+      ),
+      'custom_type' => array(
+        'class' => "Drupal\\sps_test\\SPS\\Plugin\\CustomPluginType",
+        'plugin_class' => "Drupal\\sps_test\\SPS\\Plugin\\Plugin",
+        'interface' => "Drupal\\sps_test\\SPS\\Plugin\\PluginInterface",
+      ),
+    )
+  );
+}
+
+/**
+ * Implements hook_sps_test_type_plugins()
+ */
+function sps_test_sps_default_type_plugins() {
+  return array(
+    'plugin_defaults' => array(),
+    'plugin_custom' => array(
+      'class' => "Drupal\\sps_test\\SPS\\Plugins\\PluginCustom\\TestPlugin",
+      'test_1' => 'c',
+      'test_2' => 'd',
+    ),
+  );
+}
+
+/**
+ * Implement hook_sps_plugin_custom_plugins()
+ */
+function sps_test_sps_plugin_custom_plugins() {
+  return array(
+    'plugin_defaults' => array(),
+    'plugin_custom' => array(
+      'class' => "Drupal\\sps_test\\SPS\\Plugins\\PluginCustom\\TestPlugin2",
+      'test_1' => 'c',
+      'test_2' => 'd',
+    ),
+  );
+}

@@ -1,0 +1,165 @@
+<?php
+
+use Drupal\sps\Exception as SPSException;
+
+class SPSPluginUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Plugin Unit Tests',
+      'description' => 'SPS Plugin Tests.',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testPluginFactory() {
+    $factory = new Drupal\sps\Plugin\PluginFactory();
+
+    try {
+      $factory = sps_plugin_factory();
+      $this->pass('Plugin Factory Loaded', "SPS");
+      return;
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->fail('Plugin Factory Loaded', "SPS");
+      return;
+    } catch (Exception $e) {
+      $this->fail('Plugin Factory Loaded', "SPS");
+      $this->fail('Plugin Factory Exception was not used', "SPS");
+      return;
+    }
+  }
+
+  public function testPluginLoading() {
+    $this->assertThrows(function() {
+        $plugin = sps_plugin('not_valid_type', 'not_valid_key');
+      },
+      "Drupal\\sps\\Exception\\InvalidPluginException", NULL, "Invalid Plugin Type and Plugin keys"
+    );
+
+    $this->assertThrows(function() {
+        $plugin = sps_plugin('default_type', 'not_valid_key');
+      },
+      "Drupal\\sps\\Exception\\InvalidPluginException", NULL, "Invalid Plugin key"
+    );
+
+    try {
+      $plugin = sps_plugin('default_type', 'plugin_defaults');
+      $this->pass("Plugin Loaded", "SPS");
+    } catch (Drupal\sps\Exception\InvalidPluginException $e) {
+      $this->fail("Plugin loaded", "SPS");
+    }
+
+    $plugin_type = sps_plugin_type('default_type');
+    $class_name = $plugin_type->getDefinition('plugin_class');
+
+    if ($plugin instanceof $class_name) {
+      $this->pass("Default Plugin Class Loaded", "SPS");
+    }
+    else {
+      $this->fail("Default Plugin Class Loaded", "SPS");
+    }
+
+    $plugin_2 = sps_plugin('default_type', 'plugin_custom');
+
+    if ($plugin_2 instanceof Drupal\sps_test\SPS\Plugins\PluginCustom\TestPlugin) {
+      $this->pass("Custom Plugin Class Loaded", "SPS");
+    }
+    else {
+      $this->fail("Custom Plugin Class Loaded", "SPS");
+    }
+
+    $this->assertIsPlugin($plugin);
+    $this->assertIsPlugin($plugin_2);
+
+    $plugins = sps_plugin('default_type');
+    if ($plugins instanceof Drupal\sps\Plugin\PluginCollection) {
+      $this->pass("Plugin Collection Class loaded via function", "SPS");
+    }
+    else {
+      $this->fail("Plugin Collection Class loaded via function", "SPS");
+    }
+
+    foreach ($plugins as $plugin) {
+      $this->assertCheckInterface($plugin_type->getDefinition('interface'),
+        $plugin, "Plugin {$plugin->getDefinition('name')} using the correct interface");
+    }
+  }
+
+  public function testPluginType() {
+    $this->assertThrows(function() {
+        $plugin_type = sps_plugin_type("fake_plugin");
+      }, "Drupal\\sps\\Exception\\InvalidPluginException", NULL, "Plugin Plugin was not loaded");
+
+    try {
+      $plugin_type = sps_plugin_type("default_type");
+    } catch (\SPSException\ClassLoadException $e) {
+      $this->fail("Load Plugin Type", "SPS");
+    }
+
+    $this->assertCheckInterface("Drupal\\sps\\Plugin\\PluginTypeInterface",
+      $plugin_type, "Plugin Type is using the correct interface");
+
+    $custom_plugin_type = sps_plugin_type('custom_type');
+
+    if ($custom_plugin_type instanceof Drupal\sps_test\SPS\Plugin\CustomPluginType) {
+      $this->pass('Custom Plugin Type Class Loaded');
+    }
+    else {
+      $this->fail('Custom Plugin Type Class Loaded');
+    }
+
+    if ($plugin_type instanceof Drupal\sps\Plugin\PluginType) {
+      $this->pass('Default Plugin Type Class Loaded');
+    }
+    else {
+      $this->fail('Default Plugin Type Class Loaded');
+    }
+
+    $plugins = $plugin_type->getPlugins();
+    if ($plugins instanceof Drupal\sps\Plugin\PluginCollection) {
+      $this->pass("Plugin Collection Class loaded via function", "SPS");
+    }
+    else {
+      $this->fail("Plugin Collection Class loaded via function", "SPS");
+    }
+
+    $this->_pluginTypeDefinitions($plugin_type, 'test_type');
+    $this->_pluginTypeDefinitions($custom_plugin_type, 'custom_type');
+  }
+
+  protected function _pluginTypeDefinitions($plugin_type, $type_name) {
+    $plugin_types_info = sps_test_sps_plugin_types();
+
+    $info_keys = array(
+      'module',
+      'name',
+      'class',
+      'plugin_class',
+      'interface',
+      'defaults',
+    );
+
+    $plugin_info = array();
+    foreach($info_keys as $key) {
+      $plugin_info[$key] = $plugin_type->getDefinition($key);
+    }
+
+    $this->assertEqual($plugin_info, $plugin_types_info[$type_name], "Plugin Type Definition Loaded", "SPS");
+  }
+
+  /**
+   * Reuse this in other plugin test to verify the plugin interface is correct
+   *
+   * @param $plugin
+   */
+  protected function assertIsPlugin($plugin) {
+    $this->assertCheckInterface("Drupal\\sps\\Plugin\\PluginInterface", $plugin, "Invalid Plugin");
+  }
+
+  /**
+   * Check if the class is a certain plugin type
+   */
+  protected function assertIsPluginType($plugin, $type) {
+    $interface = 'Drupal\\sps\\Plugin\\Type\\' . $type . "Interface";
+    $this->assertCheckInterface($interface, $plugin, "Plugin is of type $type");
+  }
+}

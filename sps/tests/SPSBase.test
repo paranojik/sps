@@ -25,12 +25,14 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
    *
    * Test if a block of code throws an exeption
    *
-   * @PARAM closure: a closure to run 
-   * @PARAM type: a string with the name of an exception class
-   * @PARAM error_message: a string with the message of the error
-   * @PARAM message: the message of the test
+   * @PARAM $closure Closure
+   * @PARAM $type string
+   *  name of an exception class
+   * @PARAM $error_message string
+   * @PARAM $message
+   *   the message of the test
    */
-  protected function assertThrows($closure, $type, $error_message = NULL, $message) {
+  protected function assertThrows(Closure $closure, $type, $error_message = NULL, $message) {
     try {
       $closure();
     }
