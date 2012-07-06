@@ -4,10 +4,10 @@ namespace Drupal\sps;
 /**
  * The Manager is the heart of the SPS system, taking inputs from different
  * parts of the system and pushing them to the correct object for processing
- * it can be orginized in to a few different sections
+ * it can be organized in to a few different sections
  *
  * Controller Access
- * The Manager managest access to drupal systems via different controllers. The
+ * The Manager manages access to drupal systems via different controllers. The
  * SPS system use the manger to access there when they need access to Drupal
  *  .---------------------------------------------------------------.
  *  |                            Systems                            |
@@ -49,7 +49,7 @@ namespace Drupal\sps;
  *
  * Preview Form
  * The Manager is the interface between the form hooks in the sps module
- * and the Root Conditon that does most of the Form creation and processing
+ * and the Root Condition that does most of the Form creation and processing
  * .-----------------------------------------.
  * |    preview form hooks in sps.module     |
  * |-----------------------------------------|
@@ -89,7 +89,7 @@ namespace Drupal\sps;
  *                    '-----------------------'   '--------------'
  *
  * Plugins
- * The Manager is a passthough to the plugin controller
+ * The Manager is a pass-through to the plugin controller
  */
 class Manager {
   protected $state_controller_site_state_key = 'sps_site_state_key';
@@ -179,7 +179,7 @@ class Manager {
   /**
    * Pull the site state form site state controller
    *
-   * Note the state controller is resposible for resonable caching of the site state
+   * Note the state controller is responsible for reasonable caching of the site state
    *
    * @return \Drupal\sps\SiteState | NULL
    */
@@ -279,7 +279,7 @@ class Manager {
   * Helper method for getting and causing the root Condition
   *
   * The Root condition is the use as the basis for the constructing the preview form
-  * It can be expect that it will be much more comilicated then the other conditions
+  * It can be expect that it will be much more complicated then the other conditions
   *
   * This method select the condition and its config using the config controller.
   *
@@ -305,7 +305,7 @@ class Manager {
    *   data to be passed to the react method
    *
    * @return mixed
-   *   Data used by the item calling raction
+   *   Data used by the item calling reaction
    */
   public function react($reaction, $data) {
     return $this->getPlugin("reaction", $reaction)->react($data);
