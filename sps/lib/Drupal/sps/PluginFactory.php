@@ -80,12 +80,6 @@ class PluginFactory implements PluginControllerInterface {
       throw new ClassLoadException("Plugin $name was not loaded");
     }
 
-    if (!(self::checkInterface($plugin_obj, $plugin_type_info['interface'])
-      && self::checkInterface($plugin_obj, "Drupal\\sps\\Plugins\\PluginInterface"))) {
-
-      throw new DoesNotImplementException("Plugin $name was not using the correct interface");
-    }
-
     return $plugin_obj;
   }
 
@@ -134,7 +128,7 @@ class PluginFactory implements PluginControllerInterface {
   protected function validatePluginInfo($plugin_info) {
     $required_settings = $this->getPluginTypeInfo($plugin_info['plugin_type'], 'require_settings');
     foreach ($required_settings as $setting) {
-      $this->validatePluginInfoElement($plugin_info, $setting);
+      $this->validatePluginInfoElement($plugin_info, $setting)->validatePluginClass($plugin_info);
     }
 
     module_invoke_all("sps_validate_plugin_info",
@@ -145,6 +139,29 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
+   * Validate that the plugin class is valid
+   *
+   * @param $plugin_info
+   *
+   * @throws Exception\DoesNotImplementException
+   *
+   * @return \Drupal\sps\PluginFactory
+   *  Self
+   */
+  protected function validatePluginClass($plugin_info) {
+    $interface = $this->getPluginTypeInfo($plugin_info['plugin_type'], 'interface');
+    if (!(self::checkInterface($plugin_info['class'], $interface)
+      && self::checkInterface($plugin_info['class'], "Drupal\\sps\\Plugins\\PluginInterface"))) {
+
+      throw new DoesNotImplementException("Plugin {$plugin_info['name']} is not using the correct interface");
+    }
+
+    return $this;
+  }
+
+  /**
+   * Validate that the plugin info array contains the all of the required keys
+   *
    * @param $plugin_info
    * @param $element
    *
