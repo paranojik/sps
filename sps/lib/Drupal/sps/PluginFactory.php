@@ -60,7 +60,7 @@ class PluginFactory implements PluginControllerInterface {
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @param \Drupal\sps\Manager $manager
    *
-   * @return mixed
+   * @return mixed|\Drupal\sps\Plugins\PluginInterface
    *   An instance of the plugin object
    *
    * @throws \Drupal\sps\Exception\InvalidPluginException
@@ -128,8 +128,9 @@ class PluginFactory implements PluginControllerInterface {
   protected function validatePluginInfo($plugin_info) {
     $required_settings = $this->getPluginTypeInfo($plugin_info['plugin_type'], 'require_settings');
     foreach ($required_settings as $setting) {
-      $this->validatePluginInfoElement($plugin_info, $setting)->validatePluginClass($plugin_info);
+      $this->validatePluginInfoElement($plugin_info, $setting);
     }
+    $this->validatePluginClass($plugin_info);
 
     module_invoke_all("sps_validate_plugin_info",
       $plugin_info, $plugin_info['plugin_type'],

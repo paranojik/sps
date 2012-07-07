@@ -6,6 +6,7 @@ class PluginController implements \Drupal\sps\PluginControllerInterface{
   public function __construct($infos) {
     $this->infos = $infos;
   }
+
   /**
    * factory for building a plugin object
    *
@@ -16,7 +17,7 @@ class PluginController implements \Drupal\sps\PluginControllerInterface{
    * @return
    *   an array of meta data for the plugin
    */
-  public function getPlugin($type, $name, $manager) {
+  public function getPlugin($type, $name, \Drupal\sps\Manager $manager) {
     $info = $this->getPluginInfo($type, $name);
     $class = $info['class'];
     $r = new \ReflectionClass($info['class']);

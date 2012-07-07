@@ -5,44 +5,142 @@
  */
 function sps_test_sps_plugin_types() {
   return array(
-    'default_type' => array(
+    'test_type_1' => array(
+      'interface' => "\\Drupal\\sps_tes\\Plugin\\TestTypeInterface",
       'defaults' => array(
-        'test_1' => 'a',
-        'test_2' => 'b',
+        'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'instance_settings' => array(),
       ),
-      'custom_type' => array(
-        'class' => "Drupal\\sps_test\\SPS\\Plugin\\CustomPluginType",
-        'plugin_class' => "Drupal\\sps_test\\SPS\\Plugin\\Plugin",
-        'interface' => "Drupal\\sps_test\\SPS\\Plugin\\PluginInterface",
+      'require_settings' => array(
+        'setting_1',
+        'setting_2' => array(
+          'settings 2.1',
+        ),
+        'setting 4',
+      ),
+    ),
+    'test_type_2' => array(
+      'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'defaults' => array(
+        'instance_settings' => array(
+          'instance_setting_1' =>  'abc',
+          'instance_setting_2' => 'def',
+        ),
+      ),
+    ),
+    'missing_required_settings' => array(
+      'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'defaults' => array(
+        'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'instance_settings' => array(),
+      ),
+      'required_settings' => array(
+        'required' => 'yes',
+      ),
+    ),
+    'incorrect_interface' => array(
+      'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'defaults' => array(
+        'class' => "\\Drupal\\sps_test\\Plugin\\BadPlugin",
+        'instance_settings' => array(),
       ),
     )
   );
 }
 
 /**
- * Implements hook_sps_test_type_plugins()
+ * Implements hook_sps_test_type_1_plugins().
  */
-function sps_test_sps_default_type_plugins() {
+function sps_test_sps_test_type_1_plugins() {
   return array(
-    'plugin_defaults' => array(),
-    'plugin_custom' => array(
-      'class' => "Drupal\\sps_test\\SPS\\Plugins\\PluginCustom\\TestPlugin",
-      'test_1' => 'c',
-      'test_2' => 'd',
+    'good_plugin' => array(
+      'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'setting_1' => 'abc',
+      'setting_2' => array(
+        'settings 2.1' => 'abc',
+      ),
+      'setting 4' => 'abc',
+    ),
+    'default_class_plugin' => array(
+      'setting_1' => 'abc',
+      'setting_2' => array(
+        'settings 2.1' => 'abc',
+      ),
+      'setting 4' => 'abc',
     ),
   );
 }
 
 /**
- * Implement hook_sps_plugin_custom_plugins()
+ * Implements hook_sps_test_type_2_plugins().
  */
-function sps_test_sps_plugin_custom_plugins() {
+function sps_test_sps_test_type_2_plugins() {
   return array(
-    'plugin_defaults' => array(),
-    'plugin_custom' => array(
-      'class' => "Drupal\\sps_test\\SPS\\Plugins\\PluginCustom\\TestPlugin2",
-      'test_1' => 'c',
-      'test_2' => 'd',
+    'normal_plugin' => array(
+      'class' =>"\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'instance_settings' => array(
+        'instance_setting_1' =>  '123',
+        'instance_setting_2' => '456',
+      ),
+    ),
+    'defaults_plugin' => array(
+      'class' =>"\\Drupal\\sps_test\\Plugin\\GoodPlugin",
     ),
   );
+}
+
+/**
+ * Implements hook_sps_missing_required_settings_plugins().
+ */
+function sps_test_sps_missing_required_settings_plugins() {
+  return array(
+    'missing_required_settings' => array(
+      'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'setting_1' => 'abc',
+    ),
+  );
+}
+
+/**
+ * Implements hook_sps_incorrect_interface_plugins().
+ */
+function sps_test_sps_incorrect_interface_plugins() {
+  return array(
+    'incorrect_interface' => array(
+      'class' => "\\Drupal\\sps_test\\Plugin\\BadPlugin",
+      'setting_1' => 'abc',
+      'setting_2' => array(
+        'settings 2.1' => 'abc',
+      ),
+      'setting 4' => 'abc',
+    ),
+  );
+}
+
+/**
+ * helper function for getting a Manager
+ *
+ * @param $controllers
+ *   array of controller from _sps_test_Get_basic_controllers
+ *
+ * @return
+ *   a Manager object
+ */
+function _sps_test_get_new_manager($controllers) {
+  return new Drupal\sps\Manager($controllers['state_controller'], $controllers['override_controller'], $controllers['config_controller'], $controllers['plugin_controller']);
+}
+
+/**
+ * A array of controllers to be feed to _sos_test_get_new_manager
+ *
+ * @return
+ *   A array of controllers to be feed to _sos_test_get_new_manager
+ */
+function _sps_test_get_basic_controllers() {
+  $controllers = array();
+  $controllers['state_controller'] = new Drupal\sps\Test\StorageController();
+  $controllers['override_controller'] = new Drupal\sps\Test\StorageController();
+  $controllers['config_controller'] = new Drupal\sps\Test\StorageController();
+  $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController(array());
+  return $controllers;
 }
