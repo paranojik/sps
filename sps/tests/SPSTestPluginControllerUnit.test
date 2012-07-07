@@ -3,7 +3,7 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
       'name' => 'SPS Test Plugin Controller Unit Tests',
-      'description' => 'Test the public interface to the TestPluginContrller object',
+      'description' => 'Test the public interface to the TestPluginController object',
       'group' => 'SPS',
     );
   }

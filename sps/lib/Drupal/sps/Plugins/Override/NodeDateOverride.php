@@ -1,6 +1,8 @@
 <?php
 namespace Drupal\sps\Override;
 
+use \Drupal\sps\Plugins\Override\Override;
+
 class NodeDateOverride extends Override {
   private $timestamp;
 

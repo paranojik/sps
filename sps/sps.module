@@ -1,65 +1,7 @@
 <?php
+
 define('SPS_CONFIG_ROOT_CONDITION', "sps_config_root_condition_settings");
-/**
- * Get the Site Manager
- *
- * @return Drupal\sps\Manager
- */
-function sps_get_manager() {
-  static $manager;
 
-  if (!isset($manager)) {
-    $manager = new Manager();
-  }
-
-  return $manager;
-}
-
-/**
- * Find and load the plugin if it exists
- *
- * @param $plugin_type
- *  The name of the plugin type
- * @param $plugin_name
- *  The name of the plugin to get.  This is optional.  If omitted then the plugin type object is returned.
- *
- * @return mixed|\Drupal\sps\Plugin\PluginCollection
- *  If no plugin name is passed then PluginCollection is returned.
- *  If a plugin is asked for then the plugin object will be returned.
- *
- */
-function sps_plugin($plugin_type, $plugin_name = NULL) {
-  if (isset($plugin_name)) {
-    return sps_plugin_factory()->getPlugin($plugin_type, $plugin_name);
-  }
-
-  return sps_plugin_factory()->getPlugins($plugin_type);
-
-}
-
-/**
- * Load the factor
- *
- * @return \Drupal\sps\Plugin\PluginFactory
- */
-function sps_plugin_factory() {
-  static $factory;
-
-  if (!isset($factory)) {
-    try {
-      $factory = new \Drupal\sps\PluginFactory();
-    } catch (\Exception $e) {
-      throw new Exception\ClassLoadException("Factory was not loaded");
-    }
-
-    if (!isset($factory)) {
-      throw new Exception\ClassLoadException("Factory was not loaded");
-    }
-
-  }
-
-  return $factory;
-}
 
 /**
  * A form callback for use by drupal_get_form().

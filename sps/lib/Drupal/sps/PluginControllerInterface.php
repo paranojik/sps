@@ -31,7 +31,7 @@ interface PluginControllerInterface {
    */
   public function getPluginInfo($type, $name=NULL);
 
- /**
+  /**
    * get meta info on plugins for a given criteria
    *
    * @param $type
@@ -40,7 +40,7 @@ interface PluginControllerInterface {
    *   the meta property to compare to the value
    * @param $value
    *   the value to compare to the meta property
-  *
+   *
    * @return
    *   an array of meta data for the plugins that match the criteria
    */

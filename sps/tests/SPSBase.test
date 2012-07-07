@@ -46,9 +46,25 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
         }
       }
       $this->pass($message, "SPS");
-      return ;
+      return;
     }
     $this->fail($message, "SPS");
+  }
+
+  /**
+   * Test that an object is an instance of a class
+   *
+   * @param $class
+   * @param $object
+   * @param $message
+   */
+  protected function assertIsInstance($class, $object, $message) {
+    if ($object instanceof $class) {
+      $this->pass($message, "SPS");
+    }
+    else {
+      $this->fail($message, "SPS");
+    }
   }
 
 }

@@ -60,33 +60,32 @@ class PluginFactory implements PluginControllerInterface {
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @param \Drupal\sps\Manager $manager
    *
-   * @return mixed
-   *   An instance of the plugin object
+   * @return mixed|\Drupal\sps\Plugins\PluginInterface|NULL
+   *   An instance of the plugin object or NULL if the plugin does not use a class
    *
    * @throws \Drupal\sps\Exception\InvalidPluginException
    * @throws \Drupal\sps\Exception\ClassLoadException
    * @throws \Drupal\sps\Exception\DoesNotImplementException
    */
   public function getPlugin($type, $name, Manager $manager) {
-    $plugin_type_info = $this->getPluginInfo($type);
     $plugin_info = $this->getPluginInfo($type, $name);
+    if (isset($plugin_info['class'])) {
+      $plugin_type_info = $this->getPluginInfo($type);
 
-    $class_name = isset($plugin_info['class']) ? $plugin_info['class'] : $plugin_type_info['class'];
 
-    try {
-      $plugin_obj = new $class_name($plugin_info['instance_settings'], $manager);
+      $class_name = isset($plugin_info['class']) ? $plugin_info['class'] : $plugin_type_info['class'];
+
+      try {
+        $plugin_obj = new $class_name($plugin_info['instance_settings'], $manager);
+      }
+      catch (\Exception $e) {
+        throw new ClassLoadException("Plugin $name was not loaded");
+      }
+
+      return $plugin_obj;
     }
-    catch (\Exception $e) {
-      throw new ClassLoadException("Plugin $name was not loaded");
-    }
 
-    if (!(self::checkInterface($plugin_obj, $plugin_type_info['interface'])
-      && self::checkInterface($plugin_obj, "Drupal\\sps\\Plugins\\PluginInterface"))) {
-
-      throw new DoesNotImplementException("Plugin $name was not using the correct interface");
-    }
-
-    return $plugin_obj;
+    return NULL;
   }
 
   /**
@@ -104,7 +103,7 @@ class PluginFactory implements PluginControllerInterface {
         $module_infos = $function();
 
         foreach ($module_infos as $plugin_name => $plugin_info) {
-          $plugin_info += array(
+          $plugin_info += $this->plugin_type_info[$plugin_type]['defaults'] + array(
             'plugin_type' => $plugin_type,
             'module' => $module,
             'name' => $plugin_name,
@@ -133,8 +132,12 @@ class PluginFactory implements PluginControllerInterface {
    */
   protected function validatePluginInfo($plugin_info) {
     $required_settings = $this->getPluginTypeInfo($plugin_info['plugin_type'], 'require_settings');
-    foreach ($required_settings as $setting) {
-      $this->validatePluginInfoElement($plugin_info, $setting);
+    foreach ($required_settings as $key => $setting) {
+      $this->validatePluginInfoElement($plugin_info, $key, $setting);
+    }
+
+    if (isset($plugin_info['class'])) {
+      $this->validatePluginClass($plugin_info);
     }
 
     module_invoke_all("sps_validate_plugin_info",
@@ -145,27 +148,50 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
+   * Validate that the plugin class is valid
+   *
    * @param $plugin_info
+   *
+   * @throws Exception\DoesNotImplementException
+   *
+   * @return \Drupal\sps\PluginFactory
+   *  Self
+   */
+  protected function validatePluginClass($plugin_info) {
+    $interface = $this->getPluginTypeInfo($plugin_info['plugin_type'], 'interface');
+    if (!(self::checkInterface($plugin_info['class'], $interface))) {
+      throw new DoesNotImplementException("Plugin {$plugin_info['name']} is not using the correct interface $interface");
+    }
+
+    if (!(self::checkInterface($plugin_info['class'], "Drupal\\sps\\Plugins\\PluginInterface"))) {
+      throw new DoesNotImplementException("Plugin {$plugin_info['name']} is not using the correct interface Drupal\\sps\\Plugins\\PluginInterface");
+    }
+
+    return $this;
+  }
+
+  /**
+   * Validate that the plugin info array contains the all of the required keys
+   *
+   * @param $plugin_info
+   * @param $element_key
    * @param $element
+   *
+   * @throws Exception\InvalidPluginException
+   *
    *
    * @return \Drupal\sps\PluginFactory
    *  self
-   * @throws \Drupal\sps\Exception\InvalidPluginException
    */
-  protected function validatePluginInfoElement($plugin_info, $element) {
+  protected function validatePluginInfoElement($plugin_info, $element_key, $element) {
     if (is_array($element)) {
-      foreach ($element as $key => $value) {
-        if (isset($plugin_info[$key])) {
-          $this->validatePluginInfoElement($plugin_info[$key], $value);
-        }
-        else {
-          throw new InvalidPluginException(
-            "Plugin {$plugin_info['name']} does not contain required element $key");
-        }
+      if (!isset($plugin_info[$element_key])) {
+        throw new InvalidPluginException(
+          "Plugin {$plugin_info['name']} does not contain required element $element_key");
       }
     }
     else {
-      if (!isset($plugin_type_info[$element])) {
+      if (!isset($plugin_info[$element])) {
         throw new InvalidPluginException(
           "Plugin {$plugin_info['name']} does not contain required element $element");
       }
@@ -175,6 +201,8 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
+   * Get Info about a plugin type
+   *
    * @param $plugin_type
    *  The name of the plugin type
    *
@@ -191,7 +219,7 @@ class PluginFactory implements PluginControllerInterface {
       }
 
       if (isset($key)) {
-        return empty($this->plugin_type_info[$plugin_type][$key]) ?: $this->plugin_type_info[$plugin_type][$key];
+        return !isset($this->plugin_type_info[$plugin_type][$key]) ?: $this->plugin_type_info[$plugin_type][$key];
       }
 
       return $this->plugin_type_info[$plugin_type];

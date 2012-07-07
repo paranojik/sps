@@ -1,10 +1,12 @@
 <?php
 namespace Drupal\sps\Test;
+
 class PluginController implements \Drupal\sps\PluginControllerInterface{
   protected $infos = array();
   public function __construct($infos) {
     $this->infos = $infos;
   }
+
   /**
    * factory for building a plugin object
    *
@@ -13,7 +15,7 @@ class PluginController implements \Drupal\sps\PluginControllerInterface{
    * @param $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @return
-   *   an array of meta data for the plugin or FALSE if the plugin is not found
+   *   an array of meta data for the plugin
    */
   public function getPlugin($type, $name, \Drupal\sps\Manager $manager) {
     $info = $this->getPluginInfo($type, $name);
