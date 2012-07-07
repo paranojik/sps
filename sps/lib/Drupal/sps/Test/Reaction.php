@@ -1,15 +1,16 @@
 <?php
 namespace Drupal\sps\Test;
 
-class Reaction implements \Drupal\sps\Plugins\PluginInterface, \Drupal\sps\Plugins\ReactionInterface {
+class Reaction extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sps\Plugins\ReactionInterface {
 
   protected $react_callback;
   /**
    * the construct that is expect by the plugin system
-   * @Param setting 
+   * @Param setting
    * @param $manager an object of class Drupal\sps\Manager
    */
-  public function __construct($settings, $manager) {
+  public function __construct(array $settings, \Drupal\sps\Manager $manager) {
+    parent::__construct($settings, $manager);
     $this->react_callback = $settings['callback'];
   }
 

@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Test;
 
-class PluginController implements \Drupal\sps\PluginControllerInterface{
+class PluginController implements \Drupal\sps\PluginControllerInterface {
   protected $infos = array();
   public function __construct($infos) {
     $this->infos = $infos;

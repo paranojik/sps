@@ -1,5 +1,6 @@
 <?php
 namespace Drupal\sps\Plugins;
+
 interface OverrideInterface {
   /*
    * Construct an array of override arrays.

@@ -1,6 +1,6 @@
 <?php
 namespace Drupal\sps\Test;
-class StorageController implements \Drupal\sps\StorageControllerInterface{
+class StorageController implements \Drupal\sps\StorageControllerInterface {
   protected $cache = array();
   /**
   * Cache away a object
@@ -40,5 +40,5 @@ class StorageController implements \Drupal\sps\StorageControllerInterface{
     }
     throw new \Exception("Drupal\\sps\\Test\\PersistentStorageController does not have $name cached");
   }
-  
+
 }

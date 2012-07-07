@@ -1,5 +1,9 @@
 <?php
 namespace Drupal\sps\Plugins\Widget;
 
-abstract class Widget implements \Drupal\sps\Plugins\WidgetInterface, \Drupal\sps\Plugins\PluginInterface {
+use Drupal\sps\Plugins\AbstractPlugin;
+use Drupal\sps\Plugins\WidgetInterface;
+
+
+abstract class Widget extends AbstractPlugin  implements WidgetInterface {
 }

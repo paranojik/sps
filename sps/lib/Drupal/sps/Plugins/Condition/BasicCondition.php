@@ -1,11 +1,13 @@
 <?php
 namespace Drupal\sps\Plugins\Condition;
 
-class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\sps\Plugins\PluginInterface {
+use Drupal\sps\Plugins\AbstractPlugin;
+use Drupal\sps\Plugins\ConditionInterface;
+
+class BasicCondition extends AbstractPlugin implements ConditionInterface {
   protected $overrides;
   protected $widget;
   protected $manager;
-
   protected $override_set = FALSE;
 
   /**
@@ -14,14 +16,14 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    * Create a new BasicCondition.
    *
    * @param $config
-   *  An array of configuration which includes the widgetto use
+   *  An array of configuration which includes the widget to use
    *  These should be specified as the 'widget' key.
    *  The widget key may be specified as class names or instantiated
    *  classes.
    * @param $manager
    *  The current instance of the sps manager.
    */
-  public function __construct($config, $manager) {
+  public function __construct(array $config, \Drupal\sps\Manager $manager) {
     $this->overrides = $manager->getPluginByMeta('Override', 'condition', $config['name']);
 
     if (!empty($config['widget']) && is_string($config['widget'])) {
@@ -37,13 +39,14 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    *
    * Retrieve the override if it is set.
    *
-   * @return
+   * @return bool|\Drupal\sps\Plugins\Override\AggregatorOverride
    *  The override with its values set or FALSE if the form has not been
-   *  sucessfully submitted.
    */
   public function getOverride() {
     if ($this->override_set) {
-      $override = new \Drupal\sps\Plugins\Override\AggregatorOverride();
+      $override = new \Drupal\sps\Plugins\Override\AggregatorOverride(
+        $this->settings, $this->manager);
+
       $override->setData($this->overrides);
       return $override;
     }
@@ -80,6 +83,8 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
    */
   public function validateElement($element, &$form_state) {
     $this->handleWidgetForm($element, $form_state, 'validatePreviewForm');
+
+    return $this;
   }
 
   /**
@@ -100,6 +105,8 @@ class BasicCondition implements \Drupal\sps\Plugins\ConditionInterface,\Drupal\s
     }
 
     $this->override_set = TRUE;
+
+    return $this;
   }
 
   /**

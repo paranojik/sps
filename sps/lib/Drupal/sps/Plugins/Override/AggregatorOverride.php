@@ -1,11 +1,13 @@
 <?php
+
 namespace Drupal\sps\Plugins\Override;
 
-class AggregatorOverride implements \Drupal\sps\Plugins\OverrideInterface {
+use Drupal\sps\Plugins\OverrideInterface;
+
+class AggregatorOverride extends Override {
   protected $override_table = array();
   protected $overrides_set = FALSE;
 
-  public function __construct() {}
   /**
    * Implementation of OverrideInterface::setData().
    *
@@ -14,6 +16,7 @@ class AggregatorOverride implements \Drupal\sps\Plugins\OverrideInterface {
    * @param array $data
    *  An array of overrides.
    *
+   * @return \Drupal\sps\Plugins\Override\AggregatorOverride
    * @throws \Drupal\sps\Exception\InvalidOverrideException
    *  If 2 overrides passed as data contain overrides for the same type.
    */
@@ -30,12 +33,14 @@ class AggregatorOverride implements \Drupal\sps\Plugins\OverrideInterface {
       }
     }
     $this->overrides_set = TRUE;
+
+    return $this;
   }
 
   /**
    * Implementation of OverrideInterface::getOverrides().
    *
-   * @return
+   * @return array|bool
    *  An array of overrides keyed by type with subarrays keyed by id and values
    *  representing the revision ids.
    *  Example:
@@ -59,7 +64,7 @@ class AggregatorOverride implements \Drupal\sps\Plugins\OverrideInterface {
    * \Drupal\sps\Plugins\OverrideInterface.
    * These overrides should already have their data set.
    *
-   * @return
+   * @return string
    *  A string.
    */
   public function getDataConsumerApi() {

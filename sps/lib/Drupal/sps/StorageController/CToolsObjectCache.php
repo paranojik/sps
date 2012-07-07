@@ -8,7 +8,7 @@ namespace Drupal\sps\StorageController;
  * here. the current code is just for helping to describe direction.
  *
  */
-class CToolsObjectCache implements PersistentStorageControllerInterface {
+class CToolsObjectCache implements \Drupal\sps\StorageControllerInterface {
  protected static $obj = 'sps-ctools-object-cache';
  /**
   * Cache away a object
