@@ -26,28 +26,55 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
 
     $default_plugin_type_info = array(
       'test_type_1' => array(
-        'interface' => "\\Drupal\\sps_tes\\Plugin\\TestTypeInterface",
+        'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
         'defaults' => array(
-          'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
           'instance_settings' => array(),
         ),
         'require_settings' => array(
           'setting_1',
-          'setting_2:' => array(
+          'setting_2' => array(
             'settings 2.1',
           ),
           'setting 4',
         ),
+        'module' => 'sps_test',
+        'name' => 'test_type_1',
       ),
       'test_type_2' => array(
-        'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
         'defaults' => array(
           'instance_settings' => array(
             'instance_setting_1' =>  'abc',
             'instance_setting_2' => 'def',
           ),
         ),
+        'require_settings' => array(),
+        'module' => 'sps_test',
+        'name' => 'test_type_2',
       ),
+      'missing_required_settings' => array(
+        'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'defaults' => array(
+          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+          'instance_settings' => array(),
+        ),
+        'require_settings' => array(
+          'required' => 'yes',
+        ),
+        'module' => 'sps_test',
+        'name' => 'missing_required_settings',
+      ),
+      'incorrect_interface' => array(
+        'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'defaults' => array(
+          'class' => "Drupal\\sps_test\\Plugin\\BadPlugin",
+          'instance_settings' => array(),
+        ),
+        'module' => 'sps_test',
+        'name' => 'incorrect_interface',
+        'require_settings' => array(),
+      )
     );
 
     $factory = new PluginFactory();
@@ -57,56 +84,76 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
       $default_plugin_type_info,
       'Plugin Type Info Loaded Correctly', 'SPS');
 
-    $test_1_plugin_type_info = $factory->getPluginInfo('test_type_1');
+    $test_1_plugin_type_info = $factory->getPluginTypeInfo('test_type_1');
     $this->assertEqual($test_1_plugin_type_info,
       $default_plugin_type_info['test_type_1'],
-      'Plugin Type Info Loaded Correctly for test type 1', 'SPS');
+      'Plugin Type Info Loaded correctly for test type 1', 'SPS');
 
-    $test_2_plugin_type_info = $factory->getPluginInfo('test_type_2');
+    $test_2_plugin_type_info = $factory->getPluginTypeInfo('test_type_2');
     $this->assertEqual($test_2_plugin_type_info,
       $default_plugin_type_info['test_type_2'],
-      'Plugin Type Info Loaded by type', 'SPS');
+      'Plugin Type Info Loaded by correctly for test type 2', 'SPS');
 
     foreach ($default_plugin_type_info['test_type_1'] as $property => $value) {
       $this->assertEqual($value, $factory->getPluginTypeInfo('test_type_1', $property),
-        'Plugin Type Info Loaded by key', "SPS");
+        "Plugin Type test_type_1 Info Loaded by key for $property", "SPS");
     }
 
     foreach ($default_plugin_type_info['test_type_2'] as $property => $value) {
       $this->assertEqual($value, $factory->getPluginTypeInfo('test_type_2', $property),
-        'Plugin Type Info Loaded by key', "SPS");
+        "Plugin Type test_type_2 Info Loaded by key for $property", "SPS");
+
     }
   }
 
   public function testPluginInfo() {
     $test_type_1_info = array(
       'good_plugin' => array(
-        'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
         'setting_1' => 'abc',
-        'setting_2:' => array(
+        'setting_2' => array(
           'settings 2.1' => 'abc',
         ),
         'setting 4' => 'abc',
+        'plugin_type' => 'test_type_1',
+        'module' => 'sps_test',
+        'name' => 'good_plugin',
+        'instance_settings' => array(),
       ),
       'default_class_plugin' => array(
         'setting_1' => 'abc',
-        'setting_2:' => array(
+        'setting_2' => array(
           'settings 2.1' => 'abc',
         ),
         'setting 4' => 'abc',
+        'plugin_type' => 'test_type_1',
+        'module' => 'sps_test',
+        'name' => 'default_class_plugin',
+        'instance_settings' => array(),
+        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
       ),
     );
 
     $test_type_2_info = array(
       'normal_plugin' => array(
-        'class' =>"\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'class' =>"Drupal\\sps_test\\Plugin\\GoodPlugin",
         'instance_settings' => array(
           'instance_setting_1' =>  '123',
           'instance_setting_2' => '456',
         ),
+        'plugin_type' => 'test_type_2',
+        'module' => 'sps_test',
+        'name' => 'normal_plugin',
       ),
       'defaults_plugin' => array(
-        'class' =>"\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'class' =>"Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'instance_settings' => array(
+          'instance_setting_1' =>  'abc',
+          'instance_setting_2' => 'def',
+        ),
+        'plugin_type' => 'test_type_2',
+        'module' => 'sps_test',
+        'name' => 'defaults_plugin',
       ),
     );
 
@@ -131,10 +178,10 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     };
 
     $this->assertThrows($missing_required_settings,
-      "\\Drupal\\sps\\Exception\\InvalidPluginException", NULL, 'Missing Required Settings Plugin Failed to Load');
+      "Drupal\\sps\\Exception\\InvalidPluginException", NULL, 'Missing Required Settings Plugin Failed to Load');
 
     $this->assertThrows($incorrect_interface,
-      "\\Drupal\\sps\\Exception\\DoesNotImplementException", NULL, 'Missing Required Settings Plugin Failed to Load');
+      "Drupal\\sps\\Exception\\DoesNotImplementException", NULL, 'Missing Required Settings Plugin Failed to Load');
   }
 
   public function testGetPlugin() {
@@ -144,28 +191,28 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     $factory = new PluginFactory();
     $correct_interface = $factory->getPlugin('test_type_1', 'good_plugin', $manager);
 
-    $this->assertCheckInterface("\\Drupal\\sps_tes\\Plugin\\TestTypeInterface",
+    $this->assertCheckInterface("Drupal\\sps_test\\Plugin\\TestTypeInterface",
       $correct_interface, 'The correct interface is being used in the Plugin Class');
 
     $this->assertCheckInterface("Drupal\\sps\\Plugins\\PluginInterface",
       $correct_interface, 'The correct interface is being used in the Plugin Class');
 
     $custom_instance_settings = $factory->getPlugin('test_type_2', 'normal_plugin', $manager);
-    $this->assertEqual($custom_instance_settings->getSetting('instance_setting_1', '123'),
+    $this->assertEqual($custom_instance_settings->getSetting('instance_setting_1'), '123',
       'Plugin Instance setting is correct', "SPS");
-    $this->assertEqual($custom_instance_settings->getSetting('instance_setting_2', '456'),
+    $this->assertEqual($custom_instance_settings->getSetting('instance_setting_2'), '456',
       'Plugin Instance setting is correct', "SPS");
 
     $default_instance_settings = $factory->getPlugin('test_type_2', 'defaults_plugin', $manager);
-    $this->assertEqual($default_instance_settings->getSetting('instance_setting_1', 'abc'),
+    $this->assertEqual($default_instance_settings->getSetting('instance_setting_1'), 'abc',
       'Plugin Instance setting is correct', "SPS");
-    $this->assertEqual($default_instance_settings->getSetting('instance_setting_2', 'def'),
+    $this->assertEqual($default_instance_settings->getSetting('instance_setting_2'), 'def',
       'Plugin Instance setting is correct', "SPS");
 
-    $this->assertIsInstance("\\Drupal\\sps_test\\Plugin\\TestType1\\GoodPlugin",
+    $this->assertIsInstance("Drupal\\sps_test\\Plugin\\GoodPlugin",
       $correct_interface, "Correct Plugin Class used");
 
     $default_class_plugin = $factory->getPlugin('test_type_1', 'default_class_plugin', $manager);
-    $this->assertIsInstance("\\Drupal\\sps_test\\Plugin\\GoodPlugin", $default_class_plugin, 'Default Plugin Class used');
+    $this->assertIsInstance("Drupal\\sps_test\\Plugin\\GoodPlugin", $default_class_plugin, 'Default Plugin Class used');
   }
 }

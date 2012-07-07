@@ -6,9 +6,9 @@
 function sps_test_sps_plugin_types() {
   return array(
     'test_type_1' => array(
-      'interface' => "\\Drupal\\sps_tes\\Plugin\\TestTypeInterface",
+      'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
       'defaults' => array(
-        'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
         'instance_settings' => array(),
       ),
       'require_settings' => array(
@@ -20,7 +20,7 @@ function sps_test_sps_plugin_types() {
       ),
     ),
     'test_type_2' => array(
-      'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
       'defaults' => array(
         'instance_settings' => array(
           'instance_setting_1' =>  'abc',
@@ -29,19 +29,19 @@ function sps_test_sps_plugin_types() {
       ),
     ),
     'missing_required_settings' => array(
-      'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
       'defaults' => array(
-        'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
         'instance_settings' => array(),
       ),
-      'required_settings' => array(
+      'require_settings' => array(
         'required' => 'yes',
       ),
     ),
     'incorrect_interface' => array(
-      'interface' =>  "\\Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
       'defaults' => array(
-        'class' => "\\Drupal\\sps_test\\Plugin\\BadPlugin",
+        'class' => "Drupal\\sps_test\\Plugin\\BadPlugin",
         'instance_settings' => array(),
       ),
     )
@@ -54,7 +54,7 @@ function sps_test_sps_plugin_types() {
 function sps_test_sps_test_type_1_plugins() {
   return array(
     'good_plugin' => array(
-      'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
       'setting_1' => 'abc',
       'setting_2' => array(
         'settings 2.1' => 'abc',
@@ -77,14 +77,14 @@ function sps_test_sps_test_type_1_plugins() {
 function sps_test_sps_test_type_2_plugins() {
   return array(
     'normal_plugin' => array(
-      'class' =>"\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'class' =>"Drupal\\sps_test\\Plugin\\GoodPlugin",
       'instance_settings' => array(
         'instance_setting_1' =>  '123',
         'instance_setting_2' => '456',
       ),
     ),
     'defaults_plugin' => array(
-      'class' =>"\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'class' =>"Drupal\\sps_test\\Plugin\\GoodPlugin",
     ),
   );
 }
@@ -95,7 +95,7 @@ function sps_test_sps_test_type_2_plugins() {
 function sps_test_sps_missing_required_settings_plugins() {
   return array(
     'missing_required_settings' => array(
-      'class' => "\\Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
       'setting_1' => 'abc',
     ),
   );
@@ -107,7 +107,7 @@ function sps_test_sps_missing_required_settings_plugins() {
 function sps_test_sps_incorrect_interface_plugins() {
   return array(
     'incorrect_interface' => array(
-      'class' => "\\Drupal\\sps_test\\Plugin\\BadPlugin",
+      'class' => "Drupal\\sps_test\\Plugin\\BadPlugin",
       'setting_1' => 'abc',
       'setting_2' => array(
         'settings 2.1' => 'abc',

@@ -59,10 +59,12 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
    * @param $message
    */
   protected function assertIsInstance($class, $object, $message) {
-    if ($object instanceof $object) {
+    if ($object instanceof $class) {
       $this->pass($message, "SPS");
     }
-    $this->fail($message, "SPS");
+    else {
+      $this->fail($message, "SPS");
+    }
   }
 
 }
