@@ -1,6 +1,7 @@
 <?php
 
-define('SPS_CONFIG_ROOT_CONDITION', "sps_config_root_condition_settings");
+define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
+define('SPS_CONFIG_PREFIX', "sps_config");
 
 
 /**
@@ -18,9 +19,23 @@ define('SPS_CONFIG_ROOT_CONDITION', "sps_config_root_condition_settings");
 function sps_condition_preview_form($form, &$form_state) {
   if (!empty($form_state['build_info']['args'][0])) {
     $form_function = $form_state['build_info']['args'][0];
-    if(is_callable($form_function)) {
+    if (is_callable($form_function)) {
       $form_function($form, $form_state);
     }
   }
 }
 
+/**
+ * Get the default Storage Controller
+ *
+ * @return \Drupal\sps\StorageController\DrupalVariableController
+ */
+function sps_get_default_config_controller() {
+  $controller = &drupal_static(__FUNCTION__);
+
+  if(!isset($controller)) {
+    $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+  }
+
+  return $controller;
+}

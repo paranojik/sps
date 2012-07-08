@@ -20,7 +20,8 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
       $this->fail($message, 'SPS');
     }
   }
-  /**
+  /*
+  *
    * SPSBaseUnitTest::assertThrows
    *
    * Test if a block of code throws an exeption
