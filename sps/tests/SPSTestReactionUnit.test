@@ -9,7 +9,7 @@ class SPSTestReactionUnitTest extends SPSBaseUnitTest {
   }
 
   public function testTestReaction() {
-    $manager = new stdClass();
+    $manager =  _sps_test_get_new_manager(_sps_test_get_basic_controllers());
     $settings = array(
       'callback' => function($data) { return $data + 1;},
     );

@@ -2,6 +2,8 @@
 namespace Drupal\sps\Test;
 
 class Widget extends \Drupal\sps\Plugins\Widget\Widget {
+  private $type;
+
   /**
    * Implements WidgetInterface::getPreviewForm().
    *
@@ -35,10 +37,7 @@ class Widget extends \Drupal\sps\Plugins\Widget\Widget {
    * Get the value from text_input and return it.
    */
   public function extractValues($form, $form_state) {
-    $values = array();
-    if (!empty($form_state['values']['text_input'])) {
-      $values['text_input'] = $form_state['values']['text_input'];
-    }
+    $values = $form_state['values']['text_input'];
     return $values;
   }
 }

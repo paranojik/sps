@@ -1,68 +1,41 @@
 <?php
 
-define('SPS_CONFIG_ROOT_CONDITION', "sps_config_root_condition_settings");
+define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
+define('SPS_CONFIG_PREFIX', "sps_config");
 
-use Drupal\sps;
-use Drupal\sps\Exception;
-
-/**
- * Get the Site Manager
- *
- * @return Drupal\sps\Manager
- */
-function sps_get_manager() {
-  static $manager;
-
-  if (!isset($manager)) {
-    $manager = new Manager();
-  }
-
-  return $manager;
-}
 
 /**
- * Find and load the plugin if it exists
+ * A form callback for use by drupal_get_form().
  *
- * @param $plugin_type
- *  The name of the plugin type
- * @param $plugin_name
- *  The name of the plugin to get.  This is optional.  If omitted then the plugin type object is returned.
+ * When called like:
+ * drupal_get_form('sps_condition_preview_form', array($this, 'getPreviewForm'))
+ * by the manager or a condition, it will return that form.
  *
- * @return mixed|\Drupal\sps\Plugin\PluginCollection
- *  If no plugin name is passed then PluginCollection is returned.
- *  If a plugin is asked for then the plugin object will be returned.
+ * @return
+ *  A FAPI array for drupal_get_form if a callback is provided, or NULL
  *
+ * @see Manager::getPreviewForm();
  */
-function sps_plugin($plugin_type, $plugin_name = NULL) {
-  if (isset($plugin_name)) {
-    return sps_plugin_factory()->getPlugin($plugin_type, $plugin_name);
-  }
-
-  return sps_plugin_factory()->getPlugins($plugin_type);
-
-}
-
-/**
- * Load the factor
- *
- * @return \Drupal\sps\Plugin\PluginFactory
- */
-function sps_plugin_factory() {
-  static $factory;
-
-  if (!isset($factory)) {
-    try {
-      $factory = new \Drupal\sps\Plugin\PluginFactory();
-    } catch (\Exception $e) {
-      throw new Exception\ClassLoadException("Factory was not loaded");
+function sps_condition_preview_form($form, &$form_state) {
+  if (!empty($form_state['build_info']['args'][0])) {
+    $form_function = $form_state['build_info']['args'][0];
+    if (is_callable($form_function)) {
+      $form_function($form, $form_state);
     }
-
-    if (!isset($factory)) {
-      throw new Exception\ClassLoadException("Factory was not loaded");
-    }
-
   }
-
-  return $factory;
 }
 
+/**
+ * Get the default Storage Controller
+ *
+ * @return \Drupal\sps\StorageController\DrupalVariableController
+ */
+function sps_get_default_config_controller() {
+  $controller = &drupal_static(__FUNCTION__);
+
+  if(!isset($controller)) {
+    $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+  }
+
+  return $controller;
+}

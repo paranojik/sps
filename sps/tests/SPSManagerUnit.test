@@ -19,7 +19,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $state_controller = $controllers['state_controller'];
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
-    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
     $site_state = new Drupal\sps\SiteState($controllers['override_controller'], $override);
 
@@ -33,7 +33,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $state_controller = $controllers['state_controller'];
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
-    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
     $manager->setSiteState($override);
 
@@ -55,24 +55,26 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $manager = _sps_test_get_new_manager($controllers);
 
     $this->assertEqual(
-      $manager->getPluginInfo('widget'), 
-      $info['widget'], 
+      $manager->getPluginInfo('widget'),
+      $info['widget'],
       "TestStorageController::getPluginInfo should get me all of the plugin infos for that type if i only pass it one param", 'SPS'
     );
     $this->assertEqual(
-      $manager->getPluginInfo('widget', 'test_widget'), 
-      $info['widget']['test_widget'], 
+      $manager->getPluginInfo('widget', 'test_widget'),
+      $info['widget']['test_widget'],
       'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
     );
     $this->assertEqual(
-      $manager->getPlugin('widget', 'test_widget'), 
-      new \Drupal\sps\Test\Override(array(), new StdClass()),
+      $manager->getPlugin('widget', 'test_widget'),
+      new \Drupal\sps\Test\Override(array(), $manager),
       'TestStorageController::getPlugin should build a obj from the plugin info', 'SPS'
     );
 
   }
   public function testManager_previewForm() {
-    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $controllers = _sps_test_get_basic_controllers();
+    $manager = _sps_test_get_new_manager($controllers);
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData(array(array('id'=>1, 'revision_id' =>3, 'type' => 'article')));
     $settings = array(
       'element_form' => array(
@@ -84,7 +86,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       'validate_fail_name' => "error_item",
       'override' => $override,
     );
- 
+
     $info = array(
       'condition' => array(
         'testCondition' => array(
@@ -102,26 +104,20 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $form_state = array();
 
     $this->assertEqual(
-      $manager->getPreviewForm($form, $form_state), 
-      $settings['element_form'], 
+      $manager->getPreviewForm($form, $form_state),
+      $settings['element_form'],
       "Manager::getPreviewForm should pull the form from the condition from the getElement method of the condition specified as the root condition in the config", 'SPS'
     );
-
-    form_clear_error();
-    $manager->validatePreviewForm($form, $form_state);
-    $this->assertEqual(
-      form_get_errors(), 
-      array($settings['validate_fail_name'] => $settings['validate_fail_message']), 
-      "Manager::validatePreviewForm should run validateElement on the Root Condition (we are testing that a form_set_error is called)", 'SPS'
-    );
-
+    //TODO this need to test previewFormSubmitted()
+    /*
     $manager->submitPreviewForm($form, $form_state);
     $site_state = $manager->getSiteState();
     $this->assertEqual(
-      $site_state->getOverride(), 
-      $override->getOverrides(), 
+      $site_state->getOverride(),
+      $override->getOverrides(),
       "Manager::submitPreviewForm summits the from to the root condition, as the former for the override and builds the site state with that override.", 'SPS'
     );
+    */
   }
 
   public function testManager_react() {
@@ -140,38 +136,10 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($info);
     $manager = _sps_test_get_new_manager($controllers);
     $this->assertEqual(
-      $manager->react("test_reaction", 4), 
-      5, 
+      $manager->react("test_reaction", 4),
+      5,
       "Manager::react should return based on the react method of the plugin", 'SPS'
     );
   }
 
-}
-
-/**
-* helper function for getting a Manager
-*
-* @param $controllers
-*   array of controller from _sps_test_Get_basic_controllers 
-*
-* @return 
-*   a Manager object
-*/
-function _sps_test_get_new_manager($controllers) {
-  return new Drupal\sps\Manager($controllers['state_controller'], $controllers['override_controller'], $controllers['config_controller'], $controllers['plugin_controller']);
-}
-
-/**
-* A array of controllers to be feed to _sos_test_get_new_manager
-*
-* @return 
-*   A array of controllers to be feed to _sos_test_get_new_manager
-*/
-function _sps_test_get_basic_controllers() {
-  $controllers = array();
-  $controllers['state_controller'] = new Drupal\sps\Test\StorageController();
-  $controllers['override_controller'] = new Drupal\sps\Test\StorageController();
-  $controllers['config_controller'] = new Drupal\sps\Test\StorageController();
-  $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController(array());
-  return $controllers;
 }

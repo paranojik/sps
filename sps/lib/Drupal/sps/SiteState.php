@@ -26,7 +26,7 @@ class SiteState {
   * @param $controller
   *   The StorageController to use for storing Overrides
   *
-  * @return 
+  * @return \Drupal\sps\SiteState
   *   Self
   */
   protected function setOverrideController(StorageControllerInterface $controller) {
@@ -38,9 +38,10 @@ class SiteState {
   /**
    * Store the Override to use for generating overrides
    *
-   * @param $override 
+   * @param $override
    *   The Override to use to generate overrides
-   * @return 
+   *
+   * @return \Drupal\sps\SiteState
    *   Self
    */
   protected function setOverride(Plugins\OverrideInterface $override) {
@@ -50,13 +51,14 @@ class SiteState {
   }
 
   /**
-  * Retrive Stored Overrides
+  * Retrieve Stored Overrides
   *
-  * @return 
+  * @return array
   *   Array of overrides
+  *   @TODO make this a iterator?
   */
   public function getOverride() {
-    if(!$this->override_controller->is_set($this->controller_key)) {
+    if(!$this->override_controller->exists($this->controller_key)) {
       $this->cacheOverride();
     }
     return $this->override_controller->get($this->controller_key);
@@ -65,7 +67,7 @@ class SiteState {
   /**
    * Generate overrides from the stored Override and save it to the Override Controller
    *
-   * @return
+   * @return \Drupal\sps\SiteState
    *   Self
    */
   protected function cacheOverride() {

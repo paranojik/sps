@@ -4,7 +4,7 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
       'name' => 'SPS Test Plugin Controller Unit Tests',
-      'description' => 'Test the public interface to the TestPluginContrller object',
+      'description' => 'Test the public interface to the TestPluginController object',
       'group' => 'SPS',
     );
   }
@@ -20,13 +20,13 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
     );
     $controller = new \Drupal\sps\Test\PluginController($info);
     $this->assertEqual(
-      $controller->getPluginInfo('widget'), 
-      $info['widget'], 
+      $controller->getPluginInfo('widget'),
+      $info['widget'],
       "TestStorageController::getPluginInfo should get me all of the plugin infos for that type if i only pass it one param", 'SPS'
     );
     $this->assertEqual(
-      $controller->getPluginInfo('widget', 'test_widget'), 
-      $info['widget']['test_widget'], 
+      $controller->getPluginInfo('widget', 'test_widget'),
+      $info['widget']['test_widget'],
       'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
     );
 

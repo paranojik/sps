@@ -1,6 +1,6 @@
 <?php
 namespace Drupal\sps\Test;
-class StorageController implements \Drupal\sps\StorageControllerInterface{
+class StorageController implements \Drupal\sps\StorageControllerInterface {
   protected $cache = array();
   /**
   * Cache away a object
@@ -23,7 +23,7 @@ class StorageController implements \Drupal\sps\StorageControllerInterface{
   *   A string name use for retrieval
   * @return bool
   */
-  public function is_set($name) {
+  public function exists($name) {
     return isset($this->cache[$name]);
   }
 
@@ -35,10 +35,10 @@ class StorageController implements \Drupal\sps\StorageControllerInterface{
   * @return the object that was cached
   */
   public function get($name) {
-    if ($this->is_set($name)) {
+    if ($this->exists($name)) {
       return $this->cache[$name];
     }
     throw new \Exception("Drupal\\sps\\Test\\PersistentStorageController does not have $name cached");
   }
-  
+
 }

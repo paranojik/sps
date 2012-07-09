@@ -1,31 +1,13 @@
 <?php
 namespace Drupal\sps;
 
-function test_sps_get_config() {
-  $sps_config = array(
-    'conditions' => array(
-      'collection' => array(
-        'title' => 'Collection',
-        'widget' => 'collection_select',
-        'override' => 'view_collection_override',
-      ),
-      'date' => array(
-        'title' => 'Live Date',
-        'widget' => 'live_date',
-        'override' => 'view_live_date_override',
-      ),
-    ),
-  );
-  return $sps_config;
-}
-
 /**
- * The Manager is the heart of the SPS system, taking inputs from different 
- * parts of the system and pushing them to the correct object for processing 
- * it can be orginized in to a few different sections
+ * The Manager is the heart of the SPS system, taking inputs from different
+ * parts of the system and pushing them to the correct object for processing
+ * it can be organized in to a few different sections
  *
  * Controller Access
- * The Manager managest access to drupal systems via different controllers. The 
+ * The Manager manages access to drupal systems via different controllers. The
  * SPS system use the manger to access there when they need access to Drupal
  *  .---------------------------------------------------------------.
  *  |                            Systems                            |
@@ -55,19 +37,21 @@ function test_sps_get_config() {
  *                                       '---------------------------'
  *
  * Site State
- * THe Manager can create a site state object, and uses the State Controller 
- * to keep it around from page load to page load. When creating site state it 
- * hand off the Override Controller So that the Site state can Compile the 
+ * THe Manager can create a site state object, and uses the State Controller
+ * to keep it around from page load to page load. When creating site state it
+ * hand off the Override Controller So that the Site state can Compile the
  * override data and store it in the Override Controller
- *  
- *  @TODO this part of the system should be reviews when we start needing 
+ *
+ *  @TODO this part of the system should be reviews when we start needing
  *  access to the site state
  *
  *
  *
  * Preview Form
- * The Manager is the interface between the form hooks in the sps module 
- * and the Root Conditon that does most of the Form creation and processing 
+ * TODO This has been simplified and change need to be updated.
+ *
+ * The Manager is the interface between the form hooks in the sps module
+ * and the Root Condition that does most of the Form creation and processing
  * .-----------------------------------------.
  * |    preview form hooks in sps.module     |
  * |-----------------------------------------|
@@ -95,7 +79,7 @@ function test_sps_get_config() {
  * | validateElement($form, $form_state)     |
  * | submitElement($form, $form_state)       |
  * '-----------------------------------------'
- * 
+ *
  *
  * Reactions
  * The manager is use as an interface for Drupal hooks that need to have a
@@ -107,7 +91,7 @@ function test_sps_get_config() {
  *                    '-----------------------'   '--------------'
  *
  * Plugins
- * The Manager is a passthough to the plugin controller
+ * The Manager is a pass-through to the plugin controller
  */
 class Manager {
   protected $state_controller_site_state_key = 'sps_site_state_key';
@@ -115,21 +99,22 @@ class Manager {
   protected $config_controller;
   protected $override_controller;
   protected $root_condition;
+  protected $plugin_controller;
 
   /**
-  * Constructor for \Drupal\sps\Manager
-  *
-  * @param \Drupal\sps\StorageControllerInterface $state_controller
-  *   The control to use when accessing State info (like site state)
-  * @param \Drupal\sps\StorageControllerInterface $override_controller
-  *   the control to use when accessing overrides
-  * @param \Drupal\sps\StorageControllerInterface $config_controller
-  *   the control to be used when accessing config
-  * @param \Drupal\sps\PluginControllerInterface $plugin_controller
-  *   The control to use when accessing plugins
-  *
-  * @return
-  */
+   * Constructor for \Drupal\sps\Manager
+   *
+   * @param \Drupal\sps\StorageControllerInterface $state_controller
+   *  The control to use when accessing State info (like site state)
+   * @param \Drupal\sps\StorageControllerInterface $override_controller
+   *   the control to use when accessing overrides
+   * @param \Drupal\sps\StorageControllerInterface $config_controller
+   *   the control to be used when accessing config
+   * @param \Drupal\sps\PluginControllerInterface  $plugin_controller
+   *   The control to use when accessing plugins
+   *
+   * @return \Drupal\sps\Manager
+   */
   public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
     $this->setStateController($state_controller)
       ->setOverrideController($override_controller)
@@ -154,11 +139,11 @@ class Manager {
   /**
    * store the config controller
    *
-   * @param StorageControllerInterface $controller
-   *   the control to be used when accessing config
+   * @param \Drupal\sps\StorageControllerInterface $controller
+   *  the control to be used when accessing config
    *
    * @return \Drupal\sps\Manager
-   *   Self
+   *           Self
    */
   protected function setConfigController(StorageControllerInterface $controller) {
     $this->config_controller = $controller;
@@ -168,7 +153,7 @@ class Manager {
   /**
    * store the override controller
    *
-   * @param \Drupal\sps\StorageControllerInterface $override_controller
+   * @param \Drupal\sps\StorageControllerInterface $controller
    *   the control to use when accessing overrides
    *
    * @return \Drupal\sps\Manager
@@ -182,8 +167,9 @@ class Manager {
   /**
    * store the override controller
    *
-   * @param \Drupal\sps\PluginControllerInterface $plugin_controller
+   * @param \Drupal\sps\PluginControllerInterface $controller
    *   The control to use when accessing plugins
+   *
    * @return \Drupal\sps\Manager
    *   Self
    */
@@ -193,26 +179,28 @@ class Manager {
   }
 
   /**
-   * Pull the site state from site state controller
+   * Pull the site state form site state controller
    *
-   * Note the state controller is resposible for resonable caching of the site state
+   * Note the state controller is responsible for reasonable caching of the site state
    *
-   * @return Vary
-   *   SiteState | NULL
+   * @return \Drupal\sps\SiteState | NULL
    */
   public function getSiteState() {
-    if($this->state_controller->is_set($this->state_controller_site_state_key)) {
+    if ($this->state_controller->exists($this->state_controller_site_state_key)) {
       return $this->state_controller->get($this->state_controller_site_state_key);
     }
+
+    return NULL;
   }
 
   /**
-   * Create A SiteState from an override, and store it.
+   * Create A SiteState form an override, and store it.
    *
    * This might get made private
    *
-   * @param \Drupal\sps\OverrideInterface  $override
+   * @param \Drupal\sps\Plugins\OverrideInterface  $override
    *   the override to use when creating the SiteState
+   *
    * @return \Drupal\sps\Manager
    *   Self
    */
@@ -253,38 +241,13 @@ class Manager {
   }
 
   /**
-  * Passthrough fro Drupal form to the correct condition used for validate a preview form
-  *
-  * @param $form
-  *   The form array passed to drupal validate functions
-  * @param $form_state
-  *   The form_state array passed to drupal validate functions
+  * Notify the manager that the preview form submission is complete.
   *
   * @return
   *   Self
   */
-  public function validatePreviewForm($form, &$form_state) {
+  public function previewFormSubmitted() {
     $root_condition = $this->getRootCondition();
-    $root_condition->validateElement($form, $form_state);
-    return $this;
-  }
-
-  /**
-  * Passthrough from Drupal form to the correct condition's submit method.
-  *
-  * Also save the correct override after submit.
-  *
-  * @param $form
-  *   The form array passed to drupal submit functions
-  * @param $form_state
-  *   The form_state array passed to drupal submit functions
-  *
-  * @return
-  *   Self
-  */
-  public function submitPreviewForm($form, &$form_state) {
-    $root_condition = $this->getRootCondition();
-    $root_condition->submitElement($form, $form_state);
     $this->setSiteState($root_condition->getOverride());
     return $this;
   }
@@ -293,21 +256,21 @@ class Manager {
   * Helper method for getting and causing the root Condition
   *
   * The Root condition is the use as the basis for the constructing the preview form
-  * It can be expect that it will be much more comilicated then the other conditions
+  * It can be expect that it will be much more complicated then the other conditions
   *
   * This method select the condition and its config using the config controller.
   *
-  * @return Drupal\sps\Plugins\ConditionInterface
+  * @return \Drupal\sps\Plugins\ConditionInterface
   *   the current root condition object
   */
   protected function getRootCondition() {
-    if(!isset($this->root_condition_plugin)) {
+    if(!isset($this->root_condition)) {
       $settings = $this->config_controller->get(SPS_CONFIG_ROOT_CONDITION);
       $root_condition_plugin = $settings['name'];
-      $this->root_condition_plugin = $this->getPlugin('condition', $root_condition_plugin);
-      $this->root_condition_plugin->setConfig($settings['config']);
+      $this->root_condition = $this->getPlugin('condition', $root_condition_plugin);
+      $this->root_condition->setConfig($settings['config']);
     }
-    return $this->root_condition_plugin;
+    return $this->root_condition;
   }
 
   /**
@@ -315,10 +278,11 @@ class Manager {
    *
    * @param String $reaction
    *   the name of a reaction plugin;
-   * @param Vary $data
+   * @param mixed $data
    *   data to be passed to the react method
-   * @return Vary
-   *   Data used by the item calling raction
+   *
+   * @return mixed
+   *   Data used by the item calling reaction
    */
   public function react($reaction, $data) {
     return $this->getPlugin("reaction", $reaction)->react($data);
@@ -331,7 +295,8 @@ class Manager {
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param String $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
-   * @return \Drupal\sps\PluginInterface
+   *
+   * @return \Drupal\sps\Plugins\PluginInterface
    *   An instance of the requested Plugin
    */
   public function getPlugin($type, $name) {
@@ -344,6 +309,7 @@ class Manager {
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param String | Null $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
+   *
    * @return Array
    *   an array of meta data for the plugin
    */
@@ -358,12 +324,13 @@ class Manager {
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param String $property
    *   the meta property to compare to the value
-   * @param Vary $value
+   * @param mixed $value
    *   the value to compare to the meta property
+   *
    * @return Array
    *   an array of meta data for the plugins
    */
   public function getPluginByMeta($type, $property, $value) {
-    return $this->plugin_controller->getPluginInfoByMeta($type);
+    return $this->plugin_controller->getPluginByMeta($type, $property, $value);
   }
 }
