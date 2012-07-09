@@ -19,7 +19,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $state_controller = $controllers['state_controller'];
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
-    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
     $site_state = new Drupal\sps\SiteState($controllers['override_controller'], $override);
 
@@ -33,7 +33,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $state_controller = $controllers['state_controller'];
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
-    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
     $manager->setSiteState($override);
 
@@ -66,13 +66,15 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     );
     $this->assertEqual(
       $manager->getPlugin('widget', 'test_widget'),
-      new \Drupal\sps\Test\Override(array(), new StdClass()),
+      new \Drupal\sps\Test\Override(array(), $manager),
       'TestStorageController::getPlugin should build a obj from the plugin info', 'SPS'
     );
 
   }
   public function testManager_previewForm() {
-    $override = new \Drupal\sps\Test\Override(array(), new stdClass());
+    $controllers = _sps_test_get_basic_controllers();
+    $manager = _sps_test_get_new_manager($controllers);
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData(array(array('id'=>1, 'revision_id' =>3, 'type' => 'article')));
     $settings = array(
       'element_form' => array(
@@ -106,15 +108,8 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       $settings['element_form'],
       "Manager::getPreviewForm should pull the form from the condition from the getElement method of the condition specified as the root condition in the config", 'SPS'
     );
-
-    form_clear_error();
-    $manager->validatePreviewForm($form, $form_state);
-    $this->assertEqual(
-      form_get_errors(),
-      array($settings['validate_fail_name'] => $settings['validate_fail_message']),
-      "Manager::validatePreviewForm should run validateElement on the Root Condition (we are testing that a form_set_error is called)", 'SPS'
-    );
-
+    //TODO this need to test previewFormSubmitted()
+    /*
     $manager->submitPreviewForm($form, $form_state);
     $site_state = $manager->getSiteState();
     $this->assertEqual(
@@ -122,6 +117,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       $override->getOverrides(),
       "Manager::submitPreviewForm summits the from to the root condition, as the former for the override and builds the site state with that override.", 'SPS'
     );
+    */
   }
 
   public function testManager_react() {
