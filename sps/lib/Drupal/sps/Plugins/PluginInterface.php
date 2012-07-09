@@ -17,5 +17,5 @@ interface PluginInterface {
    * @param $key string
    *  The key of the settings array to retrieve
    */
-  public function getSetting($key);
+  //public function getSetting($key);
 }
