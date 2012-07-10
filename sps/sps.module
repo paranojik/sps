@@ -39,3 +39,9 @@ function sps_get_default_config_controller() {
 
   return $controller;
 }
+
+function sps_query_alter($query) {
+  $react = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(array("tables"=> array("base"=>"node", "revision"=>"node_revision")), "bpb");
+  $react->react($query);
+}
+
