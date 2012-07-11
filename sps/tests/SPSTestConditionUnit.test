@@ -113,7 +113,6 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     //BasicCondition should submit the form properly and pass the values to the override.
     $condition->submitElement($element, $good_state);
     $override = $condition->getOverride();
-    echo json_encode($override->getOverrides());
     $this->assertEqual($override->getOverrides(), array(
         'node' => 'value',
         'box' => 'value',

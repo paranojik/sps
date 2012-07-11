@@ -1,4 +1,5 @@
 <?php
+include_once "SPSManagerUnit.test";
 class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
@@ -29,13 +30,9 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
       'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
     );
 
-    $state_controller = new Drupal\sps\Test\StorageController();
-    $override_controller = new Drupal\sps\Test\StorageController();
-    $config_controller = new Drupal\sps\Test\StorageController();
-    $manager = new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $controller);
-
+    $manager = _sps_test_get_new_manager(_sps_test_get_basic_controllers());
     $this->assertEqual(
-      $controller->getPlugin('widget', 'test_widget', $manager),
+      $controller->getPlugin('widget', 'test_widget', $manager), 
       new \Drupal\sps\Test\Override(array(), $manager),
       'TestStorageController::getPlugin should build a obj from the plugin info', 'SPS'
     );

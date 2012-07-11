@@ -4,7 +4,7 @@ namespace Drupal\sps\Plugins\Override;
 
 use Drupal\sps\Plugins\OverrideInterface;
 
-class AggregatorOverride extends Override {
+class AggregatorOverride implements OverrideInterface {
   protected $override_table = array();
   protected $overrides_set = FALSE;
 
