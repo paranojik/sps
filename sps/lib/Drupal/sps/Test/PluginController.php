@@ -7,6 +7,10 @@ class PluginController implements \Drupal\sps\PluginControllerInterface {
     $this->infos = $infos;
   }
 
+  public function setInfo($infos) {
+    $this->infos = $infos;
+  }
+
   /**
    * factory for building a plugin object
    *
