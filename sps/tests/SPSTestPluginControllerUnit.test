@@ -30,7 +30,7 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
       'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
     );
 
-    $manager = _sps_test_get_new_manager(_sps_test_get_basic_controllers());
+    $manager = new \Drupal\sps\Test\Manager();
     $this->assertEqual(
       $controller->getPlugin('widget', 'test_widget', $manager), 
       new \Drupal\sps\Test\Override(array(), $manager),

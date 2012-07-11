@@ -292,12 +292,11 @@ class PluginFactory implements PluginControllerInterface {
     $this->loadPluginInfo($type);
 
     $plugin_matches = array();
-    foreach ($this->plugin_info as $plugin => $info) {
+    foreach ($this->plugin_info[$type] as $plugin => $info) {
       if ($this->checkPluginMeta($info, $property, $value)) {
         $plugin_matches[$plugin] = $info;
       }
     }
-
     return $plugin_matches;
   }
 
@@ -306,24 +305,27 @@ class PluginFactory implements PluginControllerInterface {
    *
    * @param $plugin_info
    * @param $property
+   *   this can be a string or a array of tree keys
    * @param $value
    *
    * @return bool
    */
   protected function checkPluginMeta($plugin_info, $property, $value) {
+    $tree = array();
+    if (is_array($property)) {
+      $tree = $property;
+      $property = array_shift($tree);
+    }
     foreach ($plugin_info as $plugin_info_key => $plugin_info_value) {
-      if (is_array($plugin_info_value)) {
-        return $this->checkPluginMeta($plugin_info[$plugin_info_key], $property, $value);
-      }
-
-      if ($plugin_info_key == $property && $plugin_info_value == $value) {
-        return TRUE;
-      }
-      else {
-        return FALSE;
+      if ($plugin_info_key == $property) {
+        if($tree) {
+        return $this->checkPluginMeta($plugin_info[$plugin_info_key], $tree, $value);
+        }
+        else if ($plugin_info_value == $value) {
+          return TRUE;
+        }
       }
     }
-
     return FALSE;
   }
 }

@@ -41,6 +41,22 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
         'module' => 'sps_test',
         'name' => 'test_type_1',
       ),
+      'get_plugin_by_meta' => array(
+        'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'defaults' => array(
+          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+          'instance_settings' => array(),
+        ),
+        'require_settings' => array(
+          'setting_1',
+          'setting_2' => array(
+            'settings 2.1',
+          ),
+          'setting 4',
+        ),
+        'module' => 'sps_test',
+        'name' => 'get_plugin_by_meta',
+      ),
       'test_type_2' => array(
         'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
         'defaults' => array(
@@ -214,4 +230,22 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     $default_class_plugin = $factory->getPlugin('test_type_1', 'default_class_plugin', $manager);
     $this->assertIsInstance("Drupal\\sps_test\\Plugin\\GoodPlugin", $default_class_plugin, 'Default Plugin Class used');
   }
+  public function testPlugin_getPluginByMeta() {
+    $factory = new PluginFactory();
+    $result = array(
+      'good_plugin' => array(
+        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'setting_1' => 'abc',
+        'setting_2' => array(
+          'settings 2.1' => 'abc',
+        ),
+        'setting 4' => 'abc',
+      ),
+    );
+    $result = $factory->getPluginByMeta("get_plugin_by_meta", 'setting 4', 'abc');
+    $this->assertEqual($result['good_plugin']['setting 4'], 'abc', "Test");
+    $result = $factory->getPluginByMeta("get_plugin_by_meta", array('setting_2', 'settings 2.1'), 'abc');
+    $this->assertEqual($result['default_class_plugin']['setting_2']['settings 2.1'], 'abc', "Test");
+  }
 }
+ 

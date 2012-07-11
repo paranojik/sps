@@ -19,6 +19,21 @@ function sps_test_sps_plugin_types() {
         'setting 4',
       ),
     ),
+    'get_plugin_by_meta' => array(
+      'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+      'defaults' => array(
+        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+        'instance_settings' => array(),
+      ),
+      'require_settings' => array(
+        'setting_1',
+        'setting_2' => array(
+          'settings 2.1',
+        ),
+        'setting 4',
+      ),
+    ),
+    
     'test_type_2' => array(
       'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
       'defaults' => array(
@@ -70,6 +85,26 @@ function sps_test_sps_test_type_1_plugins() {
     ),
   );
 }
+function sps_test_sps_get_plugin_by_meta_plugins() {
+  return array(
+    'good_plugin' => array(
+      'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+      'setting_1' => 'abc',
+      'setting_2' => array(
+        'settings 2.1' => 'efg',
+      ),
+      'setting 4' => 'abc',
+    ),
+    'default_class_plugin' => array(
+      'setting_1' => 'abc',
+      'setting_2' => array(
+        'settings 2.1' => 'abc',
+      ),
+      'setting 4' => 'efg',
+    ),
+  );
+}
+
 
 /**
  * Implements hook_sps_test_type_2_plugins().
