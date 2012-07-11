@@ -239,7 +239,7 @@ class PluginFactory implements PluginControllerInterface {
     if (empty($this->plugin_type_info)) {
       foreach (module_implements('sps_plugin_types') as $module) {
         $function = $module . '_sps_plugin_types';
-        $module_infos = $function();
+        $module_infos = module_invoke($module, 'sps_plugin_types');
 
         foreach ($module_infos as $plugin_type_name => $plugin_type_info) {
           $plugin_type_info += array(
@@ -327,5 +327,11 @@ class PluginFactory implements PluginControllerInterface {
       }
     }
     return FALSE;
+  }
+
+  protected function getHookController() {
+  }
+  public function setHookController(\Drupal\sps\HookControllerInterface $controller = NULL) {
+
   }
 }

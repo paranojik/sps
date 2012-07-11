@@ -21,7 +21,49 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
       $this->fail('Plugin Factory Loaded');
     }
   }
-
+  
+  public function hook_plugin_type() {
+    return array(
+      'test_type_1' => array(
+        'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'defaults' => array(
+          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+          'instance_settings' => array(),
+        ),
+        'require_settings' => array(
+          'setting_1',
+          'setting_2' => array(
+            'settings 2.1',
+          ),
+          'setting 4',
+        ),
+      ),
+      'get_plugin_by_meta' => array(
+        'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'defaults' => array(
+          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
+          'instance_settings' => array(),
+        ),
+        'require_settings' => array(
+          'setting_1',
+          'setting_2' => array(
+            'settings 2.1',
+          ),
+          'setting 4',
+        ),
+      ),
+      
+      'test_type_2' => array(
+        'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
+        'defaults' => array(
+          'instance_settings' => array(
+            'instance_setting_1' =>  'abc',
+            'instance_setting_2' => 'def',
+          ),
+        ),
+      ),
+    );
+  }
   public function testPluginTypeInfo() {
 
     $default_plugin_type_info = array(
@@ -41,22 +83,6 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
         'module' => 'sps_test',
         'name' => 'test_type_1',
       ),
-      'get_plugin_by_meta' => array(
-        'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-        'defaults' => array(
-          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-          'instance_settings' => array(),
-        ),
-        'require_settings' => array(
-          'setting_1',
-          'setting_2' => array(
-            'settings 2.1',
-          ),
-          'setting 4',
-        ),
-        'module' => 'sps_test',
-        'name' => 'get_plugin_by_meta',
-      ),
       'test_type_2' => array(
         'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
         'defaults' => array(
@@ -69,31 +95,12 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
         'module' => 'sps_test',
         'name' => 'test_type_2',
       ),
-      'missing_required_settings' => array(
-        'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-        'defaults' => array(
-          'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-          'instance_settings' => array(),
-        ),
-        'require_settings' => array(
-          'required' => 'yes',
-        ),
-        'module' => 'sps_test',
-        'name' => 'missing_required_settings',
-      ),
-      'incorrect_interface' => array(
-        'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-        'defaults' => array(
-          'class' => "Drupal\\sps_test\\Plugin\\BadPlugin",
-          'instance_settings' => array(),
-        ),
-        'module' => 'sps_test',
-        'name' => 'incorrect_interface',
-        'require_settings' => array(),
-      )
     );
 
     $factory = new PluginFactory();
+    $hook_controller = new \Drupal\sps\Test\HookController();
+    //$hook_controller->setInvokeAll();
+    //$factory->setHookController();
 
     $all_plugin_type_info = $factory->getPluginTypeInfo();
     $this->assertEqual($all_plugin_type_info,

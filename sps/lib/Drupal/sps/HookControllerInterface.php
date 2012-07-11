@@ -14,4 +14,8 @@ interface HookControllerInterface {
    * @see drupal_alter()
    */
   public function drupalAlter($type, &$data, &$context1 = NULL, &$context2 = NULL);
+  /**
+   * @see module_implements()
+   */
+  public function moduleImplements($hook);
 }

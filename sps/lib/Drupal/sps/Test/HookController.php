@@ -54,4 +54,12 @@ class HookController implements HookControllerInterface {
   public function setDrupalAlter($type, $callable) {
     $this->alter[$type] = $callable;
   }
+  public function setmoduleImplements($hook, $modules) {
+    $this->module_implements[$hook] = $modules;
+  }
+  public function moduleImplements($hook){
+    if(isset($this->module_implements[$hook])) {
+      return $this->module_implements[$hook];
+    }
+  }
 }
