@@ -185,8 +185,7 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   }
 
   public function testGetPlugin() {
-    $controllers = _sps_test_get_basic_controllers();
-    $manager = _sps_test_get_new_manager($controllers);
+    $manager = new \Drupal\sps\Test\Manager();
 
     $factory = new PluginFactory();
     $correct_interface = $factory->getPlugin('test_type_1', 'good_plugin', $manager);
