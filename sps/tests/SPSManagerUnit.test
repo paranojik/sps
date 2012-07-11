@@ -139,6 +139,15 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       "Manager::react should return based on the react method of the plugin", 'SPS'
     );
   }
+  public function testManager_getHookController() {
+    $env = $this->getManagerEnv();
+    $this->assertEqual(
+      $env->manager->getHookController(),
+      $env->hook_controller,
+      "Manager::getHookController should return the registered hook controller", 'SPS'
+    );
+    
+  }
 
   protected function getManagerEnv() {
     $env = new stdClass();
@@ -146,7 +155,8 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $env->override_controller = new \Drupal\sps\Test\StorageController();
     $env->config_controller = new \Drupal\sps\Test\StorageController();
     $env->plugin_controller = new \Drupal\sps\Test\PluginController(array());
-    $env->manager = new \Drupal\sps\Manager($env->state_controller, $env->override_controller, $env->config_controller, $env->plugin_controller);
+    $env->hook_controller = new \Drupal\sps\Test\HookController();
+    $env->manager = new \Drupal\sps\Manager($env->state_controller, $env->override_controller, $env->config_controller, $env->plugin_controller, $env->hook_controller);
     return $env;
   }
 

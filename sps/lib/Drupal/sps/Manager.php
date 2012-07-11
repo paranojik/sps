@@ -98,6 +98,7 @@ class Manager {
   protected $state_controller;
   protected $config_controller;
   protected $override_controller;
+  protected $hook_controller;
   protected $root_condition;
   protected $plugin_controller;
 
@@ -115,11 +116,12 @@ class Manager {
    *
    * @return \Drupal\sps\Manager
    */
-  public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
+  public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller, HookControllerInterface $hook_controller) {
     $this->setStateController($state_controller)
       ->setOverrideController($override_controller)
       ->setConfigController($config_controller)
-      ->setPluginController($plugin_controller);
+      ->setPluginController($plugin_controller)
+      ->setHookController($hook_controller);
   }
 
   /**
@@ -178,6 +180,22 @@ class Manager {
     return $this;
   }
 
+  /**
+   * store the hook controller
+   *
+   * @param \Drupal\sps\HookControllerInterface $controller
+   *   The control to use when accessing drupal invoke and alter function
+   *   
+   * @return \Drupal\sps\Manager
+   *   Self
+   */
+  protected function setHookController(HookControllerInterface $controller) {
+    $this->hook_controller = $controller;
+    return $this;
+  }
+
+  /**
+   * store the config controller
   /**
    * Pull the site state form site state controller
    *
@@ -332,5 +350,9 @@ class Manager {
    */
   public function getPluginByMeta($type, $property, $value) {
     return $this->plugin_controller->getPluginByMeta($type, $property, $value);
+  }
+  
+  public function getHookController() {
+    return $this->hook_controller;
   }
 }
