@@ -229,6 +229,6 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     );
 
     $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
-    return new Drupal\sps\Test\Manager(NULL, NULL, NULL, NULL, $plugin_controller);
+    return new Drupal\sps\Test\Manager(NULL, NULL, NULL, $plugin_controller);
   }
 }
