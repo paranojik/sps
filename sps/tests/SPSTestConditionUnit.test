@@ -228,10 +228,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
       )
     );
 
-    $state_controller = new Drupal\sps\Test\StorageController();
-    $override_controller = new Drupal\sps\Test\StorageController();
-    $config_controller = new Drupal\sps\Test\StorageController();
     $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
-    return new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller);
+    return new Drupal\sps\Test\Manager(NULL, NULL, NULL, NULL, $plugin_controller);
   }
 }
