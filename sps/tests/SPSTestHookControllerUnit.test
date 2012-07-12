@@ -78,7 +78,7 @@ class SPSTestHookControllerUnitTest extends SPSBaseUnitTest {
 
   public function testTestHookController_moduleImplements() {
     $controller = new \Drupal\sps\Test\HookController();
-    $controller->setModuleImplements("test", array("module_a"));
+    $controller->setModuleInvoke("module_a", "test", function($stuff) {return array("bob"=>$stuff);});
 
     $this->assertEqual($controller->moduleImplements("test"), array("module_a"), "::moduleImplements should return the array set in setModuleImplements", "SPS");
 

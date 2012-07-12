@@ -3,6 +3,7 @@ namespace Drupal\sps\Test;
 use \Drupal\sps\HookControllerInterface;
 class HookController implements HookControllerInterface {
   public $invoke_all = array();
+  public $invoke = array();
   public function setInvokeAll($hook, $callable) {
     $this->invoke_all[$hook] = $callable;
     
@@ -20,7 +21,7 @@ class HookController implements HookControllerInterface {
 
   }
   public function setModuleInvoke($module, $hook, $callable) {
-    $this->invoke[$module][$hook] = $callable;
+    $this->invoke[$hook][$module] = $callable;
 
   }
   /**
@@ -30,8 +31,8 @@ class HookController implements HookControllerInterface {
     $args = func_get_args();
     // Remove $module and $hook from the arguments.
     unset($args[0], $args[1]);
-    if (isset($this->invoke[$module][$hook])) {
-      return call_user_func_array($this->invoke[$module][$hook], $args);
+    if (isset($this->invoke[$hook][$module])) {
+      return call_user_func_array($this->invoke[$hook][$module], $args);
     }
   }
   /**
@@ -54,12 +55,9 @@ class HookController implements HookControllerInterface {
   public function setDrupalAlter($type, $callable) {
     $this->alter[$type] = $callable;
   }
-  public function setmoduleImplements($hook, $modules) {
-    $this->module_implements[$hook] = $modules;
-  }
   public function moduleImplements($hook){
-    if(isset($this->module_implements[$hook])) {
-      return $this->module_implements[$hook];
+    if(isset($this->invoke[$hook])) {
+      return array_keys($this->invoke[$hook]);
     }
   }
 }
