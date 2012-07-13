@@ -9,28 +9,28 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
   }
 
   public function testManager_getNullSiteState() {
-    $controllers = _sps_test_get_basic_controllers();
-    $manager = _sps_test_get_new_manager($controllers);
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
     $this->assertNull($manager->getSiteState(), "Manager::getSiteState should return null if there is no state", "SPS");
   }
   public function testManager_getPersistentSiteState() {
-    $controllers = _sps_test_get_basic_controllers();
-    $manager = _sps_test_get_new_manager($controllers);
-    $state_controller = $controllers['state_controller'];
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $state_controller = $env->state_controller;
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
     $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
-    $site_state = new Drupal\sps\SiteState($controllers['override_controller'], $override);
+    $site_state = new Drupal\sps\SiteState($env->override_controller, $override);
 
     $state_controller->set($manager->getStateControllerSiteStateKey(), $site_state);
     $this->assertEqual($manager->getSiteState(), $site_state, "Manager::getSiteState returns a site_state storred in the persistent data", "SPS");
   }
   public function testManager_setSiteState() {
-    $controllers = _sps_test_get_basic_controllers();
-    $manager = _sps_test_get_new_manager($controllers);
-    $override_controller = $controllers['override_controller'];
-    $state_controller = $controllers['state_controller'];
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $override_controller = $env->override_controller;
+    $state_controller = $env->state_controller;
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
     $override = new \Drupal\sps\Test\Override(array(), $manager);
@@ -42,6 +42,8 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
 
   }
   public function testManager_PluginAccess() {
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
     $info = array(
       'widget' => array(
         'test_widget' => array(
@@ -50,9 +52,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $controllers = _sps_test_get_basic_controllers();
-    $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($info);
-    $manager = _sps_test_get_new_manager($controllers);
+    $env->plugin_controller->setInfo($info);
 
     $this->assertEqual(
       $manager->getPluginInfo('widget'),
@@ -72,8 +72,8 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
 
   }
   public function testManager_previewForm() {
-    $controllers = _sps_test_get_basic_controllers();
-    $manager = _sps_test_get_new_manager($controllers);
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
     $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData(array(array('id'=>1, 'revision_id' =>3, 'type' => 'article')));
     $settings = array(
@@ -95,11 +95,9 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $controllers = _sps_test_get_basic_controllers();
-    $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($info);
-    $config_controller = $controllers['config_controller'];
+    $env->plugin_controller->setInfo($info);
+    $config_controller = $env->config_controller;
     $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array("name" => 'testCondition', 'config' => array()));
-    $manager = _sps_test_get_new_manager($controllers);
     $form = array();
     $form_state = array();
 
@@ -121,7 +119,6 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
   }
 
   public function testManager_react() {
-    $controllers = _sps_test_get_basic_controllers();
     $settings = array(
       'callback' => function($data) { return $data + 1;},
     );
@@ -133,13 +130,24 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($info);
-    $manager = _sps_test_get_new_manager($controllers);
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $env->plugin_controller->setInfo($info);
     $this->assertEqual(
       $manager->react("test_reaction", 4),
       5,
       "Manager::react should return based on the react method of the plugin", 'SPS'
     );
+  }
+
+  protected function getManagerEnv() {
+    $env = new stdClass();
+    $env->state_controller = new \Drupal\sps\Test\StorageController();
+    $env->override_controller = new \Drupal\sps\Test\StorageController();
+    $env->config_controller = new \Drupal\sps\Test\StorageController();
+    $env->plugin_controller = new \Drupal\sps\Test\PluginController(array());
+    $env->manager = new \Drupal\sps\Manager($env->state_controller, $env->override_controller, $env->config_controller, $env->plugin_controller);
+    return $env;
   }
 
 }
