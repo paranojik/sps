@@ -4,6 +4,6 @@ description = A collection of content
 core = 7.x
 php = 5.3
 
-dependencies[] = xautoload
+dependencies[] = entity
 
 files[] = tests/*.test

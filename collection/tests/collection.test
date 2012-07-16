@@ -1,11 +1,41 @@
 <?php
 
-class CollectionUnitTest extends DrupalUnitTestCase {
+class CollectionTest extends DrupalWebTestCase {
+  protected $collection_id;
+
   static function getInfo() {
     return array(
       'name' => 'SPS DrupalVariableController Unit Tests',
       'description' => 'Test the public interface to the DrupalVariableController object',
       'group' => 'SPSInteractive',
     );
+  }
+
+  public function setUp() {
+    parent::setUp("entity");
+
+    $collection = new StdClass();
+    $collection->name = "test 1";
+
+    drupal_write_record('collection', $collection);
+    $this->collection_id = $collection->cid;
+  }
+
+  public function testCRUD() {
+    $collection = collection_load($this->collection_id);
+    $this->assertNotNull($collection, "The collection loaded");
+
+    $values = array(
+      'name' => "test_2",
+    );
+
+    $collection = new Drupal\collection\Collection($values);
+    $collection->save();
+
+    $collection = collection_load($collection->identifier());
+
+    $this->assertEqual("test_2", $collection->name);
+
+
   }
 }
