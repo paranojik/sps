@@ -24,7 +24,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    *  The current instance of the sps manager.
    */
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
-    $this->overrides = $manager->getPluginByMeta('Override', 'condition', $config['name']);
+    $this->overrides = $manager->getPluginByMeta('override', 'condition', $config['name']);
 
     if (!empty($config['widget']) && is_string($config['widget'])) {
       $config['widget'] = $manager->getPlugin('widget', $config['widget']);
@@ -57,8 +57,15 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    * Implements ConditionInterface::getElement().
    *
    * Gets the form for the condition.
+   *
+   * @see sps_condition_form_validate_callback
+   * @see sps_condition_form_submit_callback
    */
   public function getElement($element, &$form_state) {
+    if (empty($this->widget)) {
+      throw new \Drupal\sps\Exception\ClassLoadException('Element requested but no valid Widget found for the Condition.');
+    }
+
     $sub_state = $form_state;
     $sub_state['values'] = isset($form_state['values']['widget']) ? $form_state['values']['widget'] : array();
     $element['widget'] = $this->widget->getPreviewForm(array(), $sub_state);
@@ -69,8 +76,9 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
       '#value' => 'Preview',
     );
 
-    $element['#validate'] = array($this, 'validateElement');
-    $element['#submit'] = array($this, 'submitElement');
+    $element['#sps_validate'] = array($this, 'validateElement');
+    $element['#sps_submit'] = array($this, 'submitElement');
+
     return $element;
   }
 
@@ -83,7 +91,6 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   public function validateElement($element, &$form_state) {
     $this->handleWidgetForm($element, $form_state, 'validatePreviewForm');
-
     return $this;
   }
 
@@ -97,7 +104,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
   public function submitElement($element, &$form_state) {
     $values = $this->handleWidgetForm($element, $form_state, 'extractValues');
     foreach($this->overrides as $key=>$override) {
-      $override = $this->manager->getPlugin('Override', $override['name']);
+      $override = $this->manager->getPlugin('override', $override['name']);
       if (!empty($override)) {
         $override->setData($values);
         $this->overrides[$key] = $override;
@@ -127,24 +134,18 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   protected function handleWidgetForm($element, &$form_state, $method) {
     $widget_el = $element['widget'];
-    if (isset($form_state['values'])) {
-      $full_values = $form_state['values'];
-      if (isset($form_state['values']['widget'])) {
-        $form_state['values'] = $form_state['values']['widget'];
-      }
-      else {
-        $form_state['values'] = array();
-      }
+    $widget_state = $form_state;
+
+    if (isset($form_state['values']['widget'])) {
+        $widget_state['values'] = $form_state['values']['widget'];
     }
     else {
-      $full_values = array();
-      $form_state['values'] = array();
+      $widget_state['values'] = array();
     }
 
-    $return = $this->widget->{$method}($widget_el, $form_state);
+    $return = $this->widget->{$method}($widget_el, $widget_state);
 
-    $full_values['values']['widget'] = $form_state['values'];
-    $form_state['values'] = $full_values;
+    $form_state['values']['widget'] = $widget_state['values'];
 
     return $return;
   }

@@ -98,6 +98,7 @@ class Manager {
   protected $state_controller;
   protected $config_controller;
   protected $override_controller;
+  protected $hook_controller;
   protected $root_condition;
   protected $plugin_controller;
 
@@ -105,7 +106,7 @@ class Manager {
    * Constructor for \Drupal\sps\Manager
    *
    * @param \Drupal\sps\StorageControllerInterface $state_controller
-   *  The control to use when accessing State info (like site state)
+   *   The control to use when accessing State info (like site state)
    * @param \Drupal\sps\StorageControllerInterface $override_controller
    *   the control to use when accessing overrides
    * @param \Drupal\sps\StorageControllerInterface $config_controller
@@ -113,13 +114,16 @@ class Manager {
    * @param \Drupal\sps\PluginControllerInterface  $plugin_controller
    *   The control to use when accessing plugins
    *
+   * @param HookControllerInterface $hook_controller
+   *
    * @return \Drupal\sps\Manager
    */
-  public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller) {
+  public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller, HookControllerInterface $hook_controller) {
     $this->setStateController($state_controller)
       ->setOverrideController($override_controller)
       ->setConfigController($config_controller)
-      ->setPluginController($plugin_controller);
+      ->setPluginController($plugin_controller)
+      ->setHookController($hook_controller);
   }
 
   /**
@@ -179,6 +183,21 @@ class Manager {
   }
 
   /**
+   * store the hook controller
+   *
+   * @param \Drupal\sps\HookControllerInterface $controller
+   *   The control to use when accessing drupal invoke and alter function
+   * @return \Drupal\sps\Manager
+   *   Self
+   */
+  protected function setHookController(HookControllerInterface $controller) {
+    $this->hook_controller = $controller;
+    return $this;
+  }
+
+  /**
+   * store the config controller
+  /**
    * Pull the site state form site state controller
    *
    * Note the state controller is responsible for reasonable caching of the site state
@@ -224,28 +243,23 @@ class Manager {
 
 
   /**
-  * Passthrough from Drupal form to the correct condition for building the preview form
-  *
-  * @param $form
-  *   The form array used in hook_form
-  * @param $form_state
-  *   The form_state array as used in hook_form
-  *
-  * @return
-  *   A drupal form array created but the root condition
-  */
-  public function getPreviewForm(&$form, &$form_state) {
+   * Passthrough from Drupal form to the correct condition for building the preview form
+   *
+   * @return array|mixed
+   *  A drupal form array created by the root condition
+   */
+  public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
-    return $root_condition->getElement($form, $form_state);
-
+    
+    return $this->getHookController()->drupalGetForm('sps_condition_preview_form', array($root_condition, 'getElement'));
   }
 
   /**
-  * Notify the manager that the preview form submission is complete.
-  *
-  * @return
-  *   Self
-  */
+   * Notify the manager that the preview form submission is complete.
+   *
+   * @return \Drupal\sps\Manager
+   *  Self
+   */
   public function previewFormSubmitted() {
     $root_condition = $this->getRootCondition();
     $this->setSiteState($root_condition->getOverride());
@@ -268,7 +282,7 @@ class Manager {
       $settings = $this->config_controller->get(SPS_CONFIG_ROOT_CONDITION);
       $root_condition_plugin = $settings['name'];
       $this->root_condition = $this->getPlugin('condition', $root_condition_plugin);
-      $this->root_condition->setConfig($settings['config']);
+      //$this->root_condition->setConfig($settings['config']);
     }
     return $this->root_condition;
   }
@@ -332,5 +346,9 @@ class Manager {
    */
   public function getPluginByMeta($type, $property, $value) {
     return $this->plugin_controller->getPluginByMeta($type, $property, $value);
+  }
+
+  public function getHookController() {
+    return $this->hook_controller;
   }
 }
