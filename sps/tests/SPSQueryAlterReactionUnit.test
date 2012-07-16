@@ -1,0 +1,400 @@
+<?php
+class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Query Alter Reaction Unit Tests',
+      'description' => 'Test the public interface to the Query Alter Reaction objects',
+      'group' => 'SPS',
+    );
+  }
+  public function test_QueryAlterReaction_NodeAddTable() {
+    $query = new \Drupal\sps\Test\QueryAlterable($this->addTable_start());
+    $controller = new \Drupal\sps\Test\TableOverrideStorageController();
+    $reaction = $this->getNodeReaction();
+
+    $reaction->react($query, $controller);
+    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+    $expected = $this->addTable_result();
+    $this->assertEqual(
+      $result['tables'],
+      $expected['tables'],
+      "::react alter a query to change the alais of the vid field and add the overrides table"
+    );
+  }
+
+  public function test_QueryAlterReaction_NodeVidField() {
+    $query = new \Drupal\sps\Test\QueryAlterable($this->vidField_start());
+    $controller = new \Drupal\sps\Test\TableOverrideStorageController();
+    $reaction = $this->getNodeReaction();
+
+    $reaction->react($query, $controller);
+    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+    $expected = $this->vidField_result();
+    $this->assertEqual(
+      $result['fields'],
+      $expected['fields'],
+      "::react alter a query to change the alais of the vid field"
+    );
+  }
+ 
+  public function test_QueryAlterReaction_revisionFields() {
+    $query = new \Drupal\sps\Test\QueryAlterable($this->revisionFields_start());
+    $expected = $this->revisionFields_start();
+    $info = $this->getNodeReactionInfo();
+
+    $controller = new \Drupal\sps\Test\TableOverrideStorageController();
+    $reaction = $this->getNodeReaction();
+
+    $expected['fields']['title']['table'] = 'r';
+    $expected['fields']['status']['table'] = 'r';
+    $expected['fields']['promote']['table'] = 'r';
+    $expected['fields']['sticky']['table'] = 'r';
+
+    $reaction->react($query, $controller);
+    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+
+//    print_r(array( $result['fields'], $expected['fields'],));
+
+    $this->assertEqual(
+      $result['fields'],
+      $expected['fields'],
+      "::react alter a query changing the table of all fields on the base table in revisions_fields to the revision table alias"
+    );
+  }
+  protected function getNodeReactionInfo() {
+    return array(
+      'entities' => array(
+        array(
+          'base_table'=>'node', 
+          'revision_table' => 'node_revision',
+          'base_id' => 'nid',
+          'revision_id' => 'vid',
+          'revision_fields' => array('title', 'status', 'promote', 'sticky'),
+        )
+      )
+    );
+  }
+  protected function getNodeReaction() {
+     $manager = new \Drupal\sps\Test\Manager();
+     $reaction = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(
+      $this->getNodeReactionInfo(),
+      $manager
+    );
+    return $reaction;
+  }
+
+  protected function addTable_start() {
+    return array (
+      'forUpdate' => false,
+      'prepared' => false,
+      'union' => 
+      array (
+      ),
+      'range' => NULL,
+      'distinct' => false,
+      'having->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'where->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'group' => 
+      array (
+      ),
+      'order' => 
+      array (
+      ),
+      'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+      'expressions' => 
+      array (
+      ),
+      'fields' => 
+      array (
+        'nid' => 
+        array (
+          'field' => 'nid',
+          'table' => 'b',
+          'alias' => 'nid',
+        ),
+      ),
+    );
+  }
+  protected function addTable_result() {
+
+    return array(
+      'forUpdate' => false,
+      'prepared' => false,
+      'union' => 
+      array (
+      ),
+      'range' => NULL,
+      'distinct' => false,
+      'having->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'where->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'group' => 
+      array (
+      ),
+      'order' => 
+      array (
+      ),
+      'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+        'node_overrides' => 
+        array (
+          'join type' => 'LEFT OUTER',
+          'table' => 'test_override',
+          'alias' => 'node_overrides',
+          'condition' => 'b.nid = node_overrides.id',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+      'expressions' => 
+      array (
+      ),
+      'fields' => 
+      array (
+        'nid' => 
+        array (
+          'field' => 'nid',
+          'table' => 'b',
+          'alias' => 'nid',
+        ),
+      ),
+    );
+
+  }
+  protected function vidField_start() {
+    return array (
+      'forUpdate' => false,
+      'prepared' => false,
+      'union' => 
+      array (
+      ),
+      'range' => NULL,
+      'distinct' => false,
+      'having->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'where->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'group' => 
+      array (
+      ),
+      'order' => 
+      array (
+      ),
+      'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+      'expressions' => 
+      array (
+      ),
+      'fields' => 
+      array (
+        'nid' => 
+        array (
+          'field' => 'nid',
+          'table' => 'b',
+          'alias' => 'nid',
+        ),
+        'vid' => 
+        array (
+          'field' => 'vid',
+          'table' => 'b',
+          'alias' => 'vid',
+        ),
+      ),
+    );
+  }
+  protected function vidField_result() {
+
+    return array(
+      'forUpdate' => false,
+      'prepared' => false,
+      'union' => 
+      array (
+      ),
+      'range' => NULL,
+      'distinct' => false,
+      'having->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'where->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'group' => 
+      array (
+      ),
+      'order' => 
+      array (
+      ),
+      'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+        'node_overrides' => 
+        array (
+          'join type' => 'LEFT OUTER',
+          'table' => 'test_override',
+          'alias' => 'node_overrides',
+          'condition' => 'b.nid = node_overrides.id',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+      'expressions' => 
+      array (
+      ),
+      'fields' => 
+      array (
+        'nid' => 
+        array (
+          'field' => 'nid',
+          'table' => 'b',
+          'alias' => 'nid',
+        ),
+        'vid' => 
+        array (
+          'field' => 'vid',
+          'table' => 'node_overrides',
+          'alias' => 'vid',
+        ),
+      ),
+    );
+
+  }
+  protected function revisionFields_start() {
+    return array (
+      'forUpdate' => false,
+      'prepared' => false,
+      'union' => 
+      array (
+      ),
+      'range' => NULL,
+      'distinct' => false,
+      'having->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'where->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'group' => 
+      array (
+      ),
+      'order' => 
+      array (
+      ),
+      'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+        'r' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'node_revision',
+          'alias' => 'r',
+          'condition' => 'r.vid = b.vid',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+      'expressions' => 
+      array (
+      ),
+      'fields' => 
+      array (
+        'title' => 
+        array (
+          'field' => 'title',
+          'table' => 'b',
+          'alias' => 'title',
+        ),
+        'status' => 
+        array (
+          'field' => 'status',
+          'table' => 'b',
+          'alias' => 'status',
+        ),
+        'promote' => 
+        array (
+          'field' => 'promote',
+          'table' => 'b',
+          'alias' => 'promote',
+        ),
+        'sticky' => 
+        array (
+          'field' => 'sticky',
+          'table' => 'b',
+          'alias' => 'sticky',
+        ),
+      ),
+    );
+  }
+}

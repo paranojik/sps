@@ -2,47 +2,97 @@
 namespace Drupal\sps\Plugins\Reaction;
 
 class QueryAlterReaction {
-  protected $tables = array();
+  protected $entities = array();
   protected $alias = array();
+
+  /**
+   * enties = array(
+   *   array(
+   *     base
+   *     revision
+   *     revision_fields
+   *     base_id
+   *     revision_id
+   * )
+   */
   public function __construct($config, $manager) {
-    $this->tables = $config['tables'];
+    $this->entities = $config['entities'];
   }
   /**
-  * runs through a field array and find any thing that use
-  * fields on the base table that we want to change to the revision 
-  * table
+  * Alters a fields array change the table in which fields should be pulled
+  *
+  * For each entity, all fields in revision_field have the table change to the 
+  * revision table
+  *
+  * For each entity the entity_id field's table is changed to the pverrides table
   *
   * @param $fields
   * a field array from a SelectQuery object
+  *
+  * @param Array $alias
+  *   a map of the querys alias to table
   * @return 
   *   NULL
   */
-  protected function fieldReplace(&$fields) {
+  protected function fieldReplace(&$fields, $alias) {
     foreach($fields as &$field) {
-      if (($field['table'] == $this->alias['base']) && (in_array($field['field'], array('title', 'status')))){
-        $field['table'] = $this->alias['revision'];
+      foreach($this->entities as $entity) {
+        //check for revision fields in base
+        if (
+          isset($alias[$entity['revision_table']]) &&
+          ($field['table'] == $alias[$entity['base_table']]) && 
+          (in_array($field['field'], $entity['revision_fields']))
+          ){
+          $field['table'] = $alias[$entity['revision_table']];
+        }
+
+        //Check for vid in base
+        if (
+          ($field['table'] == $alias[$entity['base_table']]) && 
+          ($field['field'] == $entity['revision_id'])
+          ){
+          $field['table'] = $this->getOverrideAlias($entity);
+        }
       }
     }
   }
 
-  protected function addOverrideTable($query) {
-    $override_table = db_query_temporary("SELECT 1 as nid, 5 as vid UNION SELECT 3,7");
-    $query->addJoin("LEFT OUTER", $override_table, "overrides", $this->alias['base'] .".nid = overrides.nid");
-    $tables =& $query->getTables();
-    $new_tables = array();
-    $found_base = FALSE;
-    foreach($tables as $key => $table) {
+  /**
+  * construct on override table alias 
+  *
+  * @param $entity
+  *   an array representing an alias 
+  *   @see QueryAlterReaction::__construct()
+  *
+  * @return 
+  *   an alias for the overrides table;
+  */
+  protected function getOverrideAlias($entity) {
+    return $entity['base_table'] . "_overrides";
+  }
 
-      if ($table['alias'] == $this->alias['base']) {
-        $new_tables[$key] = $table;
-        $new_tables['overrides'] = $tables['overrides'];
-      }
-      else if ($key == 'overrides') {}
-      else {
-        $new_tables[$key] = $table;
+  /**
+  * add override tables to a query
+  *
+  * This is mostly a passthrough to the override_controller
+  *
+  * @param $query
+  *   The query to alter
+  * @param $override_controller
+  *   The Override controller that will provide the override tables;
+  *
+  * @return 
+  */
+  protected function addOverrideTable($query, $override_controller) {
+    $alias = $this->extractAlias($query);
+    foreach($this->entities as $entity) {
+      $base_alias = $alias[$entity['base_table']];
+      $base_id = $entity['base_id'];
+      $overrides_alias = $this->getOverrideAlias($entity);
+      if($base_alias) {
+        $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias);
       }
     }
-    $tables = $new_tables;
   }
 
   /**
@@ -79,23 +129,32 @@ class QueryAlterReaction {
       }
     }
   }
-  protected function setAlias($query) {
+
+  protected function extractAlias($query) {
     $tables = $query->getTables();
+    $aliases = array();
     foreach($tables as $alias => $table) {
-      if ($table['table'] == $this->tables['base']) {
-        $this->alias['base'] = $alias;
-      }
-      if ($table['table'] == $this->tables['revision']) {
-        $this->alias['revision'] = $alias;
+      foreach($this->entities as $entity) {
+        if ($table['table'] == $entity['base_table']) {
+          $aliases[$entity['base_table']] = $alias;
+        }
+        if ($table['table'] == $entity['revision_table']) {
+          $aliases[$entity['revision_table']] = $alias;
+        }
       }
     }
+    return $aliases;
   }
-  public function react($query) {
-    $this->setAlias($query);
-    if($this->alias) {
+  
+
+  public function react($query, $override_controller) {
+    $alias = $this->extractAlias($query);
+    if($alias) {
+      $this->addOverrideTable($query, $override_controller);
       $fields =& $query->getFields();
+      $this->fieldReplace($fields, $alias);
+      /* 
       $this->recusiveReplace($fields);
-      $this->fieldReplace($fields);
 
       $expressions =& $query->getExpressions();
       $this->recusiveReplace($expressions);
@@ -111,8 +170,7 @@ class QueryAlterReaction {
 
       $having =& $query->havingConditions();
       $this->recusiveReplace($having);
-
-      $this->addOverrideTable($query);
+      */
     }
   }
 }

@@ -41,7 +41,17 @@ function sps_get_default_config_controller() {
 }
 
 function sps_query_alter($query) {
-  $react = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(array("tables"=> array("base"=>"node", "revision"=>"node_revision")), "bpb");
-  $react->react($query);
+ // $react = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(array("tables"=> array("base"=>"node", "revision"=>"node_revision")), "bpb");
+//  $react->react($query);
 }
 
+function sps_init() {
+  $query = db_select("node", 'b');
+  $query->fields('b', array('title', 'status', 'promote', 'sticky'));
+  $query->join("node_revision", "r", "r.vid = b.vid");
+  dpm(\Drupal\sps\Test\QueryAlterable::exportConfig($query));
+}
+ 
+
+ 
+  
