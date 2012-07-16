@@ -22,7 +22,6 @@ class HookController implements HookControllerInterface {
   }
   public function setModuleInvoke($module, $hook, $callable) {
     $this->invoke[$hook][$module] = $callable;
-
   }
   /**
    * @see module_invoke()
@@ -55,9 +54,23 @@ class HookController implements HookControllerInterface {
   public function setDrupalAlter($type, $callable) {
     $this->alter[$type] = $callable;
   }
+
   public function moduleImplements($hook){
     if(isset($this->invoke[$hook])) {
       return array_keys($this->invoke[$hook]);
     }
+  }
+
+  public function drupalGetForm($form){
+    $args = func_get_args();
+    // Remove $module and $hook from the arguments.
+    unset($args[0]);
+    if (isset($this->form[$form])) {
+      return call_user_func_array($this->form[$form], $args);
+    }
+  }
+
+  public function setDrupalGetForm($name, $callable) {
+    $this->form[$name] = $callable;
   }
 }

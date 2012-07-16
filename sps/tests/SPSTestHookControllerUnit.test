@@ -83,5 +83,22 @@ class SPSTestHookControllerUnitTest extends SPSBaseUnitTest {
     $this->assertEqual($controller->moduleImplements("test"), array("module_a"), "::moduleImplements should return the array set in setModuleImplements", "SPS");
 
   }
+
+  public function getForm() {
+    $args = func_get_args();
+    return array("args"=>$args);
+  }
+  public function testDrupalGetForm() {
+  
+    $name = "test_from";
+    $controller = new \Drupal\sps\Test\HookController();
+    $controller->setDrupalGetForm($name, array($this, "getForm"));
+
+
+    $this->assertEqual(
+      $controller->drupalGetForm($name, array("param1")), 
+      $this->getForm(array("param1")), 
+      "::drupalGetForm should return the form set in setDrupalGetForm", "SPS");
+  }
 }
 

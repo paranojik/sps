@@ -29,4 +29,13 @@ class DrupalHookController implements HookControllerInterface {
   public function moduleImplements($hook) {
     return module_implements($hook);
   }
+
+
+  /**
+   * @see drupal_get_form()
+   */
+  public function drupalGetForm($form) {
+    return call_user_func_array('drupal_get_form', func_get_args());
+    
+  }
 }

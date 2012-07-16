@@ -96,15 +96,20 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       ),
     );
     $env->plugin_controller->setInfo($info);
+    //set drupal_get_from to just return what was passed in
+    $env->hook_controller->setDrupalGetForm("sps_condition_preview_form", function($callable) {
+      return $callable;
+    });
     $config_controller = $env->config_controller;
     $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array("name" => 'testCondition', 'config' => array()));
+
+    $condition = $manager->getPlugin("condition", 'testCondition');
     $form = array();
     $form_state = array();
-
     $this->assertEqual(
       $manager->getPreviewForm($form, $form_state),
-      $settings['element_form'],
-      "Manager::getPreviewForm should pull the form from the condition from the getElement method of the condition specified as the root condition in the config", 'SPS'
+      array($condition, 'getElement'),
+      "Manager::getPreviewForm find the root condition and then returns a form sps_condition_preview_form constucted with the getElement method of the condition", 'SPS'
     );
     //TODO this need to test previewFormSubmitted()
     /*

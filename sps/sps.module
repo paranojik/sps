@@ -11,17 +11,47 @@ define('SPS_CONFIG_PREFIX', "sps_config");
  * drupal_get_form('sps_condition_preview_form', array($this, 'getPreviewForm'))
  * by the manager or a condition, it will return that form.
  *
- * @return
+ * @param $form
+ * @param $form_state
+ *
+ * @return array
  *  A FAPI array for drupal_get_form if a callback is provided, or NULL
  *
- * @see Manager::getPreviewForm();
+ * @see \Drupal\sps\Manager::getPreviewForm();
  */
 function sps_condition_preview_form($form, &$form_state) {
   if (!empty($form_state['build_info']['args'][0])) {
     $form_function = $form_state['build_info']['args'][0];
     if (is_callable($form_function)) {
-      $form_function($form, $form_state);
+      $form = call_user_func_array($form_function, array($form, $form_state));
+      return $form;
     }
+  }
+}
+
+/**
+ * A validate callback for forms which will subsequently call the forms
+ * #sps_validate function.
+ *
+ * This allows us to call class methods as form validators.  To use #sps_validate,
+ * should be set to a callable item and the form generated through sps_condition_preview_form.
+ */
+function sps_condition_preview_form_validate($form, &$form_state) {
+  if (!empty($form['#sps_validate']) && is_callable($form['#sps_validate'])) {
+    call_user_func_array($form['#sps_validate'], array($form, $form_state));
+  }
+}
+
+/**
+ * A submit callback for forms which will subsequently call the forms
+ * #sps_submit function.
+ *
+ * This allows us to call class methods as form submitters.  To use #sps_submit,
+ * should be set to a callable item and the form generated through sps_condition_preview_form.
+ */
+function sps_condition_preview_form_submit($form, &$form_state) {
+  if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
+    call_user_func_array($form['#sps_submit'], array($form, $form_state));
   }
 }
 

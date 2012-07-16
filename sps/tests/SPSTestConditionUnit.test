@@ -109,15 +109,6 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     //BasicCondition should return false for getOverride if the form hasn't been submitted.
     $override = $condition->getOverride();
     $this->assertEqual($override, FALSE, 'BasicCondition should return false for getOverride when form is not yet submitted.');
-
-    //BasicCondition should submit the form properly and pass the values to the override.
-    $condition->submitElement($element, $good_state);
-    $override = $condition->getOverride();
-    $this->assertEqual($override->getOverrides(), array(
-        'node' => 'value',
-        'box' => 'value',
-      ),
-      'BasicCondition should properly extract values from widget and pass them to Override after submit.');
   }
 
   public function testAggregatorOverride() {
@@ -186,10 +177,10 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
    */
   protected static function getManager() {
     $plugins = array(
-      'Override' => array(
+      'override' => array(
         'test1' => array(
           'name' => 'test1',
-          'condition' => 'BasicCondition',
+          'condition' => 'basic',
           'class' => '\Drupal\sps\Test\Override',
           'instance_settings' => array(
             'type' => 'node',
@@ -197,7 +188,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
         ),
         'test2' => array(
           'name' => 'test2',
-          'condition' => 'BasicCondition',
+          'condition' => 'basic',
           'class' => '\Drupal\sps\Test\Override',
           'instance_settings' => array(
             'type' => 'box',
@@ -210,7 +201,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
           'instance_settings' => array(),
         ),
       ),
-      'Condition' => array(
+      'condition' => array(
         'basic' => array(
           'name' => 'basic',
           'class' => '\Drupal\sps\Plugins\Condition\BasicCondition',
@@ -220,10 +211,11 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
           ),
         ),
       ),
-      'Widget' => array(
+      'widget' => array(
         'basicWidget' => array(
           'name' => 'basicWidget',
           'class' => '\Drupal\sps\Test\Widget',
+          'instance_settings' => array(),
         ),
       )
     );

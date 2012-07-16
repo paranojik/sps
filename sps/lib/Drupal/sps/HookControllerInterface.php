@@ -18,4 +18,9 @@ interface HookControllerInterface {
    * @see module_implements()
    */
   public function moduleImplements($hook);
+  /**
+   * @see drupalGetForm()
+   */
+  public function drupalGetForm($form);
+
 }
