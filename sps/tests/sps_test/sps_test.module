@@ -1,5 +1,16 @@
 <?php
 
+function sps_test_menu() {
+  return array(
+    'test_sps' => array(
+      'title' => 'Test SPS Preview Form',
+      'description' => '',
+      'page callback' => 'sps_test_test_widget_form',
+      'access callback' => TRUE,
+    ),
+  );
+}
+
 /**
  * Implements hook_sps_plugin_types().
  */
@@ -152,3 +163,75 @@ function sps_test_sps_incorrect_interface_plugins() {
   );
 }
 
+/**
+ * helper function for getting a Manager
+ *
+ * @param $controllers
+ *   array of controller from _sps_test_Get_basic_controllers
+ *
+ * @return
+ *   a Manager object
+ */
+function _sps_test_get_new_manager($controllers) {
+  return new Drupal\sps\Manager($controllers['state_controller'], $controllers['override_controller'], $controllers['config_controller'], $controllers['plugin_controller']);
+}
+
+/**
+ * A array of controllers to be feed to _sos_test_get_new_manager
+ *
+ * @return
+ *   A array of controllers to be feed to _sos_test_get_new_manager
+ */
+function _sps_test_get_basic_controllers() {
+  $controllers = array();
+  $controllers['state_controller'] = new Drupal\sps\Test\StorageController();
+  $controllers['override_controller'] = new Drupal\sps\Test\StorageController();
+  $controllers['config_controller'] = new Drupal\sps\Test\StorageController();
+  $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController(array());
+  return $controllers;
+}
+
+function sps_test_test_widget_form() {
+  $plugins = array(
+    'override' => array(
+      'test1' => array(
+        'name' => 'test1',
+        'condition' => 'BasicCondition',
+        'class' => '\Drupal\sps\Test\Override',
+        'instance_settings' => array(
+          'type' => 'node',
+        ),
+      ),
+      'test2' => array(
+        'name' => 'test2',
+        'condition' => 'BasicCondition',
+        'class' => '\Drupal\sps\Test\Override',
+        'instance_settings' => array(
+          'type' => 'box',
+        ),
+      ),
+    ),
+    'condition' => array(
+      'basic' => array(
+        'name' => 'basic',
+        'class' => '\Drupal\sps\Plugins\Condition\BasicCondition',
+        'instance_settings' => array(
+          'widget' => 'basicWidget',
+          'name' => 'basic',
+        ),
+      ),
+    ),
+    'widget' => array(
+      'basicWidget' => array(
+        'name' => 'basicWidget',
+        'class' => '\Drupal\sps\Plugins\Widget\DateWidget',
+        'instance_settings' => array(),
+      ),
+    )
+  );
+  $controllers =_sps_test_get_basic_controllers();
+  $controllers['plugin_controller'] = new Drupal\sps\Test\PluginController($plugins);
+  $manager = _sps_test_get_new_manager($controllers);
+  $controllers['config_controller']->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
+  return $manager->getPreviewForm();
+}
