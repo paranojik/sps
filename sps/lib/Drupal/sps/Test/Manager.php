@@ -7,19 +7,24 @@ class Manager extends \Drupal\sps\Manager{
   public $override_controller;
   public $root_condition;
   public $plugin_controller;
+  public $hook_controller;
   public function __construct(
     \Drupal\sps\StorageControllerInterface $state_controller = NULL, 
     \Drupal\sps\StorageControllerInterface $override_controller = NULL, 
-    \Drupal\sps\StorageControllerInterface $config_controller = NULL, \Drupal\sps\PluginControllerInterface $plugin_controller = NULL) {
+    \Drupal\sps\StorageControllerInterface $config_controller = NULL,
+    \Drupal\sps\PluginControllerInterface $plugin_controller = NULL,
+    \Drupal\sps\HookControllerInterface $hook_controller = NULL) {
 
     $state_controller = $state_controller ?: new \Drupal\sps\Test\StorageController();
     $override_controller = $override_controller ?: new \Drupal\sps\Test\StorageController();
     $config_controller = $config_controller ?: new \Drupal\sps\Test\StorageController();
     $plugin_controller = $plugin_controller ?: new \Drupal\sps\Test\PluginController(array());
+    $hook_controller = $hook_controller ?: new \Drupal\sps\Test\HookController();
 
     $this->setStateController($state_controller)
       ->setOverrideController($override_controller)
       ->setConfigController($config_controller)
-      ->setPluginController($plugin_controller);
+      ->setPluginController($plugin_controller)
+      ->setHookController($hook_controller);
   }
 }
