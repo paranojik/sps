@@ -111,28 +111,67 @@ class QueryAlterReaction {
   * @return 
   */
   protected function recusiveReplace(&$data, $alias) {
+    $reorder = array();
     foreach($data as $key => &$datum) {
+
+      //check to see if we need to rewrite the keys.
+      foreach($this->entities as $entity) {
+        if(isset($alias[$entity['revision_table']])) {
+          $new_key = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $key);
+          if($new_key != $key) {
+            $reorder[$key] = $new_key;
+          }
+        }
+      }
+
+      //if an array lets run the kids
       if (is_array($datum)) {
         $this->recusiveReplace($datum, $alias);
       }
+      //@TODO this is for exceptions basicly
       else if (is_object($datum)) {
-        $sub_condition =& $datum->conditions();
-        $this->recusiveReplace($sub_condition);
+       // $sub_condition =& $datum->conditions();
+       // $this->recusiveReplace($sub_condition);
       }
+      //ok we have a single datum lets work on it.
       else {
         if($datum !== NULL) {
           foreach($this->entities as $entity) {
             //replace revision_id 
             $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".{$entity['revision_id']}, $1)", $datum);
-          /*
-          if(isset($this->alias['revision'])) {
-            $datum = preg_replace("/".$this->alias['base']."\.(title|status)/", $this->alias['revision'] .'.$1', $datum);
-          }
-          */
+            if(isset($alias[$entity['revision_table']])) {
+
+
+              $datum = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $datum);
+            }
           }
         }
       }
     }
+    if($reorder) {
+      $data = $this->reorder($data, $reorder);
+    }
+  }
+
+  /**
+  * @brief 
+  *
+  * @param $data
+  * @param $moves
+  *
+  * @return 
+  */
+  protected function reorder($data, $moves) {
+    $new_data = array();
+    foreach($data as $key => $datum) {
+      if (isset($moves[$key])) {
+        $new_data[$moves[$key]] = $datum;
+      }
+      else {
+        $new_data[$key] = $datum;
+      }
+    }
+    return $new_data;
   }
 
   protected function extractAlias($query) {
@@ -162,20 +201,23 @@ class QueryAlterReaction {
       $tables =& $query->getTables();
       $this->recusiveReplace($tables, $alias);
 
+      $where =& $query->conditions();
+      $this->recusiveReplace($where, $alias);
+
+      $expressions =& $query->getExpressions();
+      $this->recusiveReplace($expressions, $alias);
+
+      $order =& $query->getOrderBy();
+      $this->recusiveReplace($order, $alias);
+
+      $group =& $query->getGroupBy();
+      $this->recusiveReplace($group, $alias);
+
+      $having =& $query->havingConditions();
+      $this->recusiveReplace($having, $alias);
       /* 
       $this->recusiveReplace($fields);
 
-      $expressions =& $query->getExpressions();
-      $this->recusiveReplace($expressions);
-
-      $order =& $query->getOrderBy();
-      $this->recusiveReplace($order);
-
-      $where =& $query->conditions();
-      $this->recusiveReplace($where);
-
-      $having =& $query->havingConditions();
-      $this->recusiveReplace($having);
       */
     }
   }

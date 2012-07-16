@@ -124,7 +124,7 @@ class QueryAlterable extends \SelectQuery {
     $this->tables = $config['tables'];
     $this->expressions = $config['expressions'];
     $this->fields = $config['fields'];
-    $wherec = $config['where->conditions'];
+    $where_c = $config['where->conditions'];
   }
   static function extractConfig($query) {
     $config = array( 

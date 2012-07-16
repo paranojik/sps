@@ -77,8 +77,15 @@ function sps_query_alter($query) {
 
 function sps_init() {
   $query = db_select("node", 'b');
-  $query->fields('b', array('title', 'status', 'promote', 'sticky'));
   $query->join("node_revision", "r", "r.vid = b.vid");
+  $query->join("user", "u", "u.uid = b.uid");
+  //$query->condition("b.status",1);
+  $query->fields("u", array("u.name"));
+  //$query->addExpression("b.title is NULL", "expression");
+  $query->groupBy("b.uid");
+  $query->groupBy("u.name");
+  $query->having("COUNT(b.status) > 1");
+
   dpm(\Drupal\sps\Test\QueryAlterable::exportConfig($query));
 }
  

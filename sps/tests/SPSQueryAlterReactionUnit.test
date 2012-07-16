@@ -7,6 +7,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       'group' => 'SPS',
     );
   }
+
   public function test_QueryAlterReaction_NodeAddTable() {
     $query = new \Drupal\sps\Test\QueryAlterable($this->addTable_start());
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
@@ -47,19 +48,18 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
  
   public function test_QueryAlterReaction_revisionFields() {
     $query = new \Drupal\sps\Test\QueryAlterable($this->revisionFields_start());
-    $expected = $this->revisionFields_start();
     $info = $this->getNodeReactionInfo();
 
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
+    $reaction->react($query, $controller);
+    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
 
+    $expected = $this->revisionFields_start();
     $expected['fields']['title']['table'] = 'r';
     $expected['fields']['status']['table'] = 'r';
     $expected['fields']['promote']['table'] = 'r';
     $expected['fields']['sticky']['table'] = 'r';
-
-    $reaction->react($query, $controller);
-    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
 
     $this->assertEqual(
       $result['fields'],
@@ -78,6 +78,47 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       'r.vid = COALESCE(node_overrides.vid, b.vid)',
       "::react alter a query so that the revision table joins on a coalesce of the overides and the base revision ids"
     );
+
+    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+
+    $this->assertEqual(
+      $result['where->conditions'][0]['field'],
+      'r.status',
+      "::react alter a query so that conditions that reference revision fields on the base, are change to the revision table"
+    );
+
+    $this->assertEqual(
+      $result['expressions']['expression']['expression'],
+      'r.title is NULL', 
+      "::react alter a query so that expressions that reference revision fields on the base, are change to the revision table"
+    );
+
+    $this->assertEqual(
+      $result['order'],
+      array ('r.sticky' => 'ASC', 'r.title' => 'ASC'),
+      "::react alter a query so that order fields that reference revision fields on the base, are change to the revision table"
+    );
+  }
+  public function test_QueryAlterReaction_groupBy() {
+    $query = new \Drupal\sps\Test\QueryAlterable($this->groupBy_start());
+    $info = $this->getNodeReactionInfo();
+
+    $controller = new \Drupal\sps\Test\TableOverrideStorageController();
+    $reaction = $this->getNodeReaction();
+    $reaction->react($query, $controller);
+    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+
+    $this->assertEqual(
+      $result['group'],
+      array ('r.uid' => 'r.uid', 'u.name' => 'u.name'),
+      "::react alter a query so that group by fields that reference revision fields on the base, are change to the revision table"
+    );
+
+    $this->assertEqual(
+      $result['having->conditions'][0]['field'],
+      'COUNT(r.status) > 1',
+      "::react alter a query so that fields that reference revision fields on the base, are change to the revision table in having clauses"
+    );
   }
   protected function getNodeReactionInfo() {
     return array(
@@ -87,7 +128,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
           'revision_table' => 'node_revision',
           'base_id' => 'nid',
           'revision_id' => 'vid',
-          'revision_fields' => array('title', 'status', 'promote', 'sticky'),
+          'revision_fields' => array('title', 'status', 'promote', 'sticky', 'uid'),
         )
       )
     );
@@ -223,12 +264,20 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       'where->conditions' => 
       array (
         '#conjunction' => 'AND',
+        0 => 
+        array (
+          'field' => 'b.status',
+          'value' => 1,
+          'operator' => '=',
+        ),
       ),
       'group' => 
       array (
       ),
       'order' => 
       array (
+        'b.sticky' => 'ASC',
+        'b.title' => 'ASC',
       ),
       'tables' => 
       array (
@@ -255,6 +304,14 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       ),
       'expressions' => 
       array (
+        'expression' => 
+        array (
+          'expression' => 'b.title is NULL',
+          'alias' => 'expression',
+          'arguments' => 
+          array (
+          ),
+        ),
       ),
       'fields' => 
       array (
@@ -283,6 +340,86 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
           'alias' => 'sticky',
         ),
       ),
-    );
+    ); 
+  }
+  protected function groupBy_start() {
+     return array (
+      'forUpdate' => false,
+      'prepared' => false,
+      'union' => 
+      array (
+      ),
+      'range' => NULL,
+      'distinct' => false,
+      'having->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+        0 => 
+        array (
+          'field' => 'COUNT(b.status) > 1',
+          'value' => 
+          array (
+          ),
+          'operator' => NULL,
+        ),
+      ),
+      'where->conditions' => 
+      array (
+        '#conjunction' => 'AND',
+      ),
+      'group' => 
+      array (
+        'b.uid' => 'b.uid',
+        'u.name' => 'u.name',
+      ),
+      'order' => 
+      array (
+      ),
+      'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+        'r' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'node_revision',
+          'alias' => 'r',
+          'condition' => 'r.vid = b.vid',
+          'arguments' => 
+          array (
+          ),
+        ),
+        'u' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'user',
+          'alias' => 'u',
+          'condition' => 'u.uid = b.uid',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+      'expressions' => 
+      array (
+      ),
+      'fields' => 
+      array (
+        'u.name' => 
+        array (
+          'field' => 'u.name',
+          'table' => 'u',
+          'alias' => 'u.name',
+        ),
+      ),
+    ); 
   }
 }
