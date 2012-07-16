@@ -110,10 +110,10 @@ class QueryAlterReaction {
   *
   * @return 
   */
-  protected function recusiveReplace(&$data) {
+  protected function recusiveReplace(&$data, $alias) {
     foreach($data as $key => &$datum) {
       if (is_array($datum)) {
-        $this->recusiveReplace($datum);
+        $this->recusiveReplace($datum, $alias);
       }
       else if (is_object($datum)) {
         $sub_condition =& $datum->conditions();
@@ -121,9 +121,14 @@ class QueryAlterReaction {
       }
       else {
         if($datum !== NULL) {
-          $datum = preg_replace("/(".$this->alias['base']."\.vid)/", "COALESCE(overrides.vid, $1)", $datum);
+          foreach($this->entities as $entity) {
+            //replace revision_id 
+            $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".{$entity['revision_id']}, $1)", $datum);
+          /*
           if(isset($this->alias['revision'])) {
             $datum = preg_replace("/".$this->alias['base']."\.(title|status)/", $this->alias['revision'] .'.$1', $datum);
+          }
+          */
           }
         }
       }
@@ -153,14 +158,15 @@ class QueryAlterReaction {
       $this->addOverrideTable($query, $override_controller);
       $fields =& $query->getFields();
       $this->fieldReplace($fields, $alias);
+
+      $tables =& $query->getTables();
+      $this->recusiveReplace($tables, $alias);
+
       /* 
       $this->recusiveReplace($fields);
 
       $expressions =& $query->getExpressions();
       $this->recusiveReplace($expressions);
-
-      $tables =& $query->getTables();
-      $this->recusiveReplace($tables);
 
       $order =& $query->getOrderBy();
       $this->recusiveReplace($order);

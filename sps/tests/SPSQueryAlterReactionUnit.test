@@ -14,7 +14,14 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
 
     $reaction->react($query, $controller);
     $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
-    $expected = $this->addTable_result();
+    $expected = $this->addTable_start();
+    $expected['tables']['node_overrides'] = array (
+      'join type' => 'LEFT OUTER',
+      'table' => 'test_override',
+      'alias' => 'node_overrides',
+      'condition' => 'b.nid = node_overrides.id',
+      'arguments' => array (),
+    );
     $this->assertEqual(
       $result['tables'],
       $expected['tables'],
@@ -29,7 +36,8 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
 
     $reaction->react($query, $controller);
     $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
-    $expected = $this->vidField_result();
+    $expected = $this->vidField_start();
+    $expected['fields']['vid']['table'] = 'node_overrides';
     $this->assertEqual(
       $result['fields'],
       $expected['fields'],
@@ -53,12 +61,22 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     $reaction->react($query, $controller);
     $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
 
-//    print_r(array( $result['fields'], $expected['fields'],));
-
     $this->assertEqual(
       $result['fields'],
       $expected['fields'],
       "::react alter a query changing the table of all fields on the base table in revisions_fields to the revision table alias"
+    );
+
+    $this->assertEqual(
+      array_keys($result['tables']),
+      array('b', 'node_overrides', 'r'),
+      "::react alter a query so that the overrides table is right after the base table"
+    );
+
+    $this->assertEqual(
+      $result['tables']['r']['condition'],
+      'r.vid = COALESCE(node_overrides.vid, b.vid)',
+      "::react alter a query so that the revision table joins on a coalesce of the overides and the base revision ids"
     );
   }
   protected function getNodeReactionInfo() {
@@ -133,68 +151,6 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       ),
     );
   }
-  protected function addTable_result() {
-
-    return array(
-      'forUpdate' => false,
-      'prepared' => false,
-      'union' => 
-      array (
-      ),
-      'range' => NULL,
-      'distinct' => false,
-      'having->conditions' => 
-      array (
-        '#conjunction' => 'AND',
-      ),
-      'where->conditions' => 
-      array (
-        '#conjunction' => 'AND',
-      ),
-      'group' => 
-      array (
-      ),
-      'order' => 
-      array (
-      ),
-      'tables' => 
-      array (
-        'b' => 
-        array (
-          'join type' => NULL,
-          'table' => 'node',
-          'alias' => 'b',
-          'condition' => NULL,
-          'arguments' => 
-          array (
-          ),
-        ),
-        'node_overrides' => 
-        array (
-          'join type' => 'LEFT OUTER',
-          'table' => 'test_override',
-          'alias' => 'node_overrides',
-          'condition' => 'b.nid = node_overrides.id',
-          'arguments' => 
-          array (
-          ),
-        ),
-      ),
-      'expressions' => 
-      array (
-      ),
-      'fields' => 
-      array (
-        'nid' => 
-        array (
-          'field' => 'nid',
-          'table' => 'b',
-          'alias' => 'nid',
-        ),
-      ),
-    );
-
-  }
   protected function vidField_start() {
     return array (
       'forUpdate' => false,
@@ -250,74 +206,6 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-  }
-  protected function vidField_result() {
-
-    return array(
-      'forUpdate' => false,
-      'prepared' => false,
-      'union' => 
-      array (
-      ),
-      'range' => NULL,
-      'distinct' => false,
-      'having->conditions' => 
-      array (
-        '#conjunction' => 'AND',
-      ),
-      'where->conditions' => 
-      array (
-        '#conjunction' => 'AND',
-      ),
-      'group' => 
-      array (
-      ),
-      'order' => 
-      array (
-      ),
-      'tables' => 
-      array (
-        'b' => 
-        array (
-          'join type' => NULL,
-          'table' => 'node',
-          'alias' => 'b',
-          'condition' => NULL,
-          'arguments' => 
-          array (
-          ),
-        ),
-        'node_overrides' => 
-        array (
-          'join type' => 'LEFT OUTER',
-          'table' => 'test_override',
-          'alias' => 'node_overrides',
-          'condition' => 'b.nid = node_overrides.id',
-          'arguments' => 
-          array (
-          ),
-        ),
-      ),
-      'expressions' => 
-      array (
-      ),
-      'fields' => 
-      array (
-        'nid' => 
-        array (
-          'field' => 'nid',
-          'table' => 'b',
-          'alias' => 'nid',
-        ),
-        'vid' => 
-        array (
-          'field' => 'vid',
-          'table' => 'node_overrides',
-          'alias' => 'vid',
-        ),
-      ),
-    );
-
   }
   protected function revisionFields_start() {
     return array (
