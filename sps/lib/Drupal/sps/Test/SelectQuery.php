@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Test;
 
-class QueryAlterable extends \SelectQuery {
+class SelectQuery extends \SelectQuery {
   /**
    * The fields to SELECT.
    *
@@ -148,15 +148,15 @@ class QueryAlterable extends \SelectQuery {
   static function selectQuery($query) {
     $query->__sleep();
     $config =  var_export($query, TRUE);
-    $config = preg_replace("/SelectQuery/", "Drupal\sps\Test\QueryAlterable", $config);
-    $config = preg_replace("/DatabaseConnection_mysql::__set_state/", "Drupal\sps\Test\QueryAlterable::getNull", $config);
+    $config = preg_replace("/SelectQuery/", "Drupal\sps\Test\SelectQuery", $config);
+    $config = preg_replace("/DatabaseConnection_mysql::__set_state/", "Drupal\sps\Test\SelectQuery::getNull", $config);
     $config = preg_replace("/DatabaseCondition/", "Drupal\sps\Test\DatabaseCondition", $config);
     $query = eval("return " .$config .";");
     unset($query->connection);
     return $query;
   }
   static function exportSelect($query) {
-    $query = QueryAlterable::selectQuery($query);
+    $query = SelectQuery::selectQuery($query);
     return var_export($query, TRUE);
   }
   static function getNull() {
@@ -164,7 +164,7 @@ class QueryAlterable extends \SelectQuery {
   }
   
   static function __set_state($state) {
-    $select = new QueryAlterable(array());
+    $select = new SelectQuery(array());
     foreach($state as $key => $value) {
       $select->{$key} = $value;
     }

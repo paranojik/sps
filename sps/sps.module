@@ -87,7 +87,7 @@ function sps_init() {
   //$query->having("COUNT(b.status) > 1");
   $query->condition(db_or()->condition("b.sticky", 1)->condition("b.promote", 1));
 
-  //dpm(\Drupal\sps\Test\QueryAlterable::exportConfig($query));
+  //dpm(\Drupal\sps\Test\SelectQuery::exportConfig($query));
 
   //dpm(a());
   $query = db_select("node", 'b');
@@ -97,7 +97,7 @@ function sps_init() {
   $query->condition("b.status",1);
   $query->orderBy("b.sticky");
   $query->orderBy("b.title");
-  dpm(\Drupal\sps\Test\QueryAlterable::selectQuery($query));
-  dpm(\Drupal\sps\Test\QueryAlterable::exportSelect($query));
+  dpm(\Drupal\sps\Test\SelectQuery::selectQuery($query));
+  dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
 
 }

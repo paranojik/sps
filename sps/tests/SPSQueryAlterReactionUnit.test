@@ -95,13 +95,13 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
   }
   /*
   public function test_QueryAlterReaction_groupBy() {
-    $query = new \Drupal\sps\Test\QueryAlterable($this->groupBy_start());
+    $query = new \Drupal\sps\Test\SelectQuery($this->groupBy_start());
     $info = $this->getNodeReactionInfo();
 
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
     $reaction->react($query, $controller);
-    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+    $result = \Drupal\sps\Test\SelectQuery::extractConfig($query);
 
     $this->assertEqual(
       $result['group'],
@@ -116,13 +116,13 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     );
   }
   public function test_QueryAlterReaction_subCondition() {
-    $query = new \Drupal\sps\Test\QueryAlterable($this->subCondition_start());
+    $query = new \Drupal\sps\Test\SelectQuery($this->subCondition_start());
     $info = $this->getNodeReactionInfo();
 
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
     $reaction->react($query, $controller);
-    $result = \Drupal\sps\Test\QueryAlterable::extractConfig($query);
+    $result = \Drupal\sps\Test\SelectQuery::extractConfig($query);
     print_r(
       $result['having->conditions'][0]['field']);
     $this->assertEqual(
@@ -156,7 +156,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
   }
 
   protected function addTable_start() {
-    return Drupal\sps\Test\QueryAlterable::__set_state(array(
+    return Drupal\sps\Test\SelectQuery::__set_state(array(
        'fields' => 
       array (
         'nid' => 
@@ -234,7 +234,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     ));
   }
   protected function vidField_start() {
-    return Drupal\sps\Test\QueryAlterable::__set_state(array(
+    return Drupal\sps\Test\SelectQuery::__set_state(array(
        'fields' => 
       array (
         'vid' => 
@@ -312,7 +312,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     ));
   }
   protected function revisionFields_start() {
-     return Drupal\sps\Test\QueryAlterable::__set_state(array(
+     return Drupal\sps\Test\SelectQuery::__set_state(array(
        'fields' => 
       array (
         'sticky' => 
@@ -440,7 +440,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     )); 
   }
   protected function groupBy_start() {
-     return Drupal\sps\Test\QueryAlterable::__set_state(array(
+     return Drupal\sps\Test\SelectQuery::__set_state(array(
        'fields' => 
       array (
         'sticky' => 
