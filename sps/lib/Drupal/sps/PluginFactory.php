@@ -15,8 +15,11 @@ class PluginFactory implements PluginControllerInterface {
   protected $plugin_info = array();
   // The info array for the plugin type info
   protected $plugin_type_info = array();
+  // control for invoking drupal hooks
+  protected $hook_controller;
 
   public function __construct() {
+    $this->hook_controller = new \Drupal\sps\DrupalHookController();
     $this->loadPluginTypeInfo();
   }
 
@@ -33,6 +36,7 @@ class PluginFactory implements PluginControllerInterface {
    *  array of meta data for the plugin or an array of plugin arrays
    */
   public function getPluginInfo($plugin_type, $name = NULL) {
+    $this->loadPluginTypeInfo();
     if (empty($this->plugin_type_info[$plugin_type])) {
       throw new InvalidPluginException("Plugin Type $plugin_type does not exist");
     }
@@ -97,12 +101,15 @@ class PluginFactory implements PluginControllerInterface {
    *  self
    */
   protected function loadPluginInfo($plugin_type) {
+    $this->loadPluginTypeInfo();
     if (empty($this->plugin_info[$plugin_type])) {
-      foreach (module_implements("sps_{$plugin_type}_plugins") as $module) {
-        $function = "{$module}_sps_{$plugin_type}_plugins";
-        $module_infos = $function();
+      $hook = "sps_{$plugin_type}_plugins";
+      foreach ($this->getHookController()->moduleImplements($hook) as $module) {
+        $module_infos = $this->getHookController()->moduleInvoke($module, $hook);
 
         foreach ($module_infos as $plugin_name => $plugin_info) {
+          if(!is_array($this->plugin_type_info[$plugin_type]['defaults'])) {
+          }
           $plugin_info += $this->plugin_type_info[$plugin_type]['defaults'] + array(
             'plugin_type' => $plugin_type,
             'module' => $module,
@@ -110,7 +117,7 @@ class PluginFactory implements PluginControllerInterface {
             'instance_settings' => array(),
           );
 
-          drupal_alter("sps_plugin_info_{$plugin_type}_{$plugin_info['name']}", $plugin_info);
+          $this->getHookController()->drupalAlter("sps_plugin_info_{$plugin_type}_{$plugin_info['name']}", $plugin_info);
           $this->validatePluginInfo($plugin_info);
 
           $this->plugin_info[$plugin_type][$plugin_name] = $plugin_info;
@@ -131,16 +138,16 @@ class PluginFactory implements PluginControllerInterface {
    * @throws \Drupal\sps\Exception\InvalidPluginException
    */
   protected function validatePluginInfo($plugin_info) {
-    $required_settings = $this->getPluginTypeInfo($plugin_info['plugin_type'], 'require_settings');
-    foreach ($required_settings as $key => $setting) {
-      $this->validatePluginInfoElement($plugin_info, $key, $setting);
+    $type_info = $this->getPluginTypeInfo($plugin_info['plugin_type']);
+    if(isset($type_info['requires'])) {
+      $this->validatePluginInfoRequirements($plugin_info, $type_info['requires']);
     }
 
     if (isset($plugin_info['class'])) {
       $this->validatePluginClass($plugin_info);
     }
 
-    module_invoke_all("sps_validate_plugin_info",
+    $this->getHookController()->moduleInvokeAll("sps_validate_plugin_info",
       $plugin_info, $plugin_info['plugin_type'],
       $this->getPluginTypeInfo($plugin_info['plugin_type']));
 
@@ -174,8 +181,16 @@ class PluginFactory implements PluginControllerInterface {
    * Validate that the plugin info array contains the all of the required keys
    *
    * @param $plugin_info
-   * @param $element_key
-   * @param $element
+   *   an array of plugin data
+   * @param $requirements
+   *   an array of required fields that should be check, this should 
+   *   match the structure of the $plugin_info with TRUE for the values
+   *   so to check that there is a parent field with a child field in it one whould do
+   *   array("parent"=>array("child")
+   * @param $parents
+   *   a string used for recusion
+   * @param $name
+   *   a string used for recusion
    *
    * @throws Exception\InvalidPluginException
    *
@@ -183,20 +198,23 @@ class PluginFactory implements PluginControllerInterface {
    * @return \Drupal\sps\PluginFactory
    *  self
    */
-  protected function validatePluginInfoElement($plugin_info, $element_key, $element) {
-    if (is_array($element)) {
-      if (!isset($plugin_info[$element_key])) {
+  protected function validatePluginInfoRequirements($plugin_info, $requirements, $parents = '', $name = NULL) {
+    $name = $name ?: $plugin_info['name'];
+    foreach($requirements as $r_key => $r_type) {
+      if (!isset($plugin_info[$r_key])) {
         throw new InvalidPluginException(
-          "Plugin {$plugin_info['name']} does not contain required element $element_key");
+          "Plugin $name does not contain required element $parents$r_key");
+      }
+      else {
+        if(is_array($r_type)) {
+          $parents .="$r_key=>";
+          $this->validatePluginInfoRequirements($plugin_info[$r_key], $r_type, $parents, $name);
+        }
+        else {
+          //TODO add type checking based on the value of $r_type
+        }
       }
     }
-    else {
-      if (!isset($plugin_info[$element])) {
-        throw new InvalidPluginException(
-          "Plugin {$plugin_info['name']} does not contain required element $element");
-      }
-    }
-
     return $this;
   }
 
@@ -213,6 +231,7 @@ class PluginFactory implements PluginControllerInterface {
    * @return array
    */
   public function getPluginTypeInfo($plugin_type = NULL, $key = NULL) {
+    $this->loadPluginTypeInfo();
     if (isset($plugin_type)) {
       if (empty($this->plugin_type_info[$plugin_type])) {
         throw new InvalidPluginException("Plugin Type $plugin_type does not exist");
@@ -237,19 +256,19 @@ class PluginFactory implements PluginControllerInterface {
    */
   protected function loadPluginTypeInfo() {
     if (empty($this->plugin_type_info)) {
-      foreach (module_implements('sps_plugin_types') as $module) {
+      foreach ($this->getHookController()->moduleImplements('sps_plugin_types') as $module) {
         $function = $module . '_sps_plugin_types';
-        $module_infos = $function();
+        $module_infos = $this->getHookController()->moduleInvoke($module, 'sps_plugin_types');
 
         foreach ($module_infos as $plugin_type_name => $plugin_type_info) {
           $plugin_type_info += array(
             'module' => $module,
             'name' => $plugin_type_name,
-            'require_settings' => array(),
+            'requires' => array(),
           );
 
-          drupal_alter("sps_plugin_type_info_{$plugin_type_info['name']}", $plugin_type_info);
-          module_invoke_all("sps_validate_plugin_type_info", $plugin_type_info);
+          $this->getHookController()->drupalAlter("sps_plugin_type_info_{$plugin_type_info['name']}", $plugin_type_info);
+          $this->getHookController()->moduleInvokeAll("sps_validate_plugin_type_info", $plugin_type_info);
 
           $this->plugin_type_info[$plugin_type_name] = $plugin_type_info;
         }
@@ -282,6 +301,7 @@ class PluginFactory implements PluginControllerInterface {
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param $property
    *   the meta property to compare to the value
+   *   this can be a string or a array of tree keys
    * @param $value
    *   the value to compare to the meta property
    *
@@ -327,5 +347,14 @@ class PluginFactory implements PluginControllerInterface {
       }
     }
     return FALSE;
+  }
+
+  protected function getHookController() {
+    return $this->hook_controller;
+  }
+  public function setHookController(\Drupal\sps\HookControllerInterface $controller) {
+    $this->hook_controller = $controller;
+    $this->plugin_type_info = array();
+    $this->plugin_info = array();
   }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\sps_test\Plugin;
+namespace Drupal\sps\Test\Plugin;
 
 interface TestTypeInterface {
   public function testMethod();

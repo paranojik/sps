@@ -1,154 +1,57 @@
 <?php
 
-/**
- * Implements hook_sps_plugin_types().
- */
-function sps_test_sps_plugin_types() {
+function sps_test_menu() {
   return array(
-    'test_type_1' => array(
-      'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-      'defaults' => array(
-        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-        'instance_settings' => array(),
-      ),
-      'require_settings' => array(
-        'setting_1',
-        'setting_2' => array(
-          'settings 2.1',
-        ),
-        'setting 4',
-      ),
+    'test_sps' => array(
+      'title' => 'Test SPS Preview Form',
+      'description' => '',
+      'page callback' => 'sps_test_test_widget_form',
+      'access callback' => TRUE,
     ),
-    'get_plugin_by_meta' => array(
-      'interface' => "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-      'defaults' => array(
-        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-        'instance_settings' => array(),
-      ),
-      'require_settings' => array(
-        'setting_1',
-        'setting_2' => array(
-          'settings 2.1',
-        ),
-        'setting 4',
-      ),
-    ),
-    
-    'test_type_2' => array(
-      'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-      'defaults' => array(
+  );
+}
+
+function sps_test_test_widget_form() {
+  $plugins = array(
+    'override' => array(
+      'test1' => array(
+        'name' => 'test1',
+        'condition' => 'BasicCondition',
+        'class' => '\Drupal\sps\Test\Override',
         'instance_settings' => array(
-          'instance_setting_1' =>  'abc',
-          'instance_setting_2' => 'def',
+          'type' => 'node',
+        ),
+      ),
+      'test2' => array(
+        'name' => 'test2',
+        'condition' => 'BasicCondition',
+        'class' => '\Drupal\sps\Test\Override',
+        'instance_settings' => array(
+          'type' => 'box',
         ),
       ),
     ),
-    'missing_required_settings' => array(
-      'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-      'defaults' => array(
-        'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-        'instance_settings' => array(),
-      ),
-      'require_settings' => array(
-        'required' => 'yes',
+    'condition' => array(
+      'basic' => array(
+        'name' => 'basic',
+        'class' => '\Drupal\sps\Plugins\Condition\BasicCondition',
+        'instance_settings' => array(
+          'widget' => 'basicWidget',
+          'name' => 'basic',
+        ),
       ),
     ),
-    'incorrect_interface' => array(
-      'interface' =>  "Drupal\\sps_test\\Plugin\\TestTypeInterface",
-      'defaults' => array(
-        'class' => "Drupal\\sps_test\\Plugin\\BadPlugin",
+    'widget' => array(
+      'basicWidget' => array(
+        'name' => 'basicWidget',
+        'class' => '\Drupal\sps\Plugins\Widget\DateWidget',
         'instance_settings' => array(),
       ),
     )
   );
+  $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
+  $hook_controller = new Drupal\sps\DrupalHookController();
+  $manager = new Drupal\sps\Test\Manager(NULL, NULL, NULL, $plugin_controller, $hook_controller);
+  $manager->config_controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
+  return $manager->getPreviewForm();
 }
-
-/**
- * Implements hook_sps_test_type_1_plugins().
- */
-function sps_test_sps_test_type_1_plugins() {
-  return array(
-    'good_plugin' => array(
-      'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-      'setting_1' => 'abc',
-      'setting_2' => array(
-        'settings 2.1' => 'abc',
-      ),
-      'setting 4' => 'abc',
-    ),
-    'default_class_plugin' => array(
-      'setting_1' => 'abc',
-      'setting_2' => array(
-        'settings 2.1' => 'abc',
-      ),
-      'setting 4' => 'abc',
-    ),
-  );
-}
-function sps_test_sps_get_plugin_by_meta_plugins() {
-  return array(
-    'good_plugin' => array(
-      'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-      'setting_1' => 'abc',
-      'setting_2' => array(
-        'settings 2.1' => 'efg',
-      ),
-      'setting 4' => 'abc',
-    ),
-    'default_class_plugin' => array(
-      'setting_1' => 'abc',
-      'setting_2' => array(
-        'settings 2.1' => 'abc',
-      ),
-      'setting 4' => 'efg',
-    ),
-  );
-}
-
-
-/**
- * Implements hook_sps_test_type_2_plugins().
- */
-function sps_test_sps_test_type_2_plugins() {
-  return array(
-    'normal_plugin' => array(
-      'class' =>"Drupal\\sps_test\\Plugin\\GoodPlugin",
-      'instance_settings' => array(
-        'instance_setting_1' =>  '123',
-        'instance_setting_2' => '456',
-      ),
-    ),
-    'defaults_plugin' => array(
-      'class' =>"Drupal\\sps_test\\Plugin\\GoodPlugin",
-    ),
-  );
-}
-
-/**
- * Implements hook_sps_missing_required_settings_plugins().
- */
-function sps_test_sps_missing_required_settings_plugins() {
-  return array(
-    'missing_required_settings' => array(
-      'class' => "Drupal\\sps_test\\Plugin\\GoodPlugin",
-      'setting_1' => 'abc',
-    ),
-  );
-}
-
-/**
- * Implements hook_sps_incorrect_interface_plugins().
- */
-function sps_test_sps_incorrect_interface_plugins() {
-  return array(
-    'incorrect_interface' => array(
-      'class' => "Drupal\\sps_test\\Plugin\\BadPlugin",
-      'setting_1' => 'abc',
-      'setting_2' => array(
-        'settings 2.1' => 'abc',
-      ),
-      'setting 4' => 'abc',
-    ),
-  );
-}
-
