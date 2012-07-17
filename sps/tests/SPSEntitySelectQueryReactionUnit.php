@@ -1,5 +1,5 @@
 <?php
-class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
+class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
       'name' => 'SPS Query Alter Reaction Unit Tests',
@@ -8,7 +8,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     );
   }
 
-  public function test_QueryAlterReaction_NodeAddTable() {
+  public function test_EntitySelectQueryReaction_NodeAddTable() {
     
     $query = $this->addTable_start();
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
@@ -29,7 +29,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     );
   }
 
-  public function test_QueryAlterReaction_NodeVidField() {
+  public function test_EntitySelectQueryReaction_NodeVidField() {
     $query = $this->vidField_start();
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
@@ -42,7 +42,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     );
   }
  
-  public function test_QueryAlterReaction_revisionFields() {
+  public function test_EntitySelectQueryReaction_revisionFields() {
     $query = $this->revisionFields_start();
     $info = $this->getNodeReactionInfo();
 
@@ -93,45 +93,40 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       "::react alter a query so that order fields that reference revision fields on the base, are change to the revision table"
     );
   }
-  /*
-  public function test_QueryAlterReaction_groupBy() {
-    $query = new \Drupal\sps\Test\SelectQuery($this->groupBy_start());
+  public function test_EntitySelectQueryReaction_groupBy() {
+    $query = $this->groupBy_start();
     $info = $this->getNodeReactionInfo();
 
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
     $reaction->react($query, $controller);
-    $result = \Drupal\sps\Test\SelectQuery::extractConfig($query);
 
     $this->assertEqual(
-      $result['group'],
+      $query->group,
       array ('r.uid' => 'r.uid', 'u.name' => 'u.name'),
       "::react alter a query so that group by fields that reference revision fields on the base, are change to the revision table"
     );
 
     $this->assertEqual(
-      $result['having->conditions'][0]['field'],
+      $query->having->conditions[0]['field'],
       'COUNT(r.status) > 1',
       "::react alter a query so that fields that reference revision fields on the base, are change to the revision table in having clauses"
     );
   }
-  public function test_QueryAlterReaction_subCondition() {
-    $query = new \Drupal\sps\Test\SelectQuery($this->subCondition_start());
+  public function test_EntitySelectQueryReaction_subCondition() {
+    $query = $this->groupBy_start();
     $info = $this->getNodeReactionInfo();
 
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
     $reaction->react($query, $controller);
-    $result = \Drupal\sps\Test\SelectQuery::extractConfig($query);
-    print_r(
-      $result['having->conditions'][0]['field']);
+   
     $this->assertEqual(
-      $result['having->conditions'][0]['field'],
-      'COUNT(r.status) > 1',
-      "::react alter a query so that fields that reference revision fields on the base, are change to the revision table in having clauses"
+      $query->where->conditions[0]['field']->conditions[0]['field'],
+      'r.sticky',
+      "::react alter a query so that sub conditions that reference revision fields on the base, are change to the revision table"
     );
   }
-*/
 
   protected function getNodeReactionInfo() {
     return array(
@@ -148,7 +143,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
   }
   protected function getNodeReaction() {
      $manager = new \Drupal\sps\Test\Manager();
-     $reaction = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(
+     $reaction = new \Drupal\sps\Plugins\Reaction\EntitySelectQueryReaction(
       $this->getNodeReactionInfo(),
       $manager
     );
@@ -443,47 +438,9 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
      return Drupal\sps\Test\SelectQuery::__set_state(array(
        'fields' => 
       array (
-        'sticky' => 
-        array (
-          'field' => 'sticky',
-          'table' => 'b',
-          'alias' => 'sticky',
-        ),
-        'title' => 
-        array (
-          'field' => 'title',
-          'table' => 'b',
-          'alias' => 'title',
-        ),
-        'status' => 
-        array (
-          'field' => 'status',
-          'table' => 'b',
-          'alias' => 'status',
-        ),
-        'uid' => 
-        array (
-          'field' => 'uid',
-          'table' => 'b',
-          'alias' => 'uid',
-        ),
-        'promote' => 
-        array (
-          'field' => 'promote',
-          'table' => 'b',
-          'alias' => 'promote',
-        ),
       ),
        'expressions' => 
       array (
-        'expression' => 
-        array (
-          'expression' => 'b.title is NULL',
-          'alias' => 'expression',
-          'arguments' => 
-          array (
-          ),
-        ),
       ),
        'tables' => 
       array (
@@ -507,12 +464,24 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
           array (
           ),
         ),
+        'u' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'user',
+          'alias' => 'u',
+          'condition' => 'u.uid = b.uid',
+          'arguments' => 
+          array (
+          ),
+        ),
       ),
        'order' => 
       array (
       ),
        'group' => 
       array (
+        'b.uid' => 'b.uid',
+        'u.name' => 'u.name',
       ),
        'where' => 
       Drupal\sps\Test\DatabaseCondition::__set_state(array(
@@ -521,9 +490,32 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
           '#conjunction' => 'AND',
           0 => 
           array (
-            'field' => 'b.status',
-            'value' => 1,
-            'operator' => '=',
+            'field' => 
+            Drupal\sps\Test\DatabaseCondition::__set_state(array(
+               'conditions' => 
+              array (
+                '#conjunction' => 'OR',
+                0 => 
+                array (
+                  'field' => 'b.sticky',
+                  'value' => 1,
+                  'operator' => '=',
+                ),
+                1 => 
+                array (
+                  'field' => 'b.promote',
+                  'value' => 1,
+                  'operator' => '=',
+                ),
+              ),
+               'arguments' => 
+              array (
+              ),
+               'changed' => true,
+               'queryPlaceholderIdentifier' => NULL,
+            )),
+            'value' => NULL,
+            'operator' => 'IS NULL',
           ),
         ),
          'arguments' => 
@@ -537,6 +529,14 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
          'conditions' => 
         array (
           '#conjunction' => 'AND',
+          0 => 
+          array (
+            'field' => 'COUNT(b.status) > 1',
+            'value' => 
+            array (
+            ),
+            'operator' => NULL,
+          ),
         ),
          'arguments' => 
         array (
@@ -558,7 +558,7 @@ class SPSQueryAlterReactionUnitTest extends SPSBaseUnitTest {
         'target' => 'default',
         'return' => 1,
       ),
-       'uniqueIdentifier' => '5004e6f14ddc80.11586771',
+       'uniqueIdentifier' => '5005820d1a9456.93964435',
        'nextPlaceholder' => 0,
        'comments' => 
       array (

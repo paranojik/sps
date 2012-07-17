@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins\Reaction;
 
-class QueryAlterReaction {
+class EntitySelectQueryReaction {
   protected $entities = array();
   protected $alias = array();
 
@@ -62,7 +62,7 @@ class QueryAlterReaction {
   *
   * @param $entity
   *   an array representing an alias 
-  *   @see QueryAlterReaction::__construct()
+  *   @see EntitySelectQueryReaction::__construct()
   *
   * @return 
   *   an alias for the overrides table;
@@ -130,8 +130,10 @@ class QueryAlterReaction {
       }
       //@TODO this is for exceptions basicly
       else if (is_object($datum)) {
-       // $sub_condition =& $datum->conditions();
-       // $this->recusiveReplace($sub_condition);
+        if(in_array("QueryConditionInterface", class_implements($datum))){  
+          $sub_condition =& $datum->conditions();
+          $this->recusiveReplace($sub_condition, $alias);
+        }
       }
       //ok we have a single datum lets work on it.
       else {
