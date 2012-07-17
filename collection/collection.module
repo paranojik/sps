@@ -26,6 +26,7 @@ function collection_entity_info() {
       'module' => 'collection',
       'admin ui' => array(
         'path' => 'admin/content/collection',
+        'controller class' => 'Drupal\\collection\\CollectionUIController',
       ),
       'access callback' => 'collection_access',
     ),
