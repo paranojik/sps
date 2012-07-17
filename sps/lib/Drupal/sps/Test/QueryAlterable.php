@@ -108,7 +108,8 @@ class QueryAlterable extends \SelectQuery {
   public $forUpdate = FALSE;
 
 
-  public function __construct($config) {
+  public function __construct() {
+  /*
     $this->where = new \DatabaseCondition('AND');
     $this->having = new \DatabaseCondition('AND');
     $having_c = & $this->having->conditions();
@@ -125,6 +126,7 @@ class QueryAlterable extends \SelectQuery {
     $this->expressions = $config['expressions'];
     $this->fields = $config['fields'];
     $where_c = $config['where->conditions'];
+    */
   }
   static function extractConfig($query) {
     $config = array( 
@@ -143,8 +145,29 @@ class QueryAlterable extends \SelectQuery {
     );
     return $config;
   }
-  static function exportConfig($query) {
-    $config = QueryAlterable::extractConfig($query);
-    return var_export($config, TRUE);
+  static function selectQuery($query) {
+    $query->__sleep();
+    $config =  var_export($query, TRUE);
+    $config = preg_replace("/SelectQuery/", "Drupal\sps\Test\QueryAlterable", $config);
+    $config = preg_replace("/DatabaseConnection_mysql::__set_state/", "Drupal\sps\Test\QueryAlterable::getNull", $config);
+    $config = preg_replace("/DatabaseCondition/", "Drupal\sps\Test\DatabaseCondition", $config);
+    $query = eval("return " .$config .";");
+    unset($query->connection);
+    return $query;
+  }
+  static function exportSelect($query) {
+    $query = QueryAlterable::selectQuery($query);
+    return var_export($query, TRUE);
+  }
+  static function getNull() {
+  
+  }
+  
+  static function __set_state($state) {
+    $select = new QueryAlterable(array());
+    foreach($state as $key => $value) {
+      $select->{$key} = $value;
+    }
+    return $select;
   }
 }
