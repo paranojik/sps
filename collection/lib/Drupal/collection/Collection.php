@@ -10,10 +10,10 @@ class Collection extends \Entity {
   public $cid;
 
   public function __construct(array $values = array(), $entityType = NULL) {
-    parent::__construct($values, 'Collection');
+    parent::__construct($values, 'collection');
   }
 
   protected function defaultUri() {
-    return "admin/content/collection/{$this->identifier()}";
+    return array('path' => "admin/structure/collection/{$this->identifier()}");
   }
 }

@@ -2,7 +2,6 @@ name = Collection
 description = A collection of content
 
 core = 7.x
-php = 5.3
 
 dependencies[] = entity
 

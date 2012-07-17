@@ -1,6 +1,21 @@
 <?php
 
 /**
+ * Implements hook_menu().
+ */
+function collection_menu() {
+  $items = array();
+
+  $items['collection/autocomplete/%'] = array(
+    'type' => MENU_CALLBACK,
+    'page callback' => 'collection_autocomplete',
+    'access arguments' => array('access content') // @TODO make better
+  );
+
+  return $items;
+}
+
+/**
  * Implements hook_entity_info().
  */
 function collection_entity_info() {
@@ -25,7 +40,7 @@ function collection_entity_info() {
       'uri callback' => 'entity_class_uri',
       'module' => 'collection',
       'admin ui' => array(
-        'path' => 'admin/content/collection',
+        'path' => 'admin/structure/collection',
         'controller class' => 'Drupal\\collection\\CollectionUIController',
       ),
       'access callback' => 'collection_access',
@@ -98,7 +113,33 @@ function collection_form($form, &$form_state, $collection, $op) {
     '#weight' => 40,
   );
 
+  $form['actions']['delete'] = array(
+    '#type' => 'submit',
+    '#value' => t('Delete Collection'),
+    '#weight' => 45,
+    '#limit_validation_errors' => array(),
+    '#submit' => array('collection_form_submit_delete')
+  );
+
   return $form;
+}
+
+/**
+ * Form API submit callback for the type form.
+ */
+function collection_form_submit(&$form, &$form_state) {
+  $collection = entity_ui_form_submit_build_entity($form, $form_state);
+
+  $collection->status = ENTITY_IN_DB;
+  $collection->save();
+  $form_state['redirect'] = 'admin/structure/collection';
+}
+
+/**
+ * Form API submit callback for the delete button.
+ */
+function collection_form_submit_delete(&$form, &$form_state) {
+  $form_state['redirect'] = 'admin/structure/collection/manage/' . $form_state['collection']->type . '/delete';
 }
 
 /**
@@ -181,4 +222,19 @@ function collection_view($collection) {
     '#process' => 'collection_form_process_usage',
     '#theme' => 'collection_form_usage',
   );*/
+}
+
+function collection_autocomplete($text = '', $current = '') {
+  $query = db_select('collection', 'c')
+    ->fields('c', array('label'))
+    ->condition('label', '%' . db_like($text) . '%', 'LIKE')
+    ->range(0, 10);
+
+  if ($current) {
+    $query->condition('label', $current, 'NOT');
+  }
+
+  $data = $query->execute()->fetchCol();
+
+  drupal_json_output(array_combine($data, $data));
 }

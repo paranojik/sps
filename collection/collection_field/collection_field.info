@@ -1,0 +1,8 @@
+name = Collection Field
+description = A Field to attach a collection to an entity
+
+core = 7.x
+
+dependencies[] = collection
+
+files[] = tests/*.test

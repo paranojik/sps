@@ -48,9 +48,10 @@ function collection_schema() {
       'cid' => array('cid'),
     ),
     'indexes' => array(
+      'name' => array('name'),
       'status' => array('status'),
       'module' => array('module'),
-      'module-state' => array('module', 'status'),
+      'module-status' => array('module', 'status'),
     ),
   );
 

@@ -1,0 +1,112 @@
+<?php
+
+/**
+ * Implements hook_menu().
+ */
+function collection_field_menu() {
+  $items = array();
+
+  $items['collection/autocomplete'] = array(
+    'page callback' => 'collection_field_autocomplete',
+    'access arguments' => array('access content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implements of hook_field_info().
+ */
+function collection_field_field_info() {
+  return array(
+    'collection' => array(
+      'label' => t('Collection'),
+      'description' => t(''),
+      'default_widget' => 'collection',
+      'default_formatter' => 'collection',
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ */
+function collection_field_widget_info() {
+  return array(
+    'collection' => array(
+      'label' => t('Collection'),
+      'field types' => array('collection'),
+      'settings' => array(
+        'size' => 60,
+        'autocomplete_path' => 'collection/autocomplete',
+      ),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+        'default value' => FIELD_BEHAVIOR_NONE,
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_info().
+ */
+function collection_field_formatter_info() {
+  return array(
+    'collection' => array(
+      'label' => t('Default'),
+      'field types' => array('collection'),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_formatter_view()
+ */
+function collection_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  if (!empty($items)) {
+    return array(array('#markup' => $items[0]['value']));
+  }
+
+  return '';
+}
+
+/**
+ * Implements hook_field_widget_form().
+ */
+function collection_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $element += array(
+    '#type' => 'textfield',
+    '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
+    '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
+    '#size' => $instance['widget']['settings']['size'],
+    '#maxlength' => 1024,
+    '#element_validate' => array('elc_workflow_tag_validate_autocomplete'),
+  );
+  return $element;
+}
+
+/**
+ * Implements hook_field_is_empty().
+ */
+function collection_field_is_empty($item, $field) {
+  if (empty($item['value']) && (string) $item['value'] !== '0') {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+/**
+ * Autocomplete callback for widget
+ *
+ * @param $field_name
+ * @param string $string
+ *
+ * @return void
+ */
+function collection_field_autocomplete($field_name, $string = '') {
+
+}
+
+
