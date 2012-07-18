@@ -1,5 +1,5 @@
 <?php
-class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
+class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
       'name' => 'SPS Query Alter Reaction Unit Tests',
@@ -8,7 +8,7 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
     );
   }
 
-  public function test_EntitySelectQueryReaction_NodeAddTable() {
+  public function test_EntitySelectQueryAlterReaction_NodeAddTable() {
     
     $query = $this->addTable_start();
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
@@ -29,7 +29,7 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
     );
   }
 
-  public function test_EntitySelectQueryReaction_NodeVidField() {
+  public function test_EntitySelectQueryAlterReaction_NodeVidField() {
     $query = $this->vidField_start();
     $controller = new \Drupal\sps\Test\TableOverrideStorageController();
     $reaction = $this->getNodeReaction();
@@ -42,7 +42,7 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
     );
   }
  
-  public function test_EntitySelectQueryReaction_revisionFields() {
+  public function test_EntitySelectQueryAlterReaction_revisionFields() {
     $query = $this->revisionFields_start();
     $info = $this->getNodeReactionInfo();
 
@@ -93,7 +93,7 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
       "::react alter a query so that order fields that reference revision fields on the base, are change to the revision table"
     );
   }
-  public function test_EntitySelectQueryReaction_groupBy() {
+  public function test_EntitySelectQueryAlterReaction_groupBy() {
     $query = $this->groupBy_start();
     $info = $this->getNodeReactionInfo();
 
@@ -113,7 +113,7 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
       "::react alter a query so that fields that reference revision fields on the base, are change to the revision table in having clauses"
     );
   }
-  public function test_EntitySelectQueryReaction_subCondition() {
+  public function test_EntitySelectQueryAlterReaction_subCondition() {
     $query = $this->groupBy_start();
     $info = $this->getNodeReactionInfo();
 
@@ -125,6 +125,21 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
       $query->where->conditions[0]['field']->conditions[0]['field'],
       'r.sticky',
       "::react alter a query so that sub conditions that reference revision fields on the base, are change to the revision table"
+    );
+  }
+
+  public function test_EntitySelectQueryAlterReaction_noAlter() {
+    $query = $this->noAlter_start();
+    $info = $this->getNodeReactionInfo();
+
+    $controller = new \Drupal\sps\Test\TableOverrideStorageController();
+    $reaction = $this->getNodeReaction();
+    $reaction->react($query, $controller);
+   
+    $this->assertEqual(
+      $query,
+      $this->noAlter_start(),
+      "::react does not alter queries with the SPS_NO_ALTER_QUERY_TAG tag"
     );
   }
 
@@ -143,7 +158,7 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
   }
   protected function getNodeReaction() {
      $manager = new \Drupal\sps\Test\Manager();
-     $reaction = new \Drupal\sps\Plugins\Reaction\EntitySelectQueryReaction(
+     $reaction = new \Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction(
       $this->getNodeReactionInfo(),
       $manager
     );
@@ -647,5 +662,140 @@ class SPSEntitySelectQueryReactionUnitTest extends SPSBaseUnitTest {
       array (
       ),
     );
+  }
+  protected function noAlter_start() {
+    return Drupal\sps\Test\SelectQuery::__set_state(array(
+       'fields' => 
+      array (
+      ),
+       'expressions' => 
+      array (
+      ),
+       'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+        'r' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'node_revision',
+          'alias' => 'r',
+          'condition' => 'r.vid = b.vid',
+          'arguments' => 
+          array (
+          ),
+        ),
+        'u' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'user',
+          'alias' => 'u',
+          'condition' => 'u.uid = b.uid',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+       'order' => 
+      array (
+      ),
+       'group' => 
+      array (
+        'b.uid' => 'b.uid',
+        'u.name' => 'u.name',
+      ),
+       'where' => 
+      Drupal\sps\Test\DatabaseCondition::__set_state(array(
+         'conditions' => 
+        array (
+          '#conjunction' => 'AND',
+          0 => 
+          array (
+            'field' => 
+            Drupal\sps\Test\DatabaseCondition::__set_state(array(
+               'conditions' => 
+              array (
+                '#conjunction' => 'OR',
+                0 => 
+                array (
+                  'field' => 'b.sticky',
+                  'value' => 1,
+                  'operator' => '=',
+                ),
+                1 => 
+                array (
+                  'field' => 'b.promote',
+                  'value' => 1,
+                  'operator' => '=',
+                ),
+              ),
+               'arguments' => 
+              array (
+              ),
+               'changed' => true,
+               'queryPlaceholderIdentifier' => NULL,
+            )),
+            'value' => NULL,
+            'operator' => 'IS NULL',
+          ),
+        ),
+         'arguments' => 
+        array (
+        ),
+         'changed' => true,
+         'queryPlaceholderIdentifier' => NULL,
+      )),
+       'having' => 
+      Drupal\sps\Test\DatabaseCondition::__set_state(array(
+         'conditions' => 
+        array (
+          '#conjunction' => 'AND',
+          0 => 
+          array (
+            'field' => 'COUNT(b.status) > 1',
+            'value' => 
+            array (
+            ),
+            'operator' => NULL,
+          ),
+        ),
+         'arguments' => 
+        array (
+        ),
+         'changed' => true,
+         'queryPlaceholderIdentifier' => NULL,
+      )),
+       'distinct' => false,
+       'range' => NULL,
+       'union' => 
+      array (
+      ),
+       'prepared' => false,
+       'forUpdate' => false,
+       'connectionTarget' => 'default',
+       'connectionKey' => 'default',
+       'queryOptions' => 
+      array (
+        'target' => 'default',
+        'return' => 1,
+      ),
+       'uniqueIdentifier' => '50059b8a1fbeb1.17192713',
+       'nextPlaceholder' => 0,
+       'comments' => 
+      array (
+      ),
+       'alterTags' => 
+      array (
+        'sps_no_alter' => 1,
+      ),
+    ));
   }
 }

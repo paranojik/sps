@@ -1,23 +1,41 @@
 <?php
 namespace Drupal\sps\Plugins\Reaction;
 
-class EntitySelectQueryReaction {
+class EntitySelectQueryAlterReaction {
   protected $entities = array();
   protected $alias = array();
 
   /**
-   * enties = array(
-   *   array(
-   *     base
-   *     revision
-   *     revision_fields
-   *     base_id
-   *     revision_id
-   * )
+   * 
    */
+  /**
+  * The EntitySelectQueryAlterReaction can work with any number of Entites.
+  * Each entity must be shown in the $config['entities'] array.  It will 
+  * then alter any query (it can touch) and use the override revision id
+  * instead of the one in base
+  *
+  * @param $config
+  *  has one entry entites which list info about each entity for which 
+  *  query should be altered
+  * enities = array(
+  *   array(
+  *     'base_table' =>  'node', //the base table of the entity
+  *     'revision_table' => 'node_revision', //The table for the revision
+  *     'revision_fields' => array('uid', 'sticky', 'promote', 'status'),
+  *     // The fields that are in both base and entity that should pull
+  *     // from revision if we are altering the query
+  *     'base_id' => 'nid',  // the base table id 
+  *     'revision_id => 'vid'// the revision table's id in the base table
+  *   )
+  * )
+  * @param $manager
+  *   the Current Manager Object
+  * @return 
+  */
   public function __construct($config, $manager) {
     $this->entities = $config['entities'];
   }
+
   /**
   * Alters a fields array change the table in which fields should be pulled
   *
@@ -62,7 +80,7 @@ class EntitySelectQueryReaction {
   *
   * @param $entity
   *   an array representing an alias 
-  *   @see EntitySelectQueryReaction::__construct()
+  *   @see EntitySelectQueryAlterReaction::__construct()
   *
   * @return 
   *   an alias for the overrides table;
@@ -82,6 +100,7 @@ class EntitySelectQueryReaction {
   *   The Override controller that will provide the override tables;
   *
   * @return 
+  * NULL
   */
   protected function addOverrideTable($query, $override_controller) {
     $alias = $this->extractAlias($query);
@@ -107,8 +126,10 @@ class EntitySelectQueryReaction {
   *
   *
   * @param $data
+  *   This is data form a query
   *
   * @return 
+  * NULL
   */
   protected function recusiveReplace(&$data, $alias) {
     $reorder = array();
@@ -151,19 +172,21 @@ class EntitySelectQueryReaction {
       }
     }
     if($reorder) {
-      $data = $this->reorder($data, $reorder);
+      $data = $this->keyRename($data, $reorder);
     }
   }
 
   /**
-  * @brief 
+  * helper function to rename keys in an assoc array but keep the order
   *
   * @param $data
+  *   array
   * @param $moves
+  *   array of old key => new key items
   *
   * @return 
   */
-  protected function reorder($data, $moves) {
+  protected function keyRename($data, $moves) {
     $new_data = array();
     foreach($data as $key => $datum) {
       if (isset($moves[$key])) {
@@ -176,6 +199,16 @@ class EntitySelectQueryReaction {
     return $new_data;
   }
 
+  /**
+  * Check a query for tables that match our entities tables
+  * and return the alais for everyone that was found
+  *
+  * @param $query
+  *   a SelectQuery is expected
+  *
+  * @return 
+  *   and array whose keys are table names and values are alias
+  */
   protected function extractAlias($query) {
     $tables = $query->getTables();
     $aliases = array();
@@ -192,8 +225,24 @@ class EntitySelectQueryReaction {
     return $aliases;
   }
   
-
+  /**
+  * Alter a query to use the overridden revision id as well as 
+  * revision fields.
+  *
+  * @param $query
+  *   This expect a SelectQuery Object to alter
+  * @param $override_controller
+  *   This is an override controller to use to find 
+  *   override data
+  *
+  * @return 
+  *   NULL
+  */
   public function react($query, $override_controller) {
+    //exit prematurly if we ha a no alter tag
+    if($query->hasTag(SPS_NO_ALTER_QUERY_TAG)) {
+      return;
+    }
     $alias = $this->extractAlias($query);
     if($alias) {
       $this->addOverrideTable($query, $override_controller);

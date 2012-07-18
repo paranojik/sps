@@ -2,7 +2,36 @@
 
 define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
 define('SPS_CONFIG_PREFIX', "sps_config");
+define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
+
+/*
+ *  implements hook_sps_plugin_types()
+ */
+function sps_sps_plugin_types() {
+  return array(
+    'reaction' => array(
+      'interface' => 'Drupal\sps\Plugins\ReactionInterface',
+      'default' => array(
+        'instence_settings' => array(),
+      ),
+      'requires' => array(
+        'class' => TRUE,
+      ),
+    ),
+  );
+}
+/**
+ * implements hook_hook_info()
+ */
+function sps_hook_hook_info() {
+  $hooks = array();
+  foreach(module_invoke_all("sps_plugin_types") as $name => $type) {
+    $hooks["sps_{$name}_plugins"] = array(
+      'group' => 'sps_plugins'
+    );
+  }
+}
 
 /**
  * A form callback for use by drupal_get_form().
@@ -83,6 +112,7 @@ function sps_init() {
   $query->groupBy("u.name");
   $query->having("COUNT(b.status) > 1");
   $query->condition(db_or()->condition("b.sticky", 1)->condition("b.promote", 1));
+  $query->addtag("sps_no_alter");
 
   dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
 

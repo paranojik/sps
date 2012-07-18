@@ -2,6 +2,7 @@
 namespace \Drupal\sps\Test
 
 class TableOverrideStorageController implements TableOverrideStorageControllerInterface{
+
   public function addOverrideJoin($query, $base_alais, $base_id, $overrides_alais) {
     $alais = $query->addJoin("LEFT OUTER", 'test_override', $overrides_alais, "$base_alias.$base_id = overrides.id");
     $tables =& $query->getTables();
