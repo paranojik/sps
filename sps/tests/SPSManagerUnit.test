@@ -16,21 +16,23 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
   public function testManager_getPersistentSiteState() {
     $env = $this->getManagerEnv();
     $manager = $env->manager;
-    $state_controller = $env->state_controller;
+    $state_controller = $manager->getStateController();
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
     $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
-    $site_state = new Drupal\sps\SiteState($env->override_controller, $override);
+    $condition = new\Drupal\sps\Test\Condition(array("override"=> $override, "element_form" => array()), $manager);
+    $site_state = new Drupal\sps\SiteState($condition);
+    $manager->getStateController()->set($site_state);
 
-    $state_controller->set($manager->getStateControllerSiteStateKey(), $site_state);
     $this->assertEqual($manager->getSiteState(), $site_state, "Manager::getSiteState returns a site_state storred in the persistent data", "SPS");
   }
+  /*@TODO this is getting reworked with new overide contoller system
   public function testManager_setSiteState() {
     $env = $this->getManagerEnv();
     $manager = $env->manager;
-    $override_controller = $env->override_controller;
-    $state_controller = $env->state_controller;
+    $override_controller = $manager->getOverrideController();
+    $state_controller = $manager->getStateController();
 
     $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
     $override = new \Drupal\sps\Test\Override(array(), $manager);
@@ -41,6 +43,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $this->assertEqual($state_controller->get($manager->getStateControllerSiteStateKey()), $site_state, "Manager::setSiteState construct the site_state and put it in site_state_controller", "SPS");
 
   }
+  */
   public function testManager_PluginAccess() {
     $env = $this->getManagerEnv();
     $manager = $env->manager;
@@ -52,7 +55,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $env->plugin_controller->setInfo($info);
+    $manager->getPluginController()->setInfo($info);
 
     $this->assertEqual(
       $manager->getPluginInfo('widget'),
@@ -95,12 +98,12 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $env->plugin_controller->setInfo($info);
+    $manager->getPluginController()->setInfo($info);
     //set drupal_get_from to just return what was passed in
-    $env->hook_controller->setDrupalGetForm("sps_condition_preview_form", function($callable) {
+    $manager->getHookController()->setDrupalGetForm("sps_condition_preview_form", function($callable) {
       return $callable;
     });
-    $config_controller = $env->config_controller;
+    $config_controller = $manager->getConfigController();
     $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array("name" => 'testCondition', 'config' => array()));
 
     $condition = $manager->getPlugin("condition", 'testCondition');
@@ -137,32 +140,20 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     );
     $env = $this->getManagerEnv();
     $manager = $env->manager;
-    $env->plugin_controller->setInfo($info);
+    $manager->getPluginController()->setInfo($info);
     $this->assertEqual(
       $manager->react("test_reaction", 4),
       5,
       "Manager::react should return based on the react method of the plugin", 'SPS'
     );
   }
-  public function testManager_getHookController() {
-    $env = $this->getManagerEnv();
-    $this->assertEqual(
-      $env->manager->getHookController(),
-      $env->hook_controller,
-      "Manager::getHookController should return the registered hook controller", 'SPS'
-    );
-    
-  }
 
   protected function getManagerEnv() {
     $env = new stdClass();
-    $env->state_controller = new \Drupal\sps\Test\StorageController();
-    $env->override_controller = new \Drupal\sps\Test\StorageController();
-    $env->config_controller = new \Drupal\sps\Test\StorageController();
-    $env->plugin_controller = new \Drupal\sps\Test\PluginController(array());
-    $env->hook_controller = new \Drupal\sps\Test\HookController();
-    $env->manager = new \Drupal\sps\Manager($env->state_controller, $env->override_controller, $env->config_controller, $env->plugin_controller, $env->hook_controller);
+    $env->config_controller = new \Drupal\sps\Test\ConfigController();
+    $env->manager = new \Drupal\sps\Manager($env->config_controller);
     return $env;
   }
 
 }
+

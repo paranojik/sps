@@ -15,9 +15,9 @@ class SiteState {
   * @param $override
   *   The Override to use to generate overrides
   */
-  public function __construct(StorageControllerInterface $controller, Plugins\OverrideInterface $override) {
-    $this->setOverrideController($controller);
-    $this->setOverride($override);
+  public function __construct(Plugins\ConditionInterface $condition) {
+    //$this->setOverrideController($controller);
+    $this->setCondition($condition);
   }
 
   /**
@@ -44,8 +44,8 @@ class SiteState {
    * @return \Drupal\sps\SiteState
    *   Self
    */
-  protected function setOverride(Plugins\OverrideInterface $override) {
-    $this->override = $override;
+  protected function setCondition(Plugins\ConditionInterface $condition) {
+    $this->condition = $condition;
 
     return $this;
   }
