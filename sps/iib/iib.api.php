@@ -11,33 +11,59 @@
  */
 
 /**
- * Allows modules to add items into the render array for the IIB.
- *
- * @param $items
- *  The current render array for the preview bar.  This will have other
- *  modules information in it, but the order is controlled by the system
- *  weight for this hook.
+ * Allows modules to add items into the render array for the page level IIB.
+ * This will be displayed at the top of the page.
  *
  * @return
- *  The return value is ignored as the $items are passed by reference.
+ *  A renderable array, each return should have a top level key.  Modules with the
+ *  same top level key will have their arrays merged together.
  */
-function hook_iib_item_view(&$items) {
+function hook_iib_page_item() {
   $items['left'] = array(
     '#weight' => -10,
     '#prefix' => '<div>',
     '#markup' => t('Hi this is the left side.'),
     '#suffix' => '</div>',
   );
+  return $items;
 }
 
 /**
- * Allows modules to alter the result of all the iib_item_view hook invocation
+ * Allows modules to add items into the render array for the entity level IIB.
+ * This will be displayed above the entity itself.
+ *
+ * @return
+ *  A renderable array, each return should have a top level key.  Modules with the
+ *  same top level key will have their arrays merged together.
+ */
+function hook_iib_entity_item() {
+  $items['info'] = array(
+    '#weight' => -10,
+    '#prefix' => '<div>',
+    '#markup' => t('Hi this is some entity info.'),
+    '#suffix' => '</div>',
+  );
+  return $items;
+}
+
+/**
+ * Allows modules to alter the result of all the iib_page_item hook invocations.
  *
  * @param $items
- *  A render array as returned from module_invoke_all for the iib_item_view hook.
+ *  A render array as returned from module_invoke_all for the iib_page_item hook.
  */
-function hook_iib_items_view_alter(&$items) {
+function hook_iib_page_item_alter(&$items) {
   $items['left']['#weight'] = 0;
+}
+
+/**
+ * Allows modules to alter the result of all the iib_entity_item hook invocations.
+ *
+ * @param $items
+ *  A render array as returned from module_invoke_all for the iib_entity_item hook.
+ */
+function hook_iib_entity_item_alter(&$items) {
+  $items['info']['#weight'] = 0;
 }
 
 /**

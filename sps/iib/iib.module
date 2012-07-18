@@ -15,12 +15,9 @@
  * @see iib.api.php
  */
 function iib_get_page_data() {
-  if (iib_should_show_view()) {
-    $items = array();
-    module_invoke_all('iib_page_item', $items);
-    drupal_alter('iib_page_item', $items);
-    return $items;
-  }
+  $items = module_invoke_all('iib_page_item');
+  drupal_alter('iib_page_item', $items);
+  return $items;
 }
 
 /**
@@ -28,12 +25,10 @@ function iib_get_page_data() {
  *
  * Add anything added by calling iib_set_data().
  */
-function iib_iib_page_item(&$items) {
-  $set_items = &drupal_static('iib_set_items', array());
-  if (!empty($set_items)) {
-    $items += $set_items;
-  }
+function iib_iib_page_item() {
+  $data = drupal_static('iib_set_items', array());
   drupal_static_reset('iib_set_items');
+  return $data;
 }
 
 
@@ -44,6 +39,10 @@ function iib_iib_page_item(&$items) {
  * in that element getting appended to the Interactive Information Bar
  * at the page level.
  *
+ * It is equivalent to implementing hook_iib_page_item() and simply appending
+ * the data to the end of items, however, it may be called in the context of
+ * other hooks.
+ *
  * @param $renderable
  *  A renderable element (a render array) to be added to the IIB.
  *
@@ -51,7 +50,20 @@ function iib_iib_page_item(&$items) {
  */
 function iib_set_item($renderable) {
   $items = &drupal_static('iib_set_items', array());
-  $items[] = $renderable;
+  $items = array_merge_recursive($items, $renderable);
+}
+
+/**
+ * Implements hook_page_alter().
+ *
+ * Add the page level iib to a page, this is done in the page alter to allow
+ * other modules to add data throughout the page load process.
+ */
+function iib_page_alter(&$page) {
+  if (iib_should_show_view()) {
+    $items = iib_get_page_data();
+    $page['page_top']['iib'] = iib_create_render_array($items, array('page-iib'));
+  }
 }
 
 /**
@@ -68,7 +80,7 @@ function iib_entity_view($entity, $type, $view_mode, $langcode) {
     module_invoke_all('iib_entity_item', $items, $entity, $type, $view_mode);
     drupal_alter('iib_entity_item', $items, $entity, $type, $view_mode);
 
-    $entity->content['iib'] = iib_create_render_array($items);
+    $entity->content['iib'] = iib_create_render_array($items, array('entity-iib'));
   }
 }
 
@@ -81,9 +93,9 @@ function iib_entity_view($entity, $type, $view_mode, $langcode) {
  * @return
  *  A render array containing the proper wrapping elements.
  */
-function iib_create_render_array($items) {
+function iib_create_render_array($items, $classes) {
   return array(
-    '#prefix' => '<div class="iib">',
+    '#prefix' => '<div class="iib '.implode(' ', $classes).'">',
     'items' => $items,
     '#suffix' => '</div>',
     '#weight' => -100,
