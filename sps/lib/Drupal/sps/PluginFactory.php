@@ -16,10 +16,10 @@ class PluginFactory implements PluginControllerInterface {
   // The info array for the plugin type info
   protected $plugin_type_info = array();
   // control for invoking drupal hooks
-  protected $hook_controller;
+  protected $manager;
 
-  public function __construct() {
-    $this->hook_controller = new \Drupal\sps\DrupalHookController();
+  public function __construct($settings, $manager) {
+    $this->manager = $manager;
     $this->loadPluginTypeInfo();
   }
 
@@ -350,11 +350,6 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   protected function getHookController() {
-    return $this->hook_controller;
-  }
-  public function setHookController(\Drupal\sps\HookControllerInterface $controller) {
-    $this->hook_controller = $controller;
-    $this->plugin_type_info = array();
-    $this->plugin_info = array();
+    return $this->manager->getHookController();
   }
 }
