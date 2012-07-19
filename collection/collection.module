@@ -235,7 +235,7 @@ function collection_view($collection) {
  */
 function collection_autocomplete($text = '', $current = '') {
   $query = db_select('collection', 'c')
-    ->fields('c', array('label'))
+    ->fields('c', array('name', 'label'))
     ->condition('label', '%' . db_like($text) . '%', 'LIKE')
     ->range(0, 10);
 
@@ -243,7 +243,7 @@ function collection_autocomplete($text = '', $current = '') {
     $query->condition('label', $current, 'NOT');
   }
 
-  $data = $query->execute()->fetchCol();
+  $data = $query->execute()->fetchAllKeyed();
 
-  drupal_json_output(array_combine($data, $data));
+  drupal_json_output($data);
 }

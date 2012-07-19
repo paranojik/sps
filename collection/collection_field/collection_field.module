@@ -79,10 +79,10 @@ function collection_field_widget_form(&$form, &$form_state, $field, $instance, $
   $element += array(
     '#type' => 'textfield',
     '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
-    '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'] . '/' . $field['field_name'],
+    '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'],
     '#size' => $instance['widget']['settings']['size'],
     '#maxlength' => 1024,
-    '#element_validate' => array('elc_workflow_tag_validate_autocomplete'),
+    '#element_validate' => array('collection_field_validate_autocomplete'),
   );
   return $element;
 }
@@ -97,4 +97,80 @@ function collection_field_is_empty($item, $field) {
   return FALSE;
 }
 
+/**
+ * Implements hook_field_validate().
+ *
+ * Validate this module's field data.
+ *
+ * If there are validation problems, add to the $errors array (passed by
+ * reference). There is no return value.
+ *
+ * @param $entity_type
+ *   The type of $entity.
+ * @param $entity
+ *   The entity for the operation.
+ * @param $field
+ *   The field structure for the operation.
+ * @param $instance
+ *   The instance structure for $field on $entity's bundle.
+ * @param $langcode
+ *   The language associated with $items.
+ * @param $items
+ *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
+ * @param $errors
+ *   The array of errors (keyed by field name, language code, and delta) that
+ *   have already been reported for the entity. The function should add its
+ *   errors to this array. Each error is an associative array with the following
+ *   keys and values:
+ *   - error: An error code (should be a string prefixed with the module name).
+ *   - message: The human readable message to be displayed.
+ *
+ *
+ */
+function collection_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
+
+  // Get the collections that are on this entity
+
+
+  foreach ($items as $delta => $item) {
+    if (!empty($item['value'])) {
+      if (collection_field_collection_exists($entity, $entity_type, $field['name'], $item['value'])) {
+        $errors[$field['field_name']][$langcode][$delta][] = array(
+          'error' => 'collection_exists',
+          'message' => t('%name: The collection %collection_name is already associated to another revisionon this entity.',
+            array('%name' => $instance['label'], '%collection_name' => $item['value'])),
+        );
+      }
+    }
+  }
+
+}
+
+/**
+ * Does the current collection exists on this entity already
+ *
+ * @param $entity
+ * @param $entity_type
+ * @param $field_name
+ * @param $collection_name
+ *
+ * @return bool
+ */
+function collection_field_collection_exists($entity, $entity_type, $field_name, $collection_name) {
+  $entity_info = entity_get_info($entity_type);
+  $id_key = $entity_info['entity keys']['id'];
+
+  $query = new EntityFieldQuery();
+  $values = $query->entityCondition('type', $entity_type)
+    ->age(FIELD_LOAD_REVISION)
+    ->fieldCondition($field_name, 'value', $collection_name)
+    ->entityCondition('entity_id', $entity->$id_key)
+    ->execute();
+
+  if (!empty($values[$entity_type])) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
 
