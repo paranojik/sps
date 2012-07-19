@@ -134,7 +134,8 @@ class SPSWidgetUnitTest extends SPSBaseUnitTest {
       )
     );
 
-    $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
-    return new Drupal\sps\Test\Manager(NULL, NULL, NULL, $plugin_controller);
+    $config_controller = new Drupal\sps\Test\ConfigController();
+    $config_controller->default[SPS_CONFIG_PLUGIN_CONTROLLER]['instance_settings'] = $plugins;
+    return new Drupal\sps\Test\Manager($config_controller);
   }
 }

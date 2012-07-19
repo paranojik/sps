@@ -97,7 +97,6 @@ class Manager {
   protected $state_controller_site_state_key = 'sps_site_state_key';
   protected $state_controller;
   protected $config_controller;
-  protected $override_controller;
   protected $hook_controller;
   protected $root_condition;
   protected $plugin_controller;
@@ -118,12 +117,27 @@ class Manager {
    *
    * @return \Drupal\sps\Manager
    */
-  public function __construct(StorageControllerInterface $state_controller, StorageControllerInterface $override_controller, StorageControllerInterface $config_controller, PluginControllerInterface $plugin_controller, HookControllerInterface $hook_controller) {
-    $this->setStateController($state_controller)
-      ->setOverrideController($override_controller)
-      ->setConfigController($config_controller)
-      ->setPluginController($plugin_controller)
-      ->setHookController($hook_controller);
+  public function __construct(StorageControllerInterface $config_controller) {
+
+    $this->setConfigController($config_controller)
+      ->setPluginController($this->createControllerFromConfig(SPS_CONFIG_PLUGIN_CONTROLLER))
+      ->setHookController($this->createControllerFromConfig(SPS_CONFIG_HOOK_CONTROLLER))
+      ->setStateController($this->createControllerFromConfig(SPS_CONFIG_STATE_CONTROLLER));
+  }
+
+  /**
+   * Create a Controller Object based upon a configuraiton key
+   *
+   * @param $key
+   *  The key from the configuration array that contains the controller informaiton.
+   *
+   * @return StateControllerInterface|PluginControllerInterface|HookControllerInterface
+   */
+  protected function createControllerFromConfig($key) {
+    $controller_info = $this->getConfigController()->get($key);
+    $controller_class = $controller_info['class'];
+    $controller_settings = $controller_info['instance_settings'];
+    return new $controller_class($controller_settings, $this);
   }
 
   /**
@@ -135,7 +149,7 @@ class Manager {
    * @return \Drupal\sps\Manager
    *   Self
    */
-  protected function setStateController(StorageControllerInterface $controller) {
+  protected function setStateController(StateControllerInterface $controller) {
     $this->state_controller = $controller;
     return $this;
   }
@@ -223,9 +237,9 @@ class Manager {
    * @return \Drupal\sps\Manager
    *   Self
    */
-  public function setSiteState(\Drupal\sps\Plugins\OverrideInterface $override) {
-    $site_state = new SiteState($this->override_controller, $override);
-    $this->state_controller->set($this->state_controller_site_state_key, $site_state);
+  public function setSiteState(\Drupal\sps\Plugins\ConditionInterface $condition) {
+    $site_state = new SiteState($condition);
+    $this->state_controller->set($site_state);
     return $this;
   }
 
@@ -250,7 +264,7 @@ class Manager {
    */
   public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
-    
+
     return $this->getHookController()->drupalGetForm('sps_condition_preview_form', array($root_condition, 'getElement'));
   }
 
@@ -262,7 +276,7 @@ class Manager {
    */
   public function previewFormSubmitted() {
     $root_condition = $this->getRootCondition();
-    $this->setSiteState($root_condition->getOverride());
+    $this->setSiteState($root_condition);
     return $this;
   }
 
@@ -348,7 +362,40 @@ class Manager {
     return $this->plugin_controller->getPluginByMeta($type, $property, $value);
   }
 
+  /**
+   * Get the hook controller
+   *
+   * @return HookControllerInterface
+   */
   public function getHookController() {
     return $this->hook_controller;
   }
+
+  /**
+   * Get the Plugin Controller
+   *
+   * @return PluginControllerInterface
+   */
+  public function getPluginController() {
+    return $this->plugin_controller;
+  }
+
+  /**
+   * Get the State Controller
+   *
+   * @return StateControllerInterface
+   */
+  public function getStateController() {
+    return $this->state_controller;
+  }
+
+  /**
+   * Get the config Controller
+   *
+   * @return StorageControllerInterface
+   */
+  public function getConfigController() {
+    return $this->config_controller;
+  }
+
 }

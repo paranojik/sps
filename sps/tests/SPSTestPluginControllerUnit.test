@@ -18,7 +18,8 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $controller = new \Drupal\sps\Test\PluginController($info);
+    $manager = new \Drupal\sps\Test\Manager();
+    $controller = new \Drupal\sps\Test\PluginController($info, $manager);
     $this->assertEqual(
       $controller->getPluginInfo('widget'),
       $info['widget'],

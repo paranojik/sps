@@ -1,6 +1,9 @@
 <?php
 
 define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
+define('SPS_CONFIG_PLUGIN_CONTROLLER', "plugin_controller_settings");
+define('SPS_CONFIG_HOOK_CONTROLLER', "hook_controller_settings");
+define('SPS_CONFIG_STATE_CONTROLLER', "state_controller_settings");
 define('SPS_CONFIG_PREFIX', "sps_config");
 define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
@@ -115,7 +118,7 @@ function sps_init() {
   $query->condition(db_or()->condition("b.sticky", 1)->condition("b.promote", 1));
   $query->addtag("sps_no_alter");
 
-  dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
+  //dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
 
   //dpm(a());
   //$query->condition("b.status",1);

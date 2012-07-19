@@ -144,7 +144,8 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   }
   public function testLoadPluginFactory() {
     try {
-      $factory = new PluginFactory();
+      $manager = new \Drupal\sps\Test\Manager();
+      $factory = new PluginFactory(array(), $manager);
       $this->pass('Plugin Factory Loaded');
     } catch (Exception $e) {
       $this->fail('Plugin Factory Loaded');
@@ -183,12 +184,9 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
         'name' => 'test_type_2',
       ),
     );
-
-    $factory = new PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test", "sps_plugin_types", array($this, "sps_test_sps_plugin_types"));
-    
-    $factory->setHookController($hook_controller);
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_plugin_types", array($this, "sps_test_sps_plugin_types"));
 
     $all_plugin_type_info = $factory->getPluginTypeInfo();
     $this->assertEqual($all_plugin_type_info,
@@ -267,14 +265,12 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
       ),
     );
 
-    $factory = new PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test", "sps_test_type_1_plugins", array($this, "sps_test_sps_test_type_1_plugins"));
-    $hook_controller->setModuleInvoke("sps_test", "sps_test_type_2_plugins", array($this, "sps_test_sps_test_type_2_plugins"));
-    $hook_controller->setModuleInvoke("sps_test", "sps_plugin_types", array($this, "sps_test_sps_plugin_types"));
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_test_type_1_plugins", array($this, "sps_test_sps_test_type_1_plugins"));
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_test_type_2_plugins", array($this, "sps_test_sps_test_type_2_plugins"));
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_plugin_types", array($this, "sps_test_sps_plugin_types"));
     
-    $factory->setHookController($hook_controller);
-
 
     $plugin_type_info = $factory->getPluginInfo('test_type_1');
     $this->assertEqual($plugin_type_info, $test_type_1_info,
@@ -286,11 +282,10 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   }
  
   public function testPluginFactory_getPluginInfo_RequirementEx() {
-    $factory = new \Drupal\sps\PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test_mrs", "sps_plugin_types", array($this, "sps_test_mrs_sps_plugin_types"));
-    $hook_controller->setModuleInvoke("sps_test_mrs", "sps_missing_required_settings_plugins", array($this, "sps_test_mrs_sps_missing_required_settings_plugins"));
-    $factory->setHookController($hook_controller);
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test_mrs", "sps_plugin_types", array($this, "sps_test_mrs_sps_plugin_types"));
+    $manager->getHookController()->setModuleInvoke("sps_test_mrs", "sps_missing_required_settings_plugins", array($this, "sps_test_mrs_sps_missing_required_settings_plugins"));
 
     $missing_required_settings = function() use ($factory){
       $factory->getPluginInfo('missing_required_settings', 'missing_required_settings');
@@ -302,11 +297,10 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   }
 
   public function testPluginFactory_getPluginInfo_RequirementExWithDepth() {
-    $factory = new \Drupal\sps\PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test_mrs", "sps_plugin_types", array($this, "sps_test_mrs_sps_plugin_types"));
-    $hook_controller->setModuleInvoke("sps_test_mrs", "sps_missing_required_settings_plugins", array($this, "sps_test_mrs_sps_missing_in_child_required_settings_plugins"));
-    $factory->setHookController($hook_controller);
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test_mrs", "sps_plugin_types", array($this, "sps_test_mrs_sps_plugin_types"));
+    $manager->getHookController()->setModuleInvoke("sps_test_mrs", "sps_missing_required_settings_plugins", array($this, "sps_test_mrs_sps_missing_in_child_required_settings_plugins"));
 
     //check second level requirements
     $missing_required_settings_in_child = function() use ($factory){
@@ -319,11 +313,10 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   }
 
   public function testPluginFactory_getPluginInfo_InvalidClass() {
-    $factory = new \Drupal\sps\PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test_mrs", "sps_plugin_types", array($this, "sps_test_mrs_sps_plugin_types"));
-    $hook_controller->setModuleInvoke("sps_test_mrs", "sps_missing_required_settings_plugins", array($this, "sps_test_incorrect_interface_plugins"));
-    $factory->setHookController($hook_controller);
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test_mrs", "sps_plugin_types", array($this, "sps_test_mrs_sps_plugin_types"));
+    $manager->getHookController()->setModuleInvoke("sps_test_mrs", "sps_missing_required_settings_plugins", array($this, "sps_test_incorrect_interface_plugins"));
 
     $incorrect_interface = function() use ($factory) {
       $factory->getPluginInfo('missing_required_settings', 'incorrect_interface');
@@ -341,12 +334,11 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   public function testGetPlugin() {
     $manager = new \Drupal\sps\Test\Manager();
 
-    $factory = new PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test", "sps_plugin_types", array($this, "sps_test_sps_plugin_types"));
-    $hook_controller->setModuleInvoke("sps_test", "sps_test_type_1_plugins", array($this, "sps_test_sps_test_type_1_plugins"));
-    $hook_controller->setModuleInvoke("sps_test", "sps_test_type_2_plugins", array($this, "sps_test_sps_test_type_2_plugins"));
-    $factory->setHookController($hook_controller);
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_plugin_types", array($this, "sps_test_sps_plugin_types"));
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_test_type_1_plugins", array($this, "sps_test_sps_test_type_1_plugins"));
+    $manager->getHookController()->setModuleInvoke("sps_test", "sps_test_type_2_plugins", array($this, "sps_test_sps_test_type_2_plugins"));
 
     $info = $factory->getPluginInfo('test_type_1', 'good_plugin');
     $correct_interface = $factory->getPlugin('test_type_1', 'good_plugin', $manager);
@@ -395,12 +387,10 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     */
   }
   public function testPlugin_getPluginByMeta() {
-    $factory = new PluginFactory();
-    $hook_controller = new \Drupal\sps\Test\HookController();
-    $hook_controller->setModuleInvoke("sps_test_by_meta", "sps_plugin_types", array($this, "sps_test_by_meta_sps_plugin_types"));
-    $hook_controller->setModuleInvoke("sps_test_by_meta", "sps_meta_plugins", array($this, "sps_test_by_meta_sps_meta_plugins"));
-
-    $factory->setHookController($hook_controller);
+    $manager = new \Drupal\sps\Test\Manager();
+    $factory = new PluginFactory(array(), $manager);
+    $manager->getHookController()->setModuleInvoke("sps_test_by_meta", "sps_plugin_types", array($this, "sps_test_by_meta_sps_plugin_types"));
+    $manager->getHookController()->setModuleInvoke("sps_test_by_meta", "sps_meta_plugins", array($this, "sps_test_by_meta_sps_meta_plugins"));
 
     $result = $factory->getPluginByMeta("meta", 'property1', 'bob');
     $this->assertEqual(

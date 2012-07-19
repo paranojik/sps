@@ -4,20 +4,18 @@ namespace Drupal\sps;
 
 class SiteState {
   protected $controller_key = "sps_override_controller";
-  protected $override;
+  protected $condition;
+  protected $overrides;
   protected $override_controller;
 
   /**
-  * Constructor for SiteState
-  *
-  * @param $controller
-  *   The StorageController to use for storing overrides
-  * @param $override
-  *   The Override to use to generate overrides
-  */
-  public function __construct(StorageControllerInterface $controller, Plugins\OverrideInterface $override) {
-    $this->setOverrideController($controller);
-    $this->setOverride($override);
+   * Constructor for SiteState
+   *
+   * @param \Drupal\sps\Plugins\ConditionInterface $condition
+   *  The RootConditions that is used by the site state
+   */
+  public function __construct(Plugins\ConditionInterface $condition) {
+    $this->setCondition($condition);
   }
 
   /**
@@ -36,16 +34,15 @@ class SiteState {
   }
 
   /**
-   * Store the Override to use for generating overrides
+   * Store the Root Condition
    *
-   * @param $override
-   *   The Override to use to generate overrides
+   * @param Plugins\ConditionInterface $condition
    *
    * @return \Drupal\sps\SiteState
    *   Self
    */
-  protected function setOverride(Plugins\OverrideInterface $override) {
-    $this->override = $override;
+  protected function setCondition(Plugins\ConditionInterface $condition) {
+    $this->condition = $condition;
 
     return $this;
   }

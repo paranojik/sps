@@ -16,10 +16,14 @@ class PluginFactory implements PluginControllerInterface {
   // The info array for the plugin type info
   protected $plugin_type_info = array();
   // control for invoking drupal hooks
-  protected $hook_controller;
+  protected $manager;
 
-  public function __construct() {
-    $this->hook_controller = new \Drupal\sps\DrupalHookController();
+  /**
+   * @param $settings array
+   * @param $manager Manager
+   */
+  public function __construct($settings, Manager $manager) {
+    $this->manager = $manager;
     $this->loadPluginTypeInfo();
   }
 
@@ -183,7 +187,7 @@ class PluginFactory implements PluginControllerInterface {
    * @param $plugin_info
    *   an array of plugin data
    * @param $requirements
-   *   an array of required fields that should be check, this should 
+   *   an array of required fields that should be check, this should
    *   match the structure of the $plugin_info with TRUE for the values
    *   so to check that there is a parent field with a child field in it one whould do
    *   array("parent"=>array("child")
@@ -349,12 +353,12 @@ class PluginFactory implements PluginControllerInterface {
     return FALSE;
   }
 
+  /**
+   * Get the Hook Controller for SPS
+   *
+   * @return HookControllerInterface
+   */
   protected function getHookController() {
-    return $this->hook_controller;
-  }
-  public function setHookController(\Drupal\sps\HookControllerInterface $controller) {
-    $this->hook_controller = $controller;
-    $this->plugin_type_info = array();
-    $this->plugin_info = array();
+    return $this->manager->getHookController();
   }
 }

@@ -83,15 +83,11 @@ class SPSPreviewFormWebTest extends SPSBaseWebTest {
       )
     );
 
-    $state_controller = new Drupal\sps\Test\StorageController();
-    $override_controller = new Drupal\sps\Test\StorageController();
-
-    $config_controller = new Drupal\sps\Test\StorageController();
+    $config_controller = new Drupal\sps\Test\ConfigController();
     $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
+    $config_controller->default[SPS_CONFIG_PLUGIN_CONTROLLER]['instance_settings'] = $plugins;
+    $config_controller->default[SPS_CONFIG_HOOK_CONTROLLER]['class'] = '\Drupal\sps\DrupalHookController';
 
-    $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
-    $hook_controller = new Drupal\sps\DrupalHookController();
-
-    return new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller, $hook_controller);
+    return new Drupal\sps\Manager($config_controller);
   }
 }
