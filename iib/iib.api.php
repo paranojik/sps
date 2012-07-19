@@ -14,9 +14,8 @@
  * Allows modules to add items into the render array for the page level IIB.
  * This will be displayed at the top of the page.
  *
- * @return
+ * @return array
  *  A renderable array, each return should have a top level key.  Modules with the
- *  same top level key will have their arrays merged together.
  */
 function hook_iib_page_item() {
   $items['left'] = array(
@@ -32,11 +31,15 @@ function hook_iib_page_item() {
  * Allows modules to add items into the render array for the entity level IIB.
  * This will be displayed above the entity itself.
  *
- * @return
+ * @param $items
+ * @param $entity
+ * @param $type
+ * @param $view_mode
+ *
+ * @return array
  *  A renderable array, each return should have a top level key.  Modules with the
- *  same top level key will have their arrays merged together.
  */
-function hook_iib_entity_item() {
+function hook_iib_entity_item($items, $entity, $type, $view_mode) {
   $items['info'] = array(
     '#weight' => -10,
     '#prefix' => '<div>',
@@ -70,13 +73,12 @@ function hook_iib_entity_item_alter(&$items) {
  * iib_set_item allows modules to add items to the bar from any hook that runs before
  * hook_footer.
  *
- * @param $item
+ * @param $vars
  *  A render array to be placed into the items array.  Modules may use weight
  *  to control the placement of the items.  If more control is needed, a module should
  *  alter the results.
  *
- * @return
- *  NULL
+ * @return NULL
  */
 function example_module_node_view($vars) {
   iib_set_item($vars['node']->body);
