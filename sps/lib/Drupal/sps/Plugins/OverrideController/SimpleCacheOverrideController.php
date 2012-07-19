@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins\OverrideController;
 
-class SimpleCacheOverrideController extends \Drupal\sps\Plugins\OverrideController\AbstractOverrideController  {
+class SimpleCacheOverrideController extends \Drupal\sps\Plugins\OverrideController\AbstractOverrideController implements SimpleCacheOverrideControllerInterface {
 
   protected $overrides = array();
 

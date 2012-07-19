@@ -8,27 +8,7 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
     );
   }
 
-  public function testTest_StorageController() {
-    $control = new Drupal\sps\Test\StorageController();
-    $this->assertCheckInterface('Drupal\sps\StorageControllerInterface', $control, "Test Storage Controller should implement Drupal\sps\StorageControllerInterface");
-    $control = new Drupal\sps\Test\StorageController();
-    $table = array(
-      array(
-        'type' => 'thing',
-        'id' => 1,
-        'revision_id' => 5,
-      ),
-      array(
-        'type' => 'thing',
-        'id' => 3,
-        'revision_id' => 7,
-      ),
-    );
-    $key = "test_key";
-    $control->set($key, $table);
-    $this->assertEqual($control->get($key), $table, 'StorageController:: set stores the array to be retrieved by get', 'SPS');
-  }
-  public function testTestOverride() {
+  public function testSiteState_getOverrideController() {
     $table = array(
       array('type' => 'thing', 'id' => 1, 'revision_id' => 5),
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
@@ -36,11 +16,53 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
     $manager =  new \Drupal\sps\Test\Manager();
     $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
-    $this->assertEqual($override->getOverrides(), $table, 'Override should take in a table and return it for overrides', 'SPS');
+    $condition = new \Drupal\sps\Test\Condition(array(
+        'override' => $override,
+      ), $manager);
+    $condition->override_set = TRUE;
+    $map = array(
+      'api1' => new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager),
+    );
+    $site_state = new \Drupal\sps\SiteState($condition, $map);
 
+    $testController = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
+    $testController->set($table);
+
+    $this->assertEqual(
+      $site_state->getOverrideController('api1'),
+      $testController,
+      '::getOverrideController should return the controller from the map passed in, load with data from the override of the condition that was passed in to the sitestate.'
+    );
   }
 
+  public function testSiteState_getCondition() {
+     $table = array(
+      array('type' => 'thing', 'id' => 1, 'revision_id' => 5),
+      array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
+    );
+    $manager =  new \Drupal\sps\Test\Manager();
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
+    $override->setData($table);
+    $condition = new \Drupal\sps\Test\Condition(array(
+        'override' => $override,
+      ), $manager);
+    $condition->override_set = TRUE;
+    $map = array(
+      'api1' => new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager),
+    );
+    $site_state = new \Drupal\sps\SiteState($condition, $map);
+    $this->assertEqual(
+      $site_state->getCondition(),
+      $condition,
+      '::getCondition should return the condtion pass at creation (param 1).'
+    );
+
+  
+  }
+
+
   public function testSiteState() {
+  /*
     $control = new Drupal\sps\Test\StorageController();
     $table = array(
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
@@ -53,6 +75,7 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
     $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should return table given up by controller");
     $override_a->table[0]['id'] = 6;
     $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should be cached so that changing the controller table should not effect output");
+    */
   }
 
   public function testassertThrows() {

@@ -3,21 +3,22 @@
 namespace Drupal\sps;
 
 class SiteState {
-  protected $controller_key = "sps_override_controller";
-  protected $override;
-  protected $override_controller;
+  protected $condition;
+  protected $override_controllers;
 
   /**
   * Constructor for SiteState
   *
-  * @param $controller
-  *   The StorageController to use for storing overrides
-  * @param $override
-  *   The Override to use to generate overrides
+  * @param $condition
+  *   The current condition in use
+  * @param $controller_map
+  *   A map of controller api's to OVerride Controller Plugin obj
   */
-  public function __construct(Plugins\ConditionInterface $condition) {
-    //$this->setOverrideController($controller);
+  public function __construct(Plugins\ConditionInterface $condition, $controller_map) {
+    
+    $this->setOverrideControllers($controller_map);
     $this->setCondition($condition);
+    $this->setOverrides();
   }
 
   /**
@@ -29,10 +30,20 @@ class SiteState {
   * @return \Drupal\sps\SiteState
   *   Self
   */
-  protected function setOverrideController(StorageControllerInterface $controller) {
-    $this->override_controller = $controller;
+  protected function setOverrideControllers($controller_map) {
+    $this->override_controllers = $controller_map;
 
     return $this;
+  }
+
+  /**
+  * get the condtion stored in the state
+  *
+  * @return \Drupal\sps\Plugins\ConditionInterface
+  *   the stored condition
+  */
+  public function getCondition() {
+    return $this->condition;
   }
 
   /**
@@ -57,22 +68,26 @@ class SiteState {
   *   Array of overrides
   *   @TODO make this a iterator?
   */
-  public function getOverride() {
-    if(!$this->override_controller->exists($this->controller_key)) {
-      $this->cacheOverride();
+  public function getOverrideController($api) {
+    if (isset($this->override_controllers[$api])) {
+      return $this->override_controllers[$api];
     }
-    return $this->override_controller->get($this->controller_key);
   }
 
   /**
-   * Generate overrides from the stored Override and save it to the Override Controller
+   * Get overrides from the controller and pass it on to the override
+   * controllers;
+   *
+   * @TODO as some of the $controllers might be the same obj there should
+   * be something we can do to not call set on it twice
    *
    * @return \Drupal\sps\SiteState
    *   Self
    */
-  protected function cacheOverride() {
-    $this->override_controller->set($this->controller_key, $this->override->getOverrides());
-
+  protected function setOverrides() {
+    foreach($this->override_controllers as $api => $controller) {
+      $controller->set($this->condition->getOverride()->getOverrides());
+    }
     return $this;
   }
 }
