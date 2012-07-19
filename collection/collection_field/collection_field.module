@@ -97,16 +97,4 @@ function collection_field_is_empty($item, $field) {
   return FALSE;
 }
 
-/**
- * Autocomplete callback for widget
- *
- * @param $field_name
- * @param string $string
- *
- * @return void
- */
-function collection_field_autocomplete($field_name, $string = '') {
-
-}
-
 

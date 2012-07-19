@@ -9,7 +9,7 @@ function collection_menu() {
   $items['collection/autocomplete/%'] = array(
     'type' => MENU_CALLBACK,
     'page callback' => 'collection_autocomplete',
-    'access arguments' => array('access content') // @TODO make better
+    'access arguments' => array('access collection list')
   );
 
   return $items;
@@ -179,7 +179,7 @@ function collection_access($op, $collection = NULL, $account = NULL) {
     return TRUE;
   }
 
-  $perm = "$op collection";
+  $perm = "$op collections";
   if (user_access($perm, $account)) {
     return TRUE;
   }
@@ -208,6 +208,9 @@ function collection_permission() {
     'delete collection' => array(
       'title' => t('Delete a collection'),
     ),
+    'access collection list' => array(
+      'title' => t('Access Collection Autocomplete List'),
+    )
   );
 
   return $perms;
@@ -224,6 +227,12 @@ function collection_view($collection) {
   );*/
 }
 
+/**
+ * A function other modules can use for auto-complete Lists
+ *
+ * @param string $text
+ * @param string $current
+ */
 function collection_autocomplete($text = '', $current = '') {
   $query = db_select('collection', 'c')
     ->fields('c', array('label'))
