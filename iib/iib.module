@@ -61,7 +61,9 @@ function iib_set_item($renderable) {
 function iib_page_alter(&$page) {
   if (iib_should_show_view()) {
     $items = iib_get_page_data();
-    $page['page_top']['iib'] = iib_create_render_array($items, array('page-iib'));
+    if (!empty($items)) {
+      $page['page_top']['iib'] = iib_create_render_array($items, array('page-iib'));
+    }
   }
 }
 
@@ -96,7 +98,9 @@ function iib_get_entity_data($entity, $type, $view_mode) {
 function iib_entity_view($entity, $type, $view_mode, $langcode) {
   if (iib_should_show_view()) {
     $items = iib_get_entity_data($entity, $type, $view_mode);
-    $entity->content['iib'] = iib_create_render_array($items, array('entity-iib'));
+    if (!empty($items)) {
+      $entity->content['iib'] = iib_create_render_array($items, array('entity-iib'));
+    }
   }
 }
 
