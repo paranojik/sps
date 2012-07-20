@@ -4,6 +4,8 @@ define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
 define('SPS_CONFIG_PLUGIN_CONTROLLER', "plugin_controller_settings");
 define('SPS_CONFIG_HOOK_CONTROLLER', "hook_controller_settings");
 define('SPS_CONFIG_STATE_CONTROLLER', "state_controller_settings");
+define('SPS_CONFIG_SITESTATE', "sitestate_settings");
+define('SPS_CONFIG_OVERRIDE_CONTROLLERS', "override_controllers_settings");
 define('SPS_CONFIG_PREFIX', "sps_config");
 define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
@@ -22,19 +24,33 @@ function sps_sps_plugin_types() {
         'class' => TRUE,
       ),
     ),
+    'override_controller' => array(
+      'interface' => 'Drupal\sps\Plugins\OverrideControllerInterface',
+      'default' => array(
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+        'class' => TRUE,
+        'implements_controller_api',
+      ),
+    ),
   );
 }
 
 /**
  * Implements hook_hook_info()
  */
-function sps_hook_hook_info() {
-  $hooks = array();
-  foreach(module_invoke_all("sps_plugin_types") as $name => $type) {
-    $hooks["sps_{$name}_plugins"] = array(
-      'group' => 'sps_plugins'
-    );
+function sps_hook_info() {
+  dpm(__FUNCTION__);
+  $run = &drupal_static(__FUNCTION__);
+  if($run) {
+    return array();
   }
+  $run = TRUE;
+  foreach(module_invoke_all("sps_plugin_types") as $name => $type) {
+    $hooks["sps_{$name}_plugins"] = array('group' => 'sps_plugins');
+  }
+  return $hooks;
 }
 
 /**
@@ -108,30 +124,3 @@ function sps_query_alter($query) {
 //  $react->react($query);
 }
 
-function sps_init() {
-  $query = db_select("node", 'b');
-  $query->join("node_revision", "r", "r.vid = b.vid");
-  $query->join("user", "u", "u.uid = b.uid");
-  $query->groupBy("b.uid");
-  $query->groupBy("u.name");
-  $query->having("COUNT(b.status) > 1");
-  $query->condition(db_or()->condition("b.sticky", 1)->condition("b.promote", 1));
-  $query->addtag("sps_no_alter");
-
-  //dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
-
-  //dpm(a());
-  //$query->condition("b.status",1);
-  //$query->fields("u", array("u.name"));
-  //$query->addExpression("b.title is NULL", "expression");
-  $query = db_select("node", 'b');
-  $query->join("node_revision", "r", "r.vid = b.vid");
-  $query->fields("b", array("sticky", "title", "status", "uid", "promote"));
-  $query->addExpression("b.title is NULL", "expression");
-  $query->condition("b.status",1);
-  $query->orderBy("b.sticky");
-  $query->orderBy("b.title");
-  //dpm(\Drupal\sps\Test\SelectQuery::selectQuery($query));
-  //dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
-
-}

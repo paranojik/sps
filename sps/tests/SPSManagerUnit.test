@@ -22,28 +22,92 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $override = new \Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
     $condition = new\Drupal\sps\Test\Condition(array("override"=> $override, "element_form" => array()), $manager);
-    $site_state = new Drupal\sps\SiteState($condition);
+    $site_state = new Drupal\sps\SiteState($condition, array());
     $manager->getStateController()->set($site_state);
 
     $this->assertEqual($manager->getSiteState(), $site_state, "Manager::getSiteState returns a site_state storred in the persistent data", "SPS");
   }
-  /*@TODO this is getting reworked with new overide contoller system
-  public function testManager_setSiteState() {
-    $env = $this->getManagerEnv();
-    $manager = $env->manager;
-    $override_controller = $manager->getOverrideController();
-    $state_controller = $manager->getStateController();
 
-    $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
-    $override = new \Drupal\sps\Test\Override(array(), $manager);
-    $override->setData($table);
-    $manager->setSiteState($override);
+  protected function getSiteStateFromPlugins($plugins, $condition_settings, $config) {
+    $config_controller = new \Drupal\sps\Test\ConfigController();
+    $config_controller->default[SPS_CONFIG_PLUGIN_CONTROLLER]['class'] = '\Drupal\sps\Test\PluginController';
+    $config_controller->default[SPS_CONFIG_ROOT_CONDITION] = 'test_condition';
+    $config_controller->default[SPS_CONFIG_SITESTATE] = '\Drupal\sps\Test\SiteState';
+    $config_controller->default[SPS_CONFIG_STATE_CONTROLLER]['class'] = '\Drupal\sps\Test\StateController';
+    $config_controller->default[SPS_CONFIG_OVERRIDE_CONTROLLERS] = $config;
+    $manager = new \Drupal\sps\Manager($config_controller);
+    $plugin_controller = $manager->getPluginController();
+    $plugin_controller->setInfo($plugins);
+    $condition = new \Drupal\sps\Test\Condition( $condition_settings, $manager);
+    $manager->setSiteState($condition);
+    return array($manager, $manager->getStateController()->get());
 
-    $site_state = new Drupal\sps\SiteState($override_controller, $override);
-    $this->assertEqual($state_controller->get($manager->getStateControllerSiteStateKey()), $site_state, "Manager::setSiteState construct the site_state and put it in site_state_controller", "SPS");
 
   }
-  */
+  
+  public function testManager_setSiteState_get_first_controller() {
+    $plugins = array(
+      'reaction' => array(
+        'testreaction1' => array(
+          'class' => '\Drupal\sps\Test\Reaction',
+          'use_controller_api' => 'testapi1',
+        ),
+      ),
+      'override_controller' => array(
+        'testor1' => array(
+          'class' => '\Drupal\sps\Test\TableOverrideStorageController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
+        ),
+        'testor2' => array(
+          'class' => '\Drupal\sps\Test\SimpleCacheOverrideController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
+        ),
+      ),
+    );
+    $condition_settings = array('override' => array('id' => 1, 'revision_id' => 1, 'type' => 'node'));
+    list($manager, $site_state) = $this->getSiteStateFromPlugins($plugins, $condition_settings, array());
+    
+    $this->assertEqual(
+      $site_state->override_controllers,
+      array( 'testapi1' => new \Drupal\sps\Test\TableOverrideStorageController()),
+      "::setSiteState creates sitestate with the a override_controller map (param 2) that finds all of the apis used by reactions and maps this api to the first override_controller that implements that api");
+
+  }
+
+  public function testManager_setSiteState_get_controller_from_config() {
+    $plugins = array(
+      'reaction' => array(
+        'testreaction1' => array(
+          'class' => '\Drupal\sps\Test\Reaction',
+          'use_controller_api' => 'testapi1',
+        ),
+      ),
+      'override_controller' => array(
+        'testor1' => array(
+          'class' => '\Drupal\sps\Test\TableOverrideStorageController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
+        ),
+        'testor2' => array(
+          'class' => '\Drupal\sps\Test\SimpleCacheOverrideController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
+        ),
+      ),
+    );
+    $condition_settings = array('override' => array('id' => 1, 'revision_id' => 1, 'type' => 'node'));
+    $config = array('testapi1' => 'testor2');
+    list($manager, $site_state) = $this->getSiteStateFromPlugins($plugins, $condition_settings, $config);
+    
+    $this->assertEqual(
+      $site_state->override_controllers,
+      array( 'testapi1' => new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager)),
+      "::setSiteState creates sitestate with the a override_controller map (param 2) that finds all of the apis used by reactions and maps this api to the first override_controller that implements that api");
+
+  }
+
   public function testManager_PluginAccess() {
     $env = $this->getManagerEnv();
     $manager = $env->manager;
@@ -74,6 +138,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     );
 
   }
+
   public function testManager_previewForm() {
     $env = $this->getManagerEnv();
     $manager = $env->manager;
@@ -126,25 +191,101 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     */
   }
 
-  public function testManager_react() {
+  public function testManager_react_returns() {
     $settings = array(
-      'callback' => function($data) { return $data + 1;},
+      'callback' => function($data, $override_controller) { return array($override_controller, $data + 1);},
     );
     $info = array(
       'reaction' => array(
         'test_reaction' => array(
           'class' => '\Drupal\sps\Test\Reaction',
           'instance_settings' => $settings,
+          'use_controller_api' => 'testapi1',
+        ),
+      ),
+      'override_controller' => array(
+        'testor1' => array(
+          'class' => '\Drupal\sps\Test\TableOverrideStorageController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
         ),
       ),
     );
+
     $env = $this->getManagerEnv();
     $manager = $env->manager;
+    $manager->getConfigController()->set(SPS_CONFIG_OVERRIDE_CONTROLLERS, array());
+    $manager->getPluginController()->setInfo($info);
+    $manager->setSiteState(new \Drupal\sps\Test\Condition(array(), $manager));
+    $this->assertEqual(
+      $manager->react("test_reaction", 4),
+      array(new \Drupal\sps\Test\TableOverrideStorageController(), 5),
+      "Manager::react should return based on the react method of the plugin", 'SPS'
+    );
+  }
+
+  public function testManager_react_noSiteState() {
+    $settings = array(
+      'callback' => function($data, $override_controller) { return array($override_controller, $data + 1);},
+    );
+    $info = array(
+      'reaction' => array(
+        'test_reaction' => array(
+          'class' => '\Drupal\sps\Test\Reaction',
+          'instance_settings' => $settings,
+          'use_controller_api' => 'testapi1',
+        ),
+      ),
+      'override_controller' => array(
+        'testor1' => array(
+          'class' => '\Drupal\sps\Test\TableOverrideStorageController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
+        ),
+      ),
+    );
+
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $manager->getConfigController()->set(SPS_CONFIG_OVERRIDE_CONTROLLERS, array());
     $manager->getPluginController()->setInfo($info);
     $this->assertEqual(
       $manager->react("test_reaction", 4),
-      5,
-      "Manager::react should return based on the react method of the plugin", 'SPS'
+      NULL,
+      "Manager::react should not call the reaction if there is no siteState", 'SPS'
+    );
+  }
+
+  public function testManager_react_noAPIMatch() {
+    $settings = array(
+      'callback' => function($data, $override_controller) { return array($override_controller, $data + 1);},
+    );
+    $info = array(
+      'reaction' => array(
+        'test_reaction' => array(
+          'class' => '\Drupal\sps\Test\Reaction',
+          'instance_settings' => $settings,
+          'use_controller_api' => 'testapi1',
+        ),
+      ),
+      'override_controller' => array(
+        'testor1' => array(
+          'class' => '\Drupal\sps\Test\TableOverrideStorageController',
+          'implements_controller_api' => 'testapi2',
+          'instance_settings' => array(),
+        ),
+      ),
+    );
+
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $manager->getConfigController()->set(SPS_CONFIG_OVERRIDE_CONTROLLERS, array());
+    $manager->getPluginController()->setInfo($info);
+    $manager->setSiteState(new \Drupal\sps\Test\Condition(array(), $manager));
+    $this->assertEqual(
+      $manager->react("test_reaction", 4),
+      NULL,
+      "Manager::react should not call the reaction if there is no controller that implement the reaction api", 'SPS'
     );
   }
 

@@ -45,51 +45,6 @@ namespace Drupal\sps;
  *  @TODO this part of the system should be reviews when we start needing
  *  access to the site state
  *
- *
- *
- * Preview Form
- * TODO This has been simplified and change need to be updated.
- *
- * The Manager is the interface between the form hooks in the sps module
- * and the Root Condition that does most of the Form creation and processing
- * .-----------------------------------------.
- * |    preview form hooks in sps.module     |
- * |-----------------------------------------|
- * | sps_preview_form()                      |
- * | sps_preview_form_validate()             |
- * | sps_preview_form_submit()               |
- * '-----------------------------------------'
- *                      |
- *                      |
- *                      v
- * .-----------------------------------------.
- * |                 Manager                 |
- * |-----------------------------------------|
- * | getPreviewForm($form, $form_state)      |
- * | validatePreviewForm($form, $form_state) |
- * | submitPreviewForm($form, $form_state)   |
- * '-----------------------------------------'
- *                      |
- *                      |
- *                      v
- * .-----------------------------------------.
- * |            Condition (Root)             |
- * |-----------------------------------------|
- * | getElement($form, $form_state)          |
- * | validateElement($form, $form_state)     |
- * | submitElement($form, $form_state)       |
- * '-----------------------------------------'
- *
- *
- * Reactions
- * The manager is use as an interface for Drupal hooks that need to have a
- * reaction react
- *                    .-----------------------.   .--------------.
- * .--------------.   |        Manager        |   |   Reaction   |
- * | Drupal hooks |-->|-----------------------|-->|--------------|
- * '--------------'   | react($plugin, $data) |   | react($data) |
- *                    '-----------------------'   '--------------'
- *
  * Plugins
  * The Manager is a pass-through to the plugin controller
  */
@@ -212,8 +167,8 @@ class Manager {
    * @return \Drupal\sps\SiteState | NULL
    */
   public function getSiteState() {
-    if ($this->state_controller->exists($this->state_controller_site_state_key)) {
-      return $this->state_controller->get($this->state_controller_site_state_key);
+    if ($this->state_controller->exists()) {
+      return $this->state_controller->get();
     }
 
     return NULL;
@@ -231,10 +186,71 @@ class Manager {
    *   Self
    */
   public function setSiteState(\Drupal\sps\Plugins\ConditionInterface $condition) {
-    $site_state = new SiteState($condition);
+    $controller_map = $this->getOverrideControllerMap();
+    $site_state_class = $this->getConfigController()->get(SPS_CONFIG_SITESTATE);
+    $site_state = new $site_state_class($condition, $controller_map);
     $this->state_controller->set($site_state);
     return $this;
   }
+  
+
+  protected function getActiveReactionInfo() {
+    return $this->getPluginInfo('reaction');
+  }
+
+  /**
+  * product a map from controller api to override controller instances
+  * we start with a list of apis need by reations
+  * then we add to it the first override controller we come to for apis
+  * not in the config. Also if a controller implements 2 apis we do not 
+  * create two instances but instead point to the same one.
+  *
+  * @return 
+  */
+  protected function getOverrideControllerMap() {
+
+    $controllers = array();
+    $controllers_instances = array();
+    $instances = array();
+
+    //find all need apis
+    foreach($this->getActiveReactionInfo() as $info) {
+      $controllers[$info['use_controller_api']] = NULL;
+    }
+    $config = $this->getConfigController()->get(SPS_CONFIG_OVERRIDE_CONTROLLERS) ?: array();
+    $infos = $this->getPluginInfo('override_controller');
+
+    //if the config has valid controllers use them
+    foreach($config as $api=>$name) {
+      if (isset($infos[$name])) {
+        $controllers[$api]  = $name;
+      }
+    }
+    foreach($controllers as $api => $name) {
+      if(!$name) {
+        foreach($infos as $info_name => $info) {
+          //if we have not found a controller yet lets
+          //see if this one implements the api
+          if(!$name) {
+            $imp = is_array($info['implements_controller_api'])
+              ? $info['implements_controller_api']
+              : array($info['implements_controller_api']);
+            foreach ($imp as $imp_api) {
+              if($imp_api == $api) {
+                $name = $info_name;
+              }
+            }
+          } 
+        }
+      }
+      if (!isset($instances[$name])) {
+        $instances[$name] = $this->getPlugin('override_controller', $name);
+      }
+      $controllers_instances[$api] = $instances[$name];
+    }
+    return $controllers_instances;
+  }
+
 
   /**
    * Get what should be a relatively static variable used for storing the site state
@@ -297,6 +313,14 @@ class Manager {
   /**
    * call a reaction rect method
    *
+   * The manager is use as an interface for Drupal hooks that need to have a
+   * reaction react
+   *                    .-----------------------.   .-----------------------------------.
+   * .--------------.   |        Manager        |   |            Reaction               |
+   * | Drupal hooks |-->|-----------------------|-->|-----------------------------------|
+   * '--------------'   | react($plugin, $data) |   | react($data, $overridecontroller) |
+   *                    '-----------------------'   '-----------------------------------'
+   *
    * @param String $reaction
    *   the name of a reaction plugin;
    * @param mixed $data
@@ -306,7 +330,14 @@ class Manager {
    *   Data used by the item calling reaction
    */
   public function react($reaction, $data) {
-    return $this->getPlugin("reaction", $reaction)->react($data);
+    $infos = $this->getActiveReactionInfo();
+    if(isset($infos[$reaction]) &&
+       ($site_state = $this->getSiteState()) &&
+       ($controller = $site_state->getOverrideController($infos[$reaction]['use_controller_api']))
+      ) {
+      return $this->getPlugin("reaction", $reaction)->react($data, $controller);
+      
+    }
   }
 
   /**

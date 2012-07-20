@@ -2,7 +2,7 @@
 class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
-      'name' => 'SPS Query Alter Reaction Unit Tests',
+      'name' => 'SPS Entity Select Query Alter Reaction Unit Tests',
       'description' => 'Test the public interface to the Query Alter Reaction objects',
       'group' => 'SPS',
     );

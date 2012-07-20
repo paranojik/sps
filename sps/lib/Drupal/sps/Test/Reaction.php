@@ -21,7 +21,7 @@ class Reaction extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sps
    * @param $data Vary
    * @return Vary
    */
-  public function react($data) {
-    return $this->react_callback->__invoke($data);
+  public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
+    return $this->react_callback->__invoke($data, $override_controller);
   }
 }

@@ -9,5 +9,5 @@ interface ReactionInterface {
    * @param $data mixed
    * @return mixed
    */
-  function react($data);
+  function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller);
 }

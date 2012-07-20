@@ -3,7 +3,7 @@ namespace Drupal\sps\Test;
 
 class TableOverrideStorageController implements \Drupal\sps\Plugins\OverrideController\TableOverrideStorageControllerInterface {
   public $table = array();
-  public function addOverrideJoin($query, $base_alias, $base_id, $overrides_alias) {
+  public function addOverrideJoin(\SelectQueryInterface $query, $base_alias, $base_id, $overrides_alias) {
     $alias = $query->addJoin("LEFT OUTER", 'test_override', $overrides_alias, "$base_alias.$base_id = $overrides_alias.id");
     $tables =& $query->getTables();
     $new_tables = array();
