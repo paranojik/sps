@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins\OverrideController;
 
-abstract class AbstractOverrideController implements \Drupal\sps\Plugins\OverrideControllerInterface,\Drupal\sps\Plugins\PluginInterface  {
+abstract class AbstractOverrideController implements \Drupal\sps\Plugins\OverrideControllerInterface {
 
   public function validateRow($row) {
     if (!isset($row['revision_id'])) {

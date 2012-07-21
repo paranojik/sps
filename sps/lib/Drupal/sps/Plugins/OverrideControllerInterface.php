@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins;
 
-interface OverrideControllerInterface {
+interface OverrideControllerInterface extends PluginInterface{
   /**
    * Set what data should be cached way for retrival.
    *

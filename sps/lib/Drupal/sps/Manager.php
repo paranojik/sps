@@ -75,8 +75,8 @@ class Manager {
   public function __construct(StorageControllerInterface $config_controller) {
 
     $this->setConfigController($config_controller)
-      ->setPluginController($this->createControllerFromConfig(SPS_CONFIG_PLUGIN_CONTROLLER))
       ->setHookController($this->createControllerFromConfig(SPS_CONFIG_HOOK_CONTROLLER))
+      ->setPluginController($this->createControllerFromConfig(SPS_CONFIG_PLUGIN_CONTROLLER))
       ->setStateController($this->createControllerFromConfig(SPS_CONFIG_STATE_CONTROLLER));
   }
 

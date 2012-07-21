@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\StorageController;
 
-define(SPS_SITE_STATE_STORAGE_KEY, "sps_site_state_storage_key");
+define('SPS_SITE_STATE_STORAGE_KEY', "sps_site_state_storage_key");
 /**
  * Defines a PersistentStorage Controller that uses ctools_object_cache
  *
@@ -11,8 +11,8 @@ define(SPS_SITE_STATE_STORAGE_KEY, "sps_site_state_storage_key");
  *
  */
 class CToolsObjectCache implements \Drupal\sps\StateControllerInterface {
- protected static $obj = 'sps-ctools-object-cache';
- protected static $key = 'sps_site_state_storage_key';
+ protected $obj = 'sps-ctools-object-cache';
+ protected $key = 'sps_site_state_storage_key';
  /**
   * Cache away a object
   *
@@ -35,7 +35,7 @@ public function set($cache) {
   * @return bool
   */
  public function exists() {
-   return isset($_SESSION[$this->obj][$this->key]))
+   return isset($_SESSION[$this->obj][$this->key]);
  }
  /**
   * Retrieve a cached object

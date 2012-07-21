@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins;
 
-interface ReactionInterface {
+interface ReactionInterface extends PluginInterface{
   /**
    * React in some way
    * This could be to alter the $data, or return some data, or even a sideeffect of some kind
@@ -9,5 +9,5 @@ interface ReactionInterface {
    * @param $data mixed
    * @return mixed
    */
-  function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller);
+  public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller);
 }

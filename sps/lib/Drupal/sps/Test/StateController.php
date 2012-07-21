@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Test;
 class StateController implements \Drupal\sps\StateControllerInterface {
-  protected $cache;
+  public $cache;
   /**
   * Cache away a object
   *

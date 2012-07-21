@@ -17,7 +17,7 @@ function sps_sps_plugin_types() {
   return array(
     'reaction' => array(
       'interface' => 'Drupal\sps\Plugins\ReactionInterface',
-      'default' => array(
+      'defaults' => array(
         'instance_settings' => array(),
       ),
       'requires' => array(
@@ -26,12 +26,12 @@ function sps_sps_plugin_types() {
     ),
     'override_controller' => array(
       'interface' => 'Drupal\sps\Plugins\OverrideControllerInterface',
-      'default' => array(
+      'defaults' => array(
         'instance_settings' => array(),
       ),
       'requires' => array(
         'class' => TRUE,
-        'implements_controller_api',
+        'implements_controller_api' => TRUE,
       ),
     ),
   );
@@ -41,7 +41,6 @@ function sps_sps_plugin_types() {
  * Implements hook_hook_info()
  */
 function sps_hook_info() {
-  dpm(__FUNCTION__);
   $run = &drupal_static(__FUNCTION__);
   if($run) {
     return array();
@@ -114,13 +113,50 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+    $controller->set(SPS_CONFIG_STATE_CONTROLLER, array('class'=> '\Drupal\sps\Test\StateController', 'instance_settings' => array()));
   }
 
   return $controller;
 }
 
+/**
+ * Get the default Manager
+ *
+ * @return \Drupal\sps\Manager
+ */
+function sps_get_manager() {
+  $manager = &drupal_static(__FUNCTION__);
+
+  if(!isset($manager)) {
+    $manager = new \Drupal\sps\Manager(sps_get_default_config_controller());
+  }
+
+  return $manager;
+}
+/**
+ * implements hook_query_alter()
+ * 
+ * This is done on behave of the node_select_query_alter reaction
+ */
 function sps_query_alter($query) {
- // $react = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(array("tables"=> array("base"=>"node", "revision"=>"node_revision")), "bpb");
-//  $react->react($query);
+  $data = new stdClass();
+  $data->query=$query;
+  sps_get_manager()->react('node_select_query_alter', $data);
+}
+
+function sps_init() {
+
+  if(isset($_GET['doit'])) {
+    $manager = sps_get_manager();
+
+    $override = new Drupal\sps\Test\Override(array(), $manager);
+    $override->setData(array(
+      array("id" => 1,"revision_id" => 1 , "type" => 'node'),
+      array("id" => 2,"revision_id" => 5 , "type" => 'node')
+    ));
+    $condition = new Drupal\sps\Test\Condition(array('override' => $override), $manager);
+    $condition->override_set = TRUE;
+    $manager->setSiteState($condition);
+  };
 }
 
