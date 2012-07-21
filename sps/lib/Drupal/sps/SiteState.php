@@ -49,8 +49,7 @@ class SiteState {
   /**
    * Store the Override to use for generating overrides
    *
-   * @param $override
-   *   The Override to use to generate overrides
+   * @param Plugins\ConditionInterface $condition
    *
    * @return \Drupal\sps\SiteState
    *   Self

@@ -26,5 +26,7 @@ class TableOverrideStorageController implements \Drupal\sps\Plugins\OverrideCont
   public function set($table) {
     $this->table = $table;
   }
+  
+  public function __construct(array $config, \Drupal\sps\Manager $manager) {}
 }
 

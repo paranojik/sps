@@ -1,0 +1,44 @@
+<?php
+class IIBPublicApiTest extends IIBBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'IIB Public Api Unit Tests',
+      'description' => 'Test that basic Api Functions work in IIB.',
+      'group' => 'IIB',
+    );
+  }
+
+  public function testBasicApi() {
+    $test = array(
+      'test' => array(
+        '#markup' => 'test'
+      )
+    );
+
+    iib_set_item($test);
+
+    $data = iib_get_page_data();
+    $this->assertEqual($data, $test, 'IIB should return an array only containing items it was passed.');
+  }
+
+  public function testMultipleItems() {
+    drupal_static_reset();
+    $test = array(
+      'test' => array(
+        '#markup' => 'test'
+      )
+    );
+    iib_set_item($test);
+    iib_set_item(array(
+      'another' => array(
+        '#markup' => 'another'
+      )
+    ));
+
+    $data = iib_get_page_data();
+    $this->assertEqual($data['test'], $test['test'], 'IIB should properly handle multiple items being passed to it.');
+    $data = iib_get_page_data();
+
+    $this->assertTrue(empty($data), 'IIB Should empty the item store once they have been displayed');
+  }
+}

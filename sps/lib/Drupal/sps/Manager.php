@@ -80,12 +80,19 @@ class Manager {
       ->setStateController($this->createControllerFromConfig(SPS_CONFIG_STATE_CONTROLLER));
   }
 
+  /**
+   * Create a Controller Object based upon a configuraiton key
+   *
+   * @param $key
+   *  The key from the configuration array that contains the controller informaiton.
+   *
+   * @return StateControllerInterface|PluginControllerInterface|HookControllerInterface
+   */
   protected function createControllerFromConfig($key) {
     $controller_info = $this->getConfigController()->get($key);
     $controller_class = $controller_info['class'];
     $controller_settings = $controller_info['instance_settings'];
     return new $controller_class($controller_settings, $this);
-  
   }
 
   /**
@@ -273,7 +280,7 @@ class Manager {
    */
   public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
-    
+
     return $this->getHookController()->drupalGetForm('sps_condition_preview_form', array($root_condition, 'getElement'));
   }
 
@@ -386,15 +393,38 @@ class Manager {
     return $this->plugin_controller->getPluginByMeta($type, $property, $value);
   }
 
+  /**
+   * Get the hook controller
+   *
+   * @return HookControllerInterface
+   */
   public function getHookController() {
     return $this->hook_controller;
   }
+
+  /**
+   * Get the Plugin Controller
+   *
+   * @return PluginControllerInterface
+   */
   public function getPluginController() {
     return $this->plugin_controller;
   }
+
+  /**
+   * Get the State Controller
+   *
+   * @return StateControllerInterface
+   */
   public function getStateController() {
     return $this->state_controller;
   }
+
+  /**
+   * Get the config Controller
+   *
+   * @return StorageControllerInterface
+   */
   public function getConfigController() {
     return $this->config_controller;
   }

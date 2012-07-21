@@ -145,7 +145,6 @@ function sps_query_alter($query) {
 }
 
 function sps_init() {
-
   if(isset($_GET['doit'])) {
     $manager = sps_get_manager();
 

@@ -71,7 +71,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     
     $this->assertEqual(
       $site_state->override_controllers,
-      array( 'testapi1' => new \Drupal\sps\Test\TableOverrideStorageController()),
+      array( 'testapi1' => new \Drupal\sps\Test\TableOverrideStorageController(array(),$manager)),
       "::setSiteState creates sitestate with the a override_controller map (param 2) that finds all of the apis used by reactions and maps this api to the first override_controller that implements that api");
 
   }
@@ -107,7 +107,6 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
       "::setSiteState creates sitestate with the a override_controller map (param 2) that finds all of the apis used by reactions and maps this api to the first override_controller that implements that api");
 
   }
-
   public function testManager_PluginAccess() {
     $env = $this->getManagerEnv();
     $manager = $env->manager;
@@ -219,7 +218,7 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     $manager->setSiteState(new \Drupal\sps\Test\Condition(array(), $manager));
     $this->assertEqual(
       $manager->react("test_reaction", 4),
-      array(new \Drupal\sps\Test\TableOverrideStorageController(), 5),
+      array(new \Drupal\sps\Test\TableOverrideStorageController(array(), $manager), 5),
       "Manager::react should return based on the react method of the plugin", 'SPS'
     );
   }

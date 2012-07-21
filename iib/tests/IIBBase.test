@@ -1,0 +1,11 @@
+<?php
+abstract class IIBBaseUnitTest extends DrupalUnitTestCase {
+  public function setUp() {
+    drupal_load('module', 'xautoload');
+    drupal_load('module', 'iib');
+    _xautoload_register();
+    parent::setUp();
+    spl_autoload_unregister('drupal_autoload_class');
+    spl_autoload_unregister('drupal_autoload_interface');
+  }
+}
