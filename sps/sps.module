@@ -113,7 +113,6 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
-    $controller->set(SPS_CONFIG_STATE_CONTROLLER, array('class'=> '\Drupal\sps\Test\StateController', 'instance_settings' => array()));
   }
 
   return $controller;
@@ -156,6 +155,17 @@ function sps_init() {
     $condition = new Drupal\sps\Test\Condition(array('override' => $override), $manager);
     $condition->override_set = TRUE;
     $manager->setSiteState($condition);
+    dpm($manager->getSiteState());
+    dpm($_SESSION);
+    dpm($manager->getStateController());
   };
 }
 
+/**
+ * implements hook_entitY_info_alter
+ *
+ * changing the node controller on behalf of the node_load Reaction
+ */
+function sps_entity_info_alter(&$entity_info) {
+  $entity_info['node']['controller class'] = '\Drupal\sps\NodeController';
+}
