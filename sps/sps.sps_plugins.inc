@@ -6,11 +6,13 @@
  */
 function sps_sps_reaction_plugins() {
   return array(
+  /*
     'node_load'=> array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntityLoadReaction',
       'use_controller_api' =>'simple_cache',
       'instance_settings' => array('type' => 'node'),
     ),
+  */
     'node_select_query_alter' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction',
       'use_controller_api' =>'mysql_table',

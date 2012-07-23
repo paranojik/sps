@@ -34,6 +34,33 @@ function sps_sps_plugin_types() {
         'implements_controller_api' => TRUE,
       ),
     ),
+    'override' => array(
+      'interface' => 'Drupal\sps\Plugins\OverrideInterface',
+      'defaults' => array(
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+        'condition' => TRUE,
+      ),
+    ),
+    'condition' => array(
+      'interface' => 'Drupal\sps\Plugins\ConditionInterface',
+      'defaults' => array(
+        'class' => 'Drupal\sps\Plugins\Condition\BasicCondition',
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+      ),
+    ),
+    'widget' => array(
+      'interface' => 'Drupal\sps\Plugins\WidgetInterface',
+      'defaults' => array(
+        'class' => 'Drupal\sps\Plugins\Widget\Widget',
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+      ),
+    ),
   );
 }
 
@@ -101,6 +128,7 @@ function sps_condition_preview_form_submit($form, &$form_state) {
   if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
     call_user_func_array($form['#sps_submit'], array($form, $form_state));
   }
+  sps_get_manager()->previewFormSubmitted();
 }
 
 /**
@@ -113,6 +141,7 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+    $controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'first_revision_condition'));
   }
 
   return $controller;
@@ -144,6 +173,7 @@ function sps_query_alter($query) {
 }
 
 function sps_init() {
+/*
   if(isset($_GET['doit'])) {
     $manager = sps_get_manager();
 
@@ -153,12 +183,21 @@ function sps_init() {
       array("id" => 2,"revision_id" => 5 , "type" => 'node')
     ));
     $condition = new Drupal\sps\Test\Condition(array('override' => $override), $manager);
-    $condition->override_set = TRUE;
+    $condition = $manager->getPlugin('condition', 'first_revision_condition');
+    dpm($condition);
+    $condition->submitElement();
+    dpm($condition->getOverride()->getOverrides());
+    //$condition->override_set = TRUE;
     $manager->setSiteState($condition);
-    dpm($manager->getSiteState());
+   // dpm($manager->getSiteState());
     dpm($_SESSION);
-    dpm($manager->getStateController());
-  };
+   // dpm($manager->getStateController());
+  }
+  */
+  if (isset($_GET['cancel'])){
+    dpm("clear");
+    unset($_SESSION['sps-ctools-object-cache']);
+  }
 }
 
 /**
@@ -168,4 +207,18 @@ function sps_init() {
  */
 function sps_entity_info_alter(&$entity_info) {
   $entity_info['node']['controller class'] = '\Drupal\sps\NodeController';
+}
+
+/**
+ * implements hook_iib_page_item()
+ */
+function sps_iib_page_item() {
+  $manager = sps_get_manager();
+  $items['left'] = array(
+    '#weight' => -10,
+    '#prefix' => '<div>',
+    '#markup' => drupal_render($manager->getPreviewForm()),
+    '#suffix' => '</div>',
+  );
+  return $items;
 }
