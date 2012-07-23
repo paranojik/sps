@@ -37,13 +37,10 @@ function collection_field_widget_info() {
     'collection' => array(
       'label' => t('Collection'),
       'field types' => array('collection'),
-      'settings' => array(
-        'size' => 60,
-        'autocomplete_path' => 'collection/autocomplete',
-      ),
+      'settings' => array(),
       'behaviors' => array(
         'multiple values' => FIELD_BEHAVIOR_DEFAULT,
-        'default value' => FIELD_BEHAVIOR_NONE,
+        'default value' => FIELD_BEHAVIOR_DEFAULT,
       ),
     ),
   );
@@ -65,9 +62,12 @@ function collection_field_formatter_info() {
  * Implements hook_field_formatter_view()
  */
 function collection_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $output = array();
   if (!empty($items)) {
-    $return = implode(', ', $items);
-    return array(array('#markup' => $return));
+    foreach ($items as $item) {
+      $output[] = $item['value'];
+    }
+    return array(array('#markup' => implode(', ', $output)));
   }
 
   return '';
@@ -77,97 +77,59 @@ function collection_field_formatter_view($entity_type, $entity, $field, $instanc
  * Implements hook_field_widget_form().
  */
 function collection_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+  $current_collections = collection_field_get_collections($element['#entity'], $element['#entity_type'], $element['#field_name']);
+  $options = collection_get_collection_list();
+  foreach ($current_collections as $condition) {
+    unset($options[$condition->identifier()]);
+  }
+
+  array_unshift($options, t('Select'));
+
   $element += array(
-    '#type' => 'textfield',
-    '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
-    '#autocomplete_path' => $instance['widget']['settings']['autocomplete_path'],
-    '#size' => $instance['widget']['settings']['size'],
-    '#maxlength' => 1024,
-    '#element_validate' => array('collection_field_validate_autocomplete'),
+    'value' => array(
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => isset($items[$delta]['value']) ? $items[$delta]['value'] : '',
+    )
   );
+
   return $element;
 }
 
 /**
  * Implements hook_field_is_empty().
  */
-function collection_field_is_empty($item, $field) {
-  if (empty($item['value']) && (string) $item['value'] !== '0') {
+function collection_field_field_is_empty($item, $field) {
+  if (empty($item) && empty($item['value']) && (string) $item['value'] !== '0') {
     return TRUE;
   }
   return FALSE;
 }
 
 /**
- * Implements hook_field_validate().
- *
- * Validate this module's field data.
- *
- * If there are validation problems, add to the $errors array (passed by
- * reference). There is no return value.
- *
- * @param $entity_type
- *   The type of $entity.
- * @param $entity
- *   The entity for the operation.
- * @param $field
- *   The field structure for the operation.
- * @param $instance
- *   The instance structure for $field on $entity's bundle.
- * @param $langcode
- *   The language associated with $items.
- * @param $items
- *   $entity->{$field['field_name']}[$langcode], or an empty array if unset.
- * @param $errors
- *   The array of errors (keyed by field name, language code, and delta) that
- *   have already been reported for the entity. The function should add its
- *   errors to this array. Each error is an associative array with the following
- *   keys and values:
- *   - error: An error code (should be a string prefixed with the module name).
- *   - message: The human readable message to be displayed.
- *
- *
- */
-function collection_field_field_validate($entity_type, $entity, $field, $instance, $langcode, $items, &$errors) {
-  foreach ($items as $delta => $item) {
-    if (!empty($item['value'])) {
-      if (collection_field_collection_exists($entity, $entity_type, $field['name'], $item['value'])) {
-        $errors[$field['field_name']][$langcode][$delta][] = array(
-          'error' => 'collection_exists',
-          'message' => t('%name: The collection %collection_name is already associated to another revision this entity.',
-            array('%name' => $instance['label'], '%collection_name' => $item['value'])),
-        );
-      }
-    }
-  }
-
-}
-
-/**
- * Does the current collection exists on this entity already
+ * Get the collections for an entity
  *
  * @param $entity
  * @param $entity_type
  * @param $field_name
  * @param $collection_name
  *
- * @return bool
+ * @return array
  */
-function collection_field_collection_exists($entity, $entity_type, $field_name, $collection_name) {
+function collection_field_get_collections($entity, $entity_type, $field_name) {
   $entity_info = entity_get_info($entity_type);
   $id_key = $entity_info['entity keys']['id'];
 
   $query = new EntityFieldQuery();
-  $values = $query->entityCondition('type', $entity_type)
+  $values = $query->entityCondition('entity_type', $entity_type)
     ->age(FIELD_LOAD_REVISION)
-    ->fieldCondition($field_name, 'value', $collection_name)
     ->entityCondition('entity_id', $entity->$id_key)
     ->execute();
 
-  if (!empty($values[$entity_type])) {
-    return TRUE;
+  if (empty($values[$entity_type])) {
+    return array();
   }
 
-  return FALSE;
+  $colleciton_ids = array_keys($values[$entity_type]);
+  return collection_load_multiple($colleciton_ids);
 }
-
