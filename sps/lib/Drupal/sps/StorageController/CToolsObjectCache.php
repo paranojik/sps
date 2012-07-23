@@ -24,6 +24,7 @@ class CToolsObjectCache implements \Drupal\sps\StateControllerInterface {
   */
 public function set($cache) {
    $_SESSION[$this->obj][$this->key] = TRUE;
+   ctools_include('object-cache');
    ctools_object_cache_set($this->obj, $this->key, $cache);
  }
  /**
@@ -45,6 +46,7 @@ public function set($cache) {
   * @return the object that was cached
   */
  public function get() {
+   ctools_include('object-cache');
    return ctools_object_cache_get($this->obj, $this->key);
  }
 }
