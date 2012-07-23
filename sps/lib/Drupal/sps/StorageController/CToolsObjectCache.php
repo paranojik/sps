@@ -49,4 +49,12 @@ public function set($cache) {
    ctools_include('object-cache');
    return ctools_object_cache_get($this->obj, $this->key);
  }
+
+  /*
+   * Clear out the current site state
+   */
+  public function clear() {
+   ctools_include('object-cache');
+   return ctools_object_cache_clear($this->obj, $this->key);
+  }
 }

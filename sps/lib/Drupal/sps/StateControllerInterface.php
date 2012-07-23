@@ -31,4 +31,9 @@ interface StateControllerInterface {
    *   the object that was cached
    */
   public function get();
+
+  /*
+   * Clear out the current site state
+   */
+  public function clear();
 }

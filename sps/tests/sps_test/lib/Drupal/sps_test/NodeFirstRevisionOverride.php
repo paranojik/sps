@@ -21,12 +21,15 @@ class NodeFirstRevisionOverride extends Override {
    *  An array of override vids.
    */
   public function getOverrides() {
-    $query = db_query("select nid as id, min(vid) as revision_id, 'node' as type from {node_revision} group by nid");
-    $rnt = array();
-    while($row = $query->fetchAssoc()) {
-      $rnt[] = $row;
+    if($this->first) {
+      $query = db_query("select nid as id, min(vid) as revision_id, 'node' as type from {node_revision} group by nid");
+      $rnt = array();
+      while($row = $query->fetchAssoc()) {
+        $rnt[] = $row;
+      }
+      return $rnt;
     }
-    return $rnt;
+    return array();
   }
 
   /**

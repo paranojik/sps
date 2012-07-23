@@ -99,6 +99,16 @@ function sps_condition_preview_form($form, &$form_state) {
     $form_function = $form_state['build_info']['args'][0];
     if (is_callable($form_function)) {
       $form = call_user_func_array($form_function, array($form, $form_state));
+
+      $form['preview'] = array(
+        '#type' => 'submit',
+        '#value' => 'Preview',
+      );
+      $form['Cancel'] = array(
+        '#type' => 'submit',
+        '#value' => 'Cancel',
+      );
+
       return $form;
     }
   }
@@ -112,6 +122,10 @@ function sps_condition_preview_form($form, &$form_state) {
  * should be set to a callable item and the form generated through sps_condition_preview_form.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
+  if($form_state['clicked_button']['#id'] == 'edit-cancel') {
+    sps_get_manager()->clearSiteState();
+    drupal_goto(current_path());
+  }
   if (!empty($form['#sps_validate']) && is_callable($form['#sps_validate'])) {
     call_user_func_array($form['#sps_validate'], array($form, $form_state));
   }

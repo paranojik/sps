@@ -21,8 +21,9 @@ function sps_test_sps_condition_plugins() {
 function sps_test_sps_widget_plugins() {
   return array(
     'first_revision_widget'=> array(
-      'class' => '\Drupal\sps\Test\Widget',
+      'class' => '\Drupal\sps_test\SingleCheckWidget',
       'instance_settings' => array(
+        'title' => 'Show First Revision'
       ),
     ),
   );
