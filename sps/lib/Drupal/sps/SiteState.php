@@ -15,7 +15,7 @@ class SiteState {
   *   A map of controller api's to OVerride Controller Plugin obj
   */
   public function __construct(Plugins\ConditionInterface $condition, $controller_map) {
-    
+
     $this->setOverrideControllers($controller_map);
     $this->setCondition($condition);
     $this->setOverrides();
@@ -24,8 +24,8 @@ class SiteState {
   /**
   * Set the Controller for storing overrrides
   *
-  * @param $controller
-  *   The StorageController to use for storing Overrides
+  * @param $controller_map
+  *   The Map of overrides controllers
   *
   * @return \Drupal\sps\SiteState
   *   Self

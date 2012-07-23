@@ -8,9 +8,9 @@
 /**
  * Get the items to place into the IIB.
  *
- * To add items to this list a module should implement hook_iib_data($items)
+ * To add items to this list a module should implement hook_iib_page_item($items)
  * and return a render array
- * The result of this hook invocation is alterable using hook_iib_data_alter().
+ * The result of this hook invocation is alterable using hook_iib_page_item_alter().
  *
  * @see iib.api.php
  */
@@ -30,7 +30,6 @@ function iib_iib_page_item() {
   drupal_static_reset('iib_set_items');
   return $data;
 }
-
 
 /**
  * Allows other modules to add items to the IIB.
@@ -62,9 +61,31 @@ function iib_set_item($renderable) {
 function iib_page_alter(&$page) {
   if (iib_should_show_view()) {
     $items = iib_get_page_data();
-    $page['page_top']['iib'] = iib_create_render_array($items, array('page-iib'));
+    if (!empty($items)) {
+      $page['page_top']['iib'] = iib_create_render_array($items, array('page-iib'));
+    }
   }
 }
+
+/**
+ * Retreive entity data for IIB.
+ *
+ * To add items to this list a module should implement hook_iib_entity_item($items)
+ * and return a render array
+ * The result of this hook invocation is alterable using hook_iib_entity_item_alter().
+ *
+ * @see iib.api.php
+ */
+function iib_get_entity_data($entity, $type, $view_mode) {
+  $items = module_invoke_all('iib_entity_item', $entity, $type, $view_mode);
+  $extra = array(
+    'entity_type' => $type,
+    'view_mode' => $view_mode,
+  );
+  drupal_alter('iib_entity_item', $items, $entity, $extra);
+  return $items;
+}
+
 
 /**
  * Implements hook_entity_view().
@@ -76,11 +97,10 @@ function iib_page_alter(&$page) {
  */
 function iib_entity_view($entity, $type, $view_mode, $langcode) {
   if (iib_should_show_view()) {
-    $items = array();
-    module_invoke_all('iib_entity_item', $items, $entity, $type, $view_mode);
-    drupal_alter('iib_entity_item', $items, $entity, $type, $view_mode);
-
-    $entity->content['iib'] = iib_create_render_array($items, array('entity-iib'));
+    $items = iib_get_entity_data($entity, $type, $view_mode);
+    if (!empty($items)) {
+      $entity->content['iib'] = iib_create_render_array($items, array('entity-iib'));
+    }
   }
 }
 

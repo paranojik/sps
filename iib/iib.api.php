@@ -31,15 +31,17 @@ function hook_iib_page_item() {
  * Allows modules to add items into the render array for the entity level IIB.
  * This will be displayed above the entity itself.
  *
- * @param $items
  * @param $entity
- * @param $type
+ *  The entity we're currently getting items to display for.
+ * @param $entity_type
+ *  The type of entity being viewed
  * @param $view_mode
+ *  The view mode which the entity is currently being viewed in.
  *
- * @return array
+ * @return
  *  A renderable array, each return should have a top level key.  Modules with the
  */
-function hook_iib_entity_item($items, $entity, $type, $view_mode) {
+function hook_iib_entity_item($entity, $entity_type, $view_mode) {
   $items['info'] = array(
     '#weight' => -10,
     '#prefix' => '<div>',
@@ -64,8 +66,14 @@ function hook_iib_page_item_alter(&$items) {
  *
  * @param $items
  *  A render array as returned from module_invoke_all for the iib_entity_item hook.
+ * @param $entity
+ *  The entity currently being rendered
+ * @param $extra
+ *  An associative array with keys:
+ *    entity_type : The type of the entity param (i.e. node)
+ *    view_mode : The view mode which the entity is being rendered in.
  */
-function hook_iib_entity_item_alter(&$items) {
+function hook_iib_entity_item_alter(&$items, $entity, $extra) {
   $items['info']['#weight'] = 0;
 }
 

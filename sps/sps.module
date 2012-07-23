@@ -177,41 +177,13 @@ function sps_get_manager() {
 }
 /**
  * implements hook_query_alter()
- * 
+ *
  * This is done on behave of the node_select_query_alter reaction
  */
 function sps_query_alter($query) {
   $data = new stdClass();
   $data->query=$query;
   sps_get_manager()->react('node_select_query_alter', $data);
-}
-
-function sps_init() {
-/*
-  if(isset($_GET['doit'])) {
-    $manager = sps_get_manager();
-
-    $override = new Drupal\sps\Test\Override(array(), $manager);
-    $override->setData(array(
-      array("id" => 1,"revision_id" => 1 , "type" => 'node'),
-      array("id" => 2,"revision_id" => 5 , "type" => 'node')
-    ));
-    $condition = new Drupal\sps\Test\Condition(array('override' => $override), $manager);
-    $condition = $manager->getPlugin('condition', 'first_revision_condition');
-    dpm($condition);
-    $condition->submitElement();
-    dpm($condition->getOverride()->getOverrides());
-    //$condition->override_set = TRUE;
-    $manager->setSiteState($condition);
-   // dpm($manager->getSiteState());
-    dpm($_SESSION);
-   // dpm($manager->getStateController());
-  }
-  */
-  if (isset($_GET['cancel'])){
-    dpm("clear");
-    unset($_SESSION['sps-ctools-object-cache']);
-  }
 }
 
 /**
