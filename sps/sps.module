@@ -4,6 +4,8 @@ define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
 define('SPS_CONFIG_PLUGIN_CONTROLLER', "plugin_controller_settings");
 define('SPS_CONFIG_HOOK_CONTROLLER', "hook_controller_settings");
 define('SPS_CONFIG_STATE_CONTROLLER', "state_controller_settings");
+define('SPS_CONFIG_SITESTATE', "sitestate_settings");
+define('SPS_CONFIG_OVERRIDE_CONTROLLERS', "override_controllers_settings");
 define('SPS_CONFIG_PREFIX', "sps_config");
 define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
@@ -15,11 +17,21 @@ function sps_sps_plugin_types() {
   return array(
     'reaction' => array(
       'interface' => 'Drupal\sps\Plugins\ReactionInterface',
-      'default' => array(
+      'defaults' => array(
         'instance_settings' => array(),
       ),
       'requires' => array(
         'class' => TRUE,
+      ),
+    ),
+    'override_controller' => array(
+      'interface' => 'Drupal\sps\Plugins\OverrideControllerInterface',
+      'defaults' => array(
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+        'class' => TRUE,
+        'implements_controller_api' => TRUE,
       ),
     ),
   );
@@ -28,13 +40,16 @@ function sps_sps_plugin_types() {
 /**
  * Implements hook_hook_info()
  */
-function sps_hook_hook_info() {
-  $hooks = array();
-  foreach(module_invoke_all("sps_plugin_types") as $name => $type) {
-    $hooks["sps_{$name}_plugins"] = array(
-      'group' => 'sps_plugins'
-    );
+function sps_hook_info() {
+  $run = &drupal_static(__FUNCTION__);
+  if($run) {
+    return array();
   }
+  $run = TRUE;
+  foreach(module_invoke_all("sps_plugin_types") as $name => $type) {
+    $hooks["sps_{$name}_plugins"] = array('group' => 'sps_plugins');
+  }
+  return $hooks;
 }
 
 /**
@@ -98,40 +113,49 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+    $controller->set(SPS_CONFIG_STATE_CONTROLLER, array('class'=> '\Drupal\sps\Test\StateController', 'instance_settings' => array()));
   }
 
   return $controller;
 }
 
+/**
+ * Get the default Manager
+ *
+ * @return \Drupal\sps\Manager
+ */
+function sps_get_manager() {
+  $manager = &drupal_static(__FUNCTION__);
+
+  if(!isset($manager)) {
+    $manager = new \Drupal\sps\Manager(sps_get_default_config_controller());
+  }
+
+  return $manager;
+}
+/**
+ * implements hook_query_alter()
+ * 
+ * This is done on behave of the node_select_query_alter reaction
+ */
 function sps_query_alter($query) {
- // $react = new \Drupal\sps\Plugins\Reaction\QueryAlterReaction(array("tables"=> array("base"=>"node", "revision"=>"node_revision")), "bpb");
-//  $react->react($query);
+  $data = new stdClass();
+  $data->query=$query;
+  sps_get_manager()->react('node_select_query_alter', $data);
 }
 
 function sps_init() {
-  $query = db_select("node", 'b');
-  $query->join("node_revision", "r", "r.vid = b.vid");
-  $query->join("user", "u", "u.uid = b.uid");
-  $query->groupBy("b.uid");
-  $query->groupBy("u.name");
-  $query->having("COUNT(b.status) > 1");
-  $query->condition(db_or()->condition("b.sticky", 1)->condition("b.promote", 1));
-  $query->addtag("sps_no_alter");
+  if(isset($_GET['doit'])) {
+    $manager = sps_get_manager();
 
-  //dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
-
-  //dpm(a());
-  //$query->condition("b.status",1);
-  //$query->fields("u", array("u.name"));
-  //$query->addExpression("b.title is NULL", "expression");
-  $query = db_select("node", 'b');
-  $query->join("node_revision", "r", "r.vid = b.vid");
-  $query->fields("b", array("sticky", "title", "status", "uid", "promote"));
-  $query->addExpression("b.title is NULL", "expression");
-  $query->condition("b.status",1);
-  $query->orderBy("b.sticky");
-  $query->orderBy("b.title");
-  //dpm(\Drupal\sps\Test\SelectQuery::selectQuery($query));
-  //dpm(\Drupal\sps\Test\SelectQuery::exportSelect($query));
-
+    $override = new Drupal\sps\Test\Override(array(), $manager);
+    $override->setData(array(
+      array("id" => 1,"revision_id" => 1 , "type" => 'node'),
+      array("id" => 2,"revision_id" => 5 , "type" => 'node')
+    ));
+    $condition = new Drupal\sps\Test\Condition(array('override' => $override), $manager);
+    $condition->override_set = TRUE;
+    $manager->setSiteState($condition);
+  };
 }
+

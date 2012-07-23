@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins\Reaction;
 
-class EntitySelectQueryAlterReaction {
+class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInterface {
   protected $entities = array();
   protected $alias = array();
 
@@ -30,7 +30,7 @@ class EntitySelectQueryAlterReaction {
    *
    * @return \Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction
    */
-  public function __construct($config, \Drupal\sps\Manager $manager) {
+  public function __construct(array $config, \Drupal\sps\Manager $manager) {
     $this->entities = $config['entities'];
   }
 
@@ -167,7 +167,7 @@ class EntitySelectQueryAlterReaction {
         if($datum !== NULL) {
           foreach($this->entities as $entity) {
             //replace revision_id
-            $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".{$entity['revision_id']}, $1)", $datum);
+            $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".revision_id, $1)", $datum);
             if(isset($alias[$entity['revision_table']])) {
 
 
@@ -246,7 +246,8 @@ class EntitySelectQueryAlterReaction {
    * @return \Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction
    *  Self
    */
-  public function react(\SelectQueryInterface $query, $override_controller) {
+  public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
+    $query = $data->query;
     //exit prematurly if we ha a no alter tag
     if($query->hasTag(SPS_NO_ALTER_QUERY_TAG)) {
       return;
@@ -279,7 +280,6 @@ class EntitySelectQueryAlterReaction {
 
       */
     }
-
     return $this;
   }
 }

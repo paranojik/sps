@@ -1,10 +1,16 @@
 <?php
-namespace Drupal\sps\Test;
+namespace Drupal\sps\Plugins\OverrideController;
 
-class TableOverrideStorageController implements \Drupal\sps\Plugins\OverrideController\TableOverrideStorageControllerInterface {
+class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideController\TableOverrideStorageControllerInterface {
   public $table = array();
   public function addOverrideJoin(\SelectQueryInterface $query, $base_alias, $base_id, $overrides_alias) {
-    $alias = $query->addJoin("LEFT OUTER", 'test_override', $overrides_alias, "$base_alias.$base_id = $overrides_alias.id");
+
+    $querys = array();
+    foreach($this->table as $row) {
+      $querys[] = "SELECT {$row['id']} as id, {$row['revision_id']} as revision_id, '{$row['type']}' as type";
+    }
+    $table = db_query_temporary(implode(" UNION ", $querys));
+    $alias = $query->addJoin("LEFT OUTER", $table, $overrides_alias, "$base_alias.$base_id = $overrides_alias.id");
     $tables =& $query->getTables();
     $new_tables = array();
     $found_base = FALSE;
@@ -26,7 +32,7 @@ class TableOverrideStorageController implements \Drupal\sps\Plugins\OverrideCont
   public function set($table) {
     $this->table = $table;
   }
-  
+
   public function __construct(array $config, \Drupal\sps\Manager $manager) {}
 }
 

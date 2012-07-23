@@ -15,6 +15,7 @@ class ConfigController implements \Drupal\sps\StorageControllerInterface {
       'class' => '\Drupal\sps\Test\StateController',
       'instance_settings' => array(),
     ),
+    SPS_CONFIG_SITESTATE => '\Drupal\sps\Test\SiteState',
   );
 
   /**

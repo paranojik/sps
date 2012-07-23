@@ -18,6 +18,7 @@ class DrupalVariableController implements \Drupal\sps\StorageControllerInterface
       'class' => '\Drupal\sps\StorageController\CToolsObjectCache',
       'instance_settings' => array(),
     ),
+    SPS_CONFIG_SITESTATE => '\Drupal\sps\SiteState',
   );
 
 

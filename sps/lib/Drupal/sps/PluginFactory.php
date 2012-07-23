@@ -107,6 +107,8 @@ class PluginFactory implements PluginControllerInterface {
   protected function loadPluginInfo($plugin_type) {
     $this->loadPluginTypeInfo();
     if (empty($this->plugin_info[$plugin_type])) {
+      $this->plugin_info[$plugin_type] = array();
+      
       $hook = "sps_{$plugin_type}_plugins";
       foreach ($this->getHookController()->moduleImplements($hook) as $module) {
         $module_infos = $this->getHookController()->moduleInvoke($module, $hook);
