@@ -134,7 +134,7 @@ function sps_get_manager() {
 }
 /**
  * implements hook_query_alter()
- * 
+ *
  * This is done on behave of the node_select_query_alter reaction
  */
 function sps_query_alter($query) {
@@ -155,9 +155,6 @@ function sps_init() {
     $condition = new Drupal\sps\Test\Condition(array('override' => $override), $manager);
     $condition->override_set = TRUE;
     $manager->setSiteState($condition);
-    dpm($manager->getSiteState());
-    dpm($_SESSION);
-    dpm($manager->getStateController());
   };
 }
 
