@@ -247,3 +247,23 @@ function collection_autocomplete($text = '', $current = '') {
 
   drupal_json_output($data);
 }
+
+/**
+ * Get a list of collections
+ *
+ * @param $exclude
+ *  Collection to exclude
+ *
+ * @return array
+ *  name => label
+ */
+function collection_get_collection_list(array $exclude = array()) {
+  $query = db_select('collection', 'c')
+    ->fields('c', array('name', 'label'));
+
+  if ($exclude) {
+    $query->condition('name', $exclude, 'NOT IN');
+  }
+
+  return $query->execute()->fetchAllKeyed();
+}
