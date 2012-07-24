@@ -68,12 +68,7 @@ function sps_sps_plugin_types() {
  * Implements hook_hook_info()
  */
 function sps_hook_info() {
-  $run = &drupal_static(__FUNCTION__);
-  if($run) {
-    return array();
-  }
-  $run = TRUE;
-  foreach(module_invoke_all("sps_plugin_types") as $name => $type) {
+  foreach(sps_sps_plugin_types() as $name => $type) {
     $hooks["sps_{$name}_plugins"] = array('group' => 'sps_plugins');
   }
   return $hooks;

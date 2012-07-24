@@ -17,7 +17,7 @@ class CToolsObjectCache implements \Drupal\sps\StateControllerInterface {
 
  public function __construct($key = NULL) {
    if($key) {
-     $this->$key = $key;
+     $this->key = $key;
    }
  }
  /**

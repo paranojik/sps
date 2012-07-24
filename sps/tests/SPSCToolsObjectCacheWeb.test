@@ -11,6 +11,7 @@ class SPSCToolsObjectCacheWebTest extends SPSBaseWebTest {
 
   public function testCToolsObjectCache_exists() {
     $control = new \Drupal\sps\StorageController\CToolsObjectCache('test1');
+    $control->clear();
 
     $obj = new stdClass();
     $obj->param = "test";
@@ -21,23 +22,30 @@ class SPSCToolsObjectCacheWebTest extends SPSBaseWebTest {
     $control->clear();
     $this->assertFalse($control->exists(), "::exists is False after running clear"); 
  
-    $control->set($obj);
-
     $account = $this->drupalCreateUser(array());
     $this->drupalLogin($account);
-    /*
     $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test");$c->set("TESTSTRING");return "iset";';
-    //$rtn = "return 'John';";
     sps_test_call_set('SPSCToolsObjectCacheWebTestSet', $rtn);
-    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->exists() ? "SiteController is Set" : "Fail";';
+    $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestSet");
+
+    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->exists() ? "SiteController is Set" : "SiteController is not Set";';
+    sps_test_call_set('SPSCToolsObjectCacheWebTestExists', $rtn);
+
     $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->get();';
-    //$rtn = "return 'SiteController is Set';";
     sps_test_call_set('SPSCToolsObjectCacheWebTestGet', $rtn);
 
-    $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestSet");
+    $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestExists");
+    $this->assertText("SiteController is Set", "::exists should be persistent");
+
     $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestGet");
-    $this->assertText("SiteController is Set");
-    */
+    $this->assertText("TESTSTRING", "::get should be persistent");
+
+    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test");$c->clear() ;return "iset";';
+    sps_test_call_set('SPSCToolsObjectCacheWebTestClear', $rtn);
+    $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestClear");
+
+    $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestExists");
+    $this->assertText("SiteController is not Set", "::clear should be persistent");
   }
 
 
