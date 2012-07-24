@@ -13,6 +13,13 @@ define('SPS_SITE_STATE_STORAGE_KEY', "sps_site_state_storage_key");
 class CToolsObjectCache implements \Drupal\sps\StateControllerInterface {
  protected $obj = 'sps-ctools-object-cache';
  protected $key = 'sps_site_state_storage_key';
+
+
+ public function __construct($key = NULL) {
+   if($key) {
+     $this->$key = $key;
+   }
+ }
  /**
   * Cache away a object
   *
@@ -55,6 +62,7 @@ public function set($cache) {
    */
   public function clear() {
    ctools_include('object-cache');
+   unset($_SESSION[$this->obj][$this->key]);
    return ctools_object_cache_clear($this->obj, $this->key);
   }
 }

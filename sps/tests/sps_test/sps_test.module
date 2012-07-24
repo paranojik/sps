@@ -8,6 +8,13 @@ function sps_test_menu() {
       'page callback' => 'sps_test_test_widget_form',
       'access callback' => TRUE,
     ),
+    'sps_test_call/%' => array(
+      'title' => 'Test SPS Preview Form',
+      'description' => '',
+      'page callback' => 'sps_test_call',
+      'page arguments' => array(1),
+      'access callback' => TRUE,
+    ),
   );
 }
 
@@ -56,3 +63,22 @@ function sps_test_test_widget_form() {
   $manager = new Drupal\sps\Manager($config_controller);
   return $manager->getPreviewForm();
 }
+
+
+function sps_test_call_set($name, $rtn) {
+  $returns = variable_get('sps_test_call', array());
+  $returns[$name] = $rtn;
+  variable_set('sps_test_call', $returns);
+
+}
+function sps_test_call($name) {
+  $returns = variable_get('sps_test_call', array());
+  if(isset($returns[$name]) 
+  ) {
+    return eval($returns[$name]);
+  }
+  else {
+     return '';
+  }
+}
+

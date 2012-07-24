@@ -32,10 +32,10 @@ class StateController implements \Drupal\sps\StateControllerInterface {
     if ($this->exists()) {
       return $this->cache;
     }
-    throw new \Exception("Drupal\\sps\\Test\\PersistentStorageController does not have $name cached");
+    throw new \Exception("Drupal\\sps\\Test\\PersistentStorageController does not have state cached");
   }
 
   public function clear() {
-    $this->cache = NULL;
+    unset($this->cache);
   }
 }
