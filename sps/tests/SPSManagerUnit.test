@@ -27,6 +27,23 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
 
     $this->assertEqual($manager->getSiteState(), $site_state, "Manager::getSiteState returns a site_state storred in the persistent data", "SPS");
   }
+  public function testManager_clearSiteState() {
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $state_controller = $manager->getStateController();
+
+    $table = array(array("id"=> 1, "revision_id" => 2, "type"=>"bob"));
+    $override = new \Drupal\sps\Test\Override(array(), $manager);
+    $override->setData($table);
+    $condition = new\Drupal\sps\Test\Condition(array("override"=> $override, "element_form" => array()), $manager);
+    $site_state = new Drupal\sps\SiteState($condition, array());
+    $manager->getStateController()->set($site_state);
+
+    $manager->clearSiteState();
+
+    $this->assertFalse($manager->getStateController()->exists(), "::clearSiteState should clear the SiteController of the sitestate");
+  }
+
 
   protected function getSiteStateFromPlugins($plugins, $condition_settings, $config) {
     $config_controller = new \Drupal\sps\Test\ConfigController();

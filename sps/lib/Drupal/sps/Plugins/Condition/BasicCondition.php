@@ -71,11 +71,6 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
     $element['widget'] = $this->widget->getPreviewForm(array(), $sub_state);
     $element['widget']['#tree'] = TRUE;
 
-    $element['preview'] = array(
-      '#type' => 'submit',
-      '#value' => 'Preview',
-    );
-
     $element['#sps_validate'] = array($this, 'validateElement');
     $element['#sps_submit'] = array($this, 'submitElement');
 

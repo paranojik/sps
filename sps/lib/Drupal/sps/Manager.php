@@ -200,6 +200,9 @@ class Manager {
     return $this;
   }
   
+  public function clearSiteState() {
+    $this->getStateController()->clear();
+  }
 
   protected function getActiveReactionInfo() {
     return $this->getPluginInfo('reaction');

@@ -6,6 +6,10 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
   public function addOverrideJoin(\SelectQueryInterface $query, $base_alias, $base_id, $overrides_alias) {
 
     $querys = array();
+    // if we do not have any overrides we need to add a dummy one so that the temp table can be created
+    if(empty($this->table)) {
+      $querys[] = "SELECT 0 as id, 0 as revision_id, 'no_type_at_all' as type";
+    }
     foreach($this->table as $row) {
       $querys[] = "SELECT {$row['id']} as id, {$row['revision_id']} as revision_id, '{$row['type']}' as type";
     }
