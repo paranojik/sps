@@ -3,7 +3,7 @@ namespace Drupal\sps\Override;
 
 use \Drupal\sps\Plugins\Override\Override;
 
-class NodeDateOverride extends Override {
+abstract class NodeDateOverride extends Override {
   protected $timestamp;
 
   /**
@@ -21,17 +21,7 @@ class NodeDateOverride extends Override {
    * @return
    *  An array of override vids.
    */
-  public function getOverrides() {
-    //for right now just load node vids that are set to be published in the future
-    $results = db_select('node_revision', 'v')
-      ->fields('v', array('nid, vid'))
-      ->condition('status', 0)
-      ->condition('timestamp', $this->timestamp, '>')
-      ->execute()
-      ->fetchAllAssoc('nid');
-
-    return $results;
-  }
+  abstract public function getOverrides();
 
   /**
    * Set the data for this override.
