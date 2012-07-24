@@ -2,7 +2,7 @@
 
 abstract class SPSBaseWebTest extends DrupalWebTestCase {
   public function setUp() {
-    parent::setUp("sps", "sps_test");
+    parent::setUp("sps", "sps_test", "ctools");
   }
 
   protected function assertCheckInterface($interface, $object, $message) {

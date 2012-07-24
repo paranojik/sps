@@ -1,5 +1,7 @@
 <?php
 namespace Drupal\sps\StorageController;
+
+define('SPS_SITE_STATE_STORAGE_KEY', "sps_site_state_storage_key");
 /**
  * Defines a PersistentStorage Controller that uses ctools_object_cache
  *
@@ -8,8 +10,16 @@ namespace Drupal\sps\StorageController;
  * here. the current code is just for helping to describe direction.
  *
  */
-class CToolsObjectCache implements \Drupal\sps\StorageControllerInterface {
- protected static $obj = 'sps-ctools-object-cache';
+class CToolsObjectCache implements \Drupal\sps\StateControllerInterface {
+ protected $obj = 'sps-ctools-object-cache';
+ protected $key = 'sps_site_state_storage_key';
+
+
+ public function __construct($key = NULL) {
+   if($key) {
+     $this->key = $key;
+   }
+ }
  /**
   * Cache away a object
   *
@@ -19,9 +29,10 @@ class CToolsObjectCache implements \Drupal\sps\StorageControllerInterface {
   *   an object to be cached
   * @return NULL
   */
-public function set($name, $cache) {
-   $_SESSION[$this->obj]['name'] = TRUE;
-   ctools_object_cache_set($this->obj, $name, $cache);
+public function set($cache) {
+   $_SESSION[$this->obj][$this->key] = TRUE;
+   ctools_include('object-cache');
+   ctools_object_cache_set($this->obj, $this->key, $cache);
  }
  /**
   * Test if we have an object cached
@@ -31,8 +42,8 @@ public function set($name, $cache) {
   *   A string name use for retrieval
   * @return bool
   */
- public function exists($name) {
-   return isset($_SESSION[$this->obj]['name']) && $_SESSION[$this->obj]['name'];
+ public function exists() {
+   return isset($_SESSION[$this->obj][$this->key]);
  }
  /**
   * Retrieve a cached object
@@ -41,7 +52,17 @@ public function set($name, $cache) {
   *   A string name use for retrieval
   * @return the object that was cached
   */
- public function get($name) {
-   return ctools_object_cache_get($this->obj, $name);
+ public function get() {
+   ctools_include('object-cache');
+   return ctools_object_cache_get($this->obj, $this->key);
  }
+
+  /*
+   * Clear out the current site state
+   */
+  public function clear() {
+   ctools_include('object-cache');
+   unset($_SESSION[$this->obj][$this->key]);
+   return ctools_object_cache_clear($this->obj, $this->key);
+  }
 }

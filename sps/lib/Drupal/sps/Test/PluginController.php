@@ -8,7 +8,7 @@ class PluginController extends \Drupal\sps\PluginFactory{
     }
   }
 
-  public function __construct($plugin_info) {
+  public function __construct($plugin_info, $manager) {
     $this->setInfo($plugin_info);
   }
   protected function loadPluginInfo($plugin_type) {

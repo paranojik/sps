@@ -14,9 +14,10 @@ class SPSTestReactionUnitTest extends SPSBaseUnitTest {
       'callback' => function($data) { return $data + 1;},
     );
     $reaction = new \Drupal\sps\Test\Reaction($settings, $manager);
+    $override_controller = new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
     $this->assertEqual(
-      $reaction->react(4), 
-      5, 
+      $reaction->react(4, $override_controller),
+      5,
       "Test Reaction::react should modify the data based on the callback passed in in settings", 'SPS'
     );
   }

@@ -5,6 +5,22 @@ namespace Drupal\sps\StorageController;
 class DrupalVariableController implements \Drupal\sps\StorageControllerInterface {
 
   protected $prefix = '';
+  protected $default = array(
+    SPS_CONFIG_PLUGIN_CONTROLLER => array(
+      'class' => '\Drupal\sps\PluginFactory',
+      'instance_settings' => array(),
+    ),
+    SPS_CONFIG_HOOK_CONTROLLER => array(
+      'class' => '\Drupal\sps\DrupalHookController',
+      'instance_settings' => array(),
+    ),
+    SPS_CONFIG_STATE_CONTROLLER => array(
+      'class' => '\Drupal\sps\StorageController\CToolsObjectCache',
+      'instance_settings' => array(),
+    ),
+    SPS_CONFIG_SITESTATE => '\Drupal\sps\SiteState',
+  );
+
 
   /**
    * store our prefix for use with variables
@@ -59,7 +75,7 @@ class DrupalVariableController implements \Drupal\sps\StorageControllerInterface
    */
   public function exists($name) {
     $variable = variable_get($this->getVariableName($name), NULL);
-    return ($variable !== NULL);
+    return ($variable !== NULL) || isset($this->default[$name]);
   }
 
   /**
@@ -72,6 +88,11 @@ class DrupalVariableController implements \Drupal\sps\StorageControllerInterface
    *   the object that
    */
   public function get($name) {
-    return variable_get($this->getVariableName($name), NULL);
+    
+    $variable = variable_get($this->getVariableName($name), NULL);
+    if(($variable === NULL) && isset($this->default[$name])) {
+      $variable = $this->default[$name];
+    }
+    return $variable;
   }
 }

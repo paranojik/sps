@@ -2,18 +2,18 @@
 namespace Drupal\sps\Test;
 
 class Condition extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sps\Plugins\ConditionInterface {
-  protected $element_form;
-  protected $validate_fail_message;
-  protected $validate_fail_name;
-  protected $override;
-  protected $override_set = FALSE;
+  public $element_form;
+  public $validate_fail_message;
+  public $validate_fail_name;
+  public $override;
+  public $override_set = FALSE;
 
   public function __construct(array $settings, \Drupal\sps\Manager $manager) {
     parent::__construct($settings, $manager);
-    $this->element_form = $settings['element_form'];
+    $this->element_form = isset($settings['element_form']) ? $settings['element_form'] : array();
     $this->validate_fail_message = isset($settings['validate_fail_message']) ? $settings['validate_fail_message'] : NULL;
     $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
-    $this->override = $settings['override'];
+    $this->override = isset($settings['override']) ? $settings['override'] : new \Drupal\sps\Test\Override(array(), $manager);
   }
 
   /**

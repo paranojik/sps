@@ -1,11 +1,17 @@
 <?php
-
 function sps_test_menu() {
   return array(
     'test_sps' => array(
       'title' => 'Test SPS Preview Form',
       'description' => '',
       'page callback' => 'sps_test_test_widget_form',
+      'access callback' => TRUE,
+    ),
+    'sps_test_call/%' => array(
+      'title' => 'Test SPS Preview Form',
+      'description' => '',
+      'page callback' => 'sps_test_call',
+      'page arguments' => array(1),
       'access callback' => TRUE,
     ),
   );
@@ -49,9 +55,29 @@ function sps_test_test_widget_form() {
       ),
     )
   );
-  $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
-  $hook_controller = new Drupal\sps\DrupalHookController();
-  $manager = new Drupal\sps\Test\Manager(NULL, NULL, NULL, $plugin_controller, $hook_controller);
-  $manager->config_controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
+  $config_controller = new Drupal\sps\Test\ConfigController();
+  $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
+  $config_controller->default[SPS_CONFIG_PLUGIN_CONTROLLER]['instance_settings'] = $plugins;
+  $config_controller->default[SPS_CONFIG_HOOK_CONTROLLER]['class'] = '\Drupal\sps\DrupalHookController';
+  $manager = new Drupal\sps\Manager($config_controller);
   return $manager->getPreviewForm();
 }
+
+
+function sps_test_call_set($name, $rtn) {
+  $returns = variable_get('sps_test_call', array());
+  $returns[$name] = $rtn;
+  variable_set('sps_test_call', $returns);
+
+}
+function sps_test_call($name) {
+  $returns = variable_get('sps_test_call', array());
+  if(isset($returns[$name]) 
+  ) {
+    return eval($returns[$name]);
+  }
+  else {
+     return '';
+  }
+}
+

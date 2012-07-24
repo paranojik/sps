@@ -1,8 +1,78 @@
 <?php
 
 define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
+define('SPS_CONFIG_PLUGIN_CONTROLLER', "plugin_controller_settings");
+define('SPS_CONFIG_HOOK_CONTROLLER', "hook_controller_settings");
+define('SPS_CONFIG_STATE_CONTROLLER', "state_controller_settings");
+define('SPS_CONFIG_SITESTATE', "sitestate_settings");
+define('SPS_CONFIG_OVERRIDE_CONTROLLERS', "override_controllers_settings");
 define('SPS_CONFIG_PREFIX', "sps_config");
+define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
+
+/**
+ *  Implements hook_sps_plugin_types()
+ */
+function sps_sps_plugin_types() {
+  return array(
+    'reaction' => array(
+      'interface' => 'Drupal\sps\Plugins\ReactionInterface',
+      'defaults' => array(
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+        'class' => TRUE,
+      ),
+    ),
+    'override_controller' => array(
+      'interface' => 'Drupal\sps\Plugins\OverrideControllerInterface',
+      'defaults' => array(
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+        'class' => TRUE,
+        'implements_controller_api' => TRUE,
+      ),
+    ),
+    'override' => array(
+      'interface' => 'Drupal\sps\Plugins\OverrideInterface',
+      'defaults' => array(
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+        'condition' => TRUE,
+      ),
+    ),
+    'condition' => array(
+      'interface' => 'Drupal\sps\Plugins\ConditionInterface',
+      'defaults' => array(
+        'class' => 'Drupal\sps\Plugins\Condition\BasicCondition',
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+      ),
+    ),
+    'widget' => array(
+      'interface' => 'Drupal\sps\Plugins\WidgetInterface',
+      'defaults' => array(
+        'class' => 'Drupal\sps\Plugins\Widget\Widget',
+        'instance_settings' => array(),
+      ),
+      'requires' => array(
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_hook_info()
+ */
+function sps_hook_info() {
+  foreach(sps_sps_plugin_types() as $name => $type) {
+    $hooks["sps_{$name}_plugins"] = array('group' => 'sps_plugins');
+  }
+  return $hooks;
+}
 
 /**
  * A form callback for use by drupal_get_form().
@@ -24,6 +94,16 @@ function sps_condition_preview_form($form, &$form_state) {
     $form_function = $form_state['build_info']['args'][0];
     if (is_callable($form_function)) {
       $form = call_user_func_array($form_function, array($form, $form_state));
+
+      $form['preview'] = array(
+        '#type' => 'submit',
+        '#value' => 'Preview',
+      );
+      $form['Cancel'] = array(
+        '#type' => 'submit',
+        '#value' => 'Cancel',
+      );
+
       return $form;
     }
   }
@@ -37,6 +117,10 @@ function sps_condition_preview_form($form, &$form_state) {
  * should be set to a callable item and the form generated through sps_condition_preview_form.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
+  if($form_state['clicked_button']['#id'] == 'edit-cancel') {
+    sps_get_manager()->clearSiteState();
+    drupal_goto(current_path());
+  }
   if (!empty($form['#sps_validate']) && is_callable($form['#sps_validate'])) {
     call_user_func_array($form['#sps_validate'], array($form, $form_state));
   }
@@ -53,6 +137,7 @@ function sps_condition_preview_form_submit($form, &$form_state) {
   if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
     call_user_func_array($form['#sps_submit'], array($form, $form_state));
   }
+  sps_get_manager()->previewFormSubmitted();
 }
 
 /**
@@ -65,7 +150,56 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+    $controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'first_revision_condition'));
   }
 
   return $controller;
+}
+
+/**
+ * Get the default Manager
+ *
+ * @return \Drupal\sps\Manager
+ */
+function sps_get_manager() {
+  $manager = &drupal_static(__FUNCTION__);
+
+  if(!isset($manager)) {
+    $manager = new \Drupal\sps\Manager(sps_get_default_config_controller());
+  }
+
+  return $manager;
+}
+/**
+ * implements hook_query_alter()
+ *
+ * This is done on behave of the node_select_query_alter reaction
+ */
+function sps_query_alter($query) {
+  $data = new stdClass();
+  $data->query=$query;
+  sps_get_manager()->react('node_select_query_alter', $data);
+}
+
+/**
+ * implements hook_entitY_info_alter
+ *
+ * changing the node controller on behalf of the node_load Reaction
+ */
+function sps_entity_info_alter(&$entity_info) {
+  $entity_info['node']['controller class'] = '\Drupal\sps\NodeController';
+}
+
+/**
+ * implements hook_iib_page_item()
+ */
+function sps_iib_page_item() {
+  $manager = sps_get_manager();
+  $items['left'] = array(
+    '#weight' => -10,
+    '#prefix' => '<div>',
+    '#markup' => drupal_render($manager->getPreviewForm()),
+    '#suffix' => '</div>',
+  );
+  return $items;
 }

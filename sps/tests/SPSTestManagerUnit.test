@@ -8,42 +8,25 @@ class SPSTestManagerUnitTest extends SPSBaseUnitTest {
     );
   }
   public function testTestManager_DefaultSettings() {
-    $start['state_controller'] = new \Drupal\sps\Test\StorageController();
-    $start['override_controller'] = new \Drupal\sps\Test\StorageController();
-    $start['config_controller'] = new \Drupal\sps\Test\StorageController();
-    $start['plugin_controller'] = new \Drupal\sps\Test\PluginController(array());
-    $start['hook_controller'] = new \Drupal\sps\Test\HookController();
   
     $manager = new \Drupal\sps\Test\Manager();
 
     $end['state_controller'] = $manager->state_controller;
-    $end['override_controller'] = $manager->override_controller;
     $end['config_controller'] = $manager->config_controller;
     $end['plugin_controller'] = $manager->plugin_controller;
     $end['hook_controller'] = $manager->hook_controller;
+    $start['state_controller'] = new \Drupal\sps\Test\StateController(array(), $manager);
+    $start['config_controller'] = new \Drupal\sps\Test\ConfigController();
+    $start['plugin_controller'] = new \Drupal\sps\Test\PluginController(array(), $manager);
+    $start['hook_controller'] = new \Drupal\sps\Test\HookController(array(), $manager);
     $this->assertEqual($start, $end, "A new Test Manager with no params stores default empty test controllers", "SPS");
   }
   public function testTestManager_AlterSettings() {
-    $start['state_controller'] = new \Drupal\sps\Test\StorageController(array("data"=>"a"));
-    $start['override_controller'] = new \Drupal\sps\Test\StorageController(array("data"=>"b"));
-    $start['config_controller'] = new \Drupal\sps\Test\StorageController(array("data"=>"c"));
-    $start['plugin_controller'] = new \Drupal\sps\Test\PluginController(array("widget"=>array()));
-    $start['hook_controller'] = new \Drupal\sps\Test\HookController();
-    $start['hook_controller']->setInvokeAll("test", function() {return 1;});
+    $start['config_controller'] = new \Drupal\sps\StorageController\DrupalVariableController();
   
-    $manager = new \Drupal\sps\Test\Manager(
-      $start['state_controller'],
-      $start['override_controller'],
-      $start['config_controller'],
-      $start['plugin_controller'],
-      $start['hook_controller']
-    );
+    $manager = new \Drupal\sps\Test\Manager($start['config_controller']);
 
-    $end['state_controller'] = $manager->state_controller;
-    $end['override_controller'] = $manager->override_controller;
     $end['config_controller'] = $manager->config_controller;
-    $end['plugin_controller'] = $manager->plugin_controller;
-    $end['hook_controller'] = $manager->hook_controller;
     $this->assertEqual($start, $end, "A new Test Manager with params stores them as controllers", "SPS");
   }
 }

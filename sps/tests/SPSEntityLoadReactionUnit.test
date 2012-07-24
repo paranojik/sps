@@ -1,0 +1,29 @@
+<?php
+class SPSEntityLoadReactionUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Entity Load Reaction Unit Tests',
+      'description' => 'Test the public interface to Entity Load Reaction objects',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testEntityLoadReaction_react() {
+    $manager =  new \Drupal\sps\Test\Manager();
+    $settings = array(
+      'type' => 'node',
+    );
+    $reaction = new \Drupal\sps\Plugins\Reaction\EntityLoadReaction($settings, $manager);
+    $override_controller = new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
+    $override_controller->set(array(
+      array('id' => 5, 'revision_id' => 10, 'type' =>'node'),
+      array('id' => 7, 'revision_id' => 8, 'type' =>'node'),
+    ));
+    $this->assertEqual(
+      $reaction->react(7, $override_controller),
+      8,
+      "::react should return the revision_id from the controller matching on id and type", 'SPS'
+    );
+  }
+
+}

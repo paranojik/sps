@@ -59,6 +59,7 @@ class HookController implements HookControllerInterface {
     if(isset($this->invoke[$hook])) {
       return array_keys($this->invoke[$hook]);
     }
+    return array();
   }
 
   public function drupalGetForm($form){
