@@ -284,7 +284,7 @@ class Manager {
   public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
 
-    return $this->getHookController()->drupalGetForm('sps_condition_preview_form', array($root_condition, 'getElement'));
+    return $this->getHookController()->drupalGetForm('sps_condition_preview_form', $root_condition);
   }
 
   /**

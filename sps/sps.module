@@ -91,37 +91,28 @@ function sps_hook_info() {
  */
 function sps_condition_preview_form($form, &$form_state) {
   if (!empty($form_state['build_info']['args'][0])) {
-    $form_function = $form_state['build_info']['args'][0];
-    if (is_callable($form_function)) {
-      $form = array();
-      //$form = call_user_func_array($form_function, array($form, $form_state));
-      if(is_array($form_function)) {
-        $method= $form_function[1];
-        $form = $form_function[0]->$method($form, $form_state);
-      }
-      else {
-        $form = $form_function($form, $form_state);
-      }
+    $condition = $form_state['build_info']['args'][0];
+    $form_state['root_condition'] = $condition;
+    $form = $condition->getElement($form, $form_state);
 
-      $form['preview'] = array(
-        '#type' => 'submit',
-        '#value' => 'Preview',
-      );
-      $form['Cancel'] = array(
-        '#type' => 'submit',
-        '#value' => 'Cancel',
-      );
-      return $form;
-    }
+    $form['preview'] = array(
+      '#type' => 'submit',
+      '#value' => 'Preview',
+    );
+    $form['Cancel'] = array(
+      '#type' => 'submit',
+      '#value' => 'Cancel',
+    );
+    return $form;
   }
 }
 
 /**
- * A validate callback for forms which will subsequently call the forms
- * #sps_validate function.
+ * A validate will find the root condition (from the build args)
+ * and call its validateElement method
  *
- * This allows us to call class methods as form validators.  To use #sps_validate,
- * should be set to a callable item and the form generated through sps_condition_preview_form.
+ * also if we have a cancel selected we clear the site state
+ *
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
   // if cancel was press blow away the site state and refresh
@@ -129,31 +120,28 @@ function sps_condition_preview_form_validate($form, &$form_state) {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
   }
-  if (!empty($form['#sps_validate']) && is_callable($form['#sps_validate'])) {
-    call_user_func_array($form['#sps_validate'], array($form, $form_state));
+  if (!empty($form_state['build_info']['args'][0])) {
+    $condition = $form_state['build_info']['args'][0];
+    $form_state['root_condition'] = $condition;
+    $condition->validateElement($form, $form_state);
   }
 }
 
 /**
- * A submit callback for forms which will subsequently call the forms
- * #sps_submit function.
+ * A submit will find the root condition (from the build args)
+ * and call its submitElement method
  *
- * This allows us to call class methods as form submitters.  To use #sps_submit,
- * should be set to a callable item and the form generated through sps_condition_preview_form.
+ * Then the manager is notified that the sumbit happened.
+ *
  */
 function sps_condition_preview_form_submit($form, &$form_state) {
-  if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
-    call_user_func_array($form['#sps_submit'], array($form, $form_state));
-    $form_function = $form['#sps_submit'];
-    if(is_array($form_function)) {
-       $method= $form_function[1];
-       $form = $form_function[0]->$method($form, $form_state);
-    }
-    else {
-      $form = $form_function($form, $form_state);
-    }
+  
+  if (!empty($form_state['build_info']['args'][0])) {
+    $condition = $form_state['build_info']['args'][0];
+    $form_state['root_condition'] = $condition;
+    $condition->submitElement($form, $form_state);
+    sps_get_manager()->previewFormSubmitted($condition);
   }
-  sps_get_manager()->previewFormSubmitted($form_state['root_condition']);
 }
 
 /**

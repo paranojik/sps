@@ -205,7 +205,6 @@ class WrapperCondition extends BasicCondition {
     $selector = $active_condition_key . 'selector';
     $this->form_state = $form_state;
     $this->form_state['values'][$wrapper][$selector] = $this->active_condition;
-    $form_state['root_condition'] = $this;
     return $this;
   }
 
