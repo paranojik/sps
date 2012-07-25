@@ -93,7 +93,15 @@ function sps_condition_preview_form($form, &$form_state) {
   if (!empty($form_state['build_info']['args'][0])) {
     $form_function = $form_state['build_info']['args'][0];
     if (is_callable($form_function)) {
-      $form = call_user_func_array($form_function, array($form, $form_state));
+      $form = array();
+      //$form = call_user_func_array($form_function, array($form, $form_state));
+      if(is_array($form_function)) {
+        $method= $form_function[1];
+        $form = $form_function[0]->$method($form, $form_state);
+      }
+      else {
+        $form = $form_function($form, $form_state);
+      }
 
       $form['preview'] = array(
         '#type' => 'submit',
@@ -103,7 +111,6 @@ function sps_condition_preview_form($form, &$form_state) {
         '#type' => 'submit',
         '#value' => 'Cancel',
       );
-
       return $form;
     }
   }
@@ -117,6 +124,7 @@ function sps_condition_preview_form($form, &$form_state) {
  * should be set to a callable item and the form generated through sps_condition_preview_form.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
+  // if cancel was press blow away the site state and refresh
   if($form_state['clicked_button']['#id'] == 'edit-cancel') {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
@@ -136,8 +144,19 @@ function sps_condition_preview_form_validate($form, &$form_state) {
 function sps_condition_preview_form_submit($form, &$form_state) {
   if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
     call_user_func_array($form['#sps_submit'], array($form, $form_state));
+    $form_function = $form['#sps_submit'];
+     if(is_array($form_function)) {
+        $method= $form_function[1];
+        $form = $form_function[0]->$method($form, $form_state);
+      }
+      else {
+        $form = $form_function($form, $form_state);
+      }
+
+
+
   }
-  sps_get_manager()->previewFormSubmitted();
+  sps_get_manager()->previewFormSubmitted($form_state['root_condition']);
 }
 
 /**
@@ -150,9 +169,7 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
-    $controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'first_revision_condition'));
   }
-
   return $controller;
 }
 
@@ -202,4 +219,24 @@ function sps_iib_page_item() {
     '#suffix' => '</div>',
   );
   return $items;
+}
+
+/**
+* This callback is used by the wrapper condition to change out which 
+* condition is being used
+*
+* @see \Drupal\sps\Plugins\Condition\WrapperCondition::getElement()
+* @param $form
+*   A drupal form array
+* @param $form_state
+*  A drupal form state array
+* @return 
+*   a drupal render array
+*/
+function sps_wrapper_condition_ajax_callback($form, $form_state) {
+  array_pop($form_state['triggering_element']['#parents']);
+  foreach($form_state['triggering_element']['#parents'] as $key) {
+    $form = $form[$key];
+  }
+  return $form;
 }

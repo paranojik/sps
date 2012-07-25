@@ -5,6 +5,12 @@ namespace Drupal\sps\StorageController;
 class DrupalVariableController implements \Drupal\sps\StorageControllerInterface {
 
   protected $prefix = '';
+
+  /*
+   * Hold the default config values 
+   *
+   * @var Array
+   */
   protected $default = array(
     SPS_CONFIG_PLUGIN_CONTROLLER => array(
       'class' => '\Drupal\sps\PluginFactory',
@@ -19,6 +25,7 @@ class DrupalVariableController implements \Drupal\sps\StorageControllerInterface
       'instance_settings' => array(),
     ),
     SPS_CONFIG_SITESTATE => '\Drupal\sps\SiteState',
+    SPS_CONFIG_ROOT_CONDITION => array('name' => 'default_root_condition'),
   );
 
 

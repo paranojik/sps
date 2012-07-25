@@ -6,6 +6,7 @@ use Drupal\sps\Plugins\ConditionInterface;
 
 class BasicCondition extends AbstractPlugin implements ConditionInterface {
   protected $overrides;
+  protected $overrides_info;
   protected $widget;
   protected $manager;
   protected $override_set = FALSE;
@@ -24,7 +25,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    *  The current instance of the sps manager.
    */
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
-    $this->overrides = $manager->getPluginByMeta('override', 'condition', $config['name']);
+    $this->overrides_info = $manager->getPluginByMeta('override', 'condition', $config['name']);
 
     if (!empty($config['widget']) && is_string($config['widget'])) {
       $config['widget'] = $manager->getPlugin('widget', $config['widget']);
@@ -71,8 +72,8 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
     $element['widget'] = $this->widget->getPreviewForm(array(), $sub_state);
     $element['widget']['#tree'] = TRUE;
 
-    $element['#sps_validate'] = array($this, 'validateElement');
-    $element['#sps_submit'] = array($this, 'submitElement');
+    //$element['#sps_validate'] = array($this, 'validateElement');
+    //$element['#sps_submit'] = array($this, 'submitElement');
 
     return $element;
   }
@@ -98,8 +99,8 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   public function submitElement($element, &$form_state) {
     $values = $this->handleWidgetForm($element, $form_state, 'extractValues');
-    foreach($this->overrides as $key=>$override) {
-      $override = $this->manager->getPlugin('override', $override['name']);
+    foreach($this->overrides_info as $key=>$override_info) {
+      $override = $this->manager->getPlugin('override', $override_info['name']);
       if (!empty($override)) {
         $override->setData($values);
         $this->overrides[$key] = $override;
