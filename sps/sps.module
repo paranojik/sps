@@ -145,16 +145,13 @@ function sps_condition_preview_form_submit($form, &$form_state) {
   if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
     call_user_func_array($form['#sps_submit'], array($form, $form_state));
     $form_function = $form['#sps_submit'];
-     if(is_array($form_function)) {
-        $method= $form_function[1];
-        $form = $form_function[0]->$method($form, $form_state);
-      }
-      else {
-        $form = $form_function($form, $form_state);
-      }
-
-
-
+    if(is_array($form_function)) {
+       $method= $form_function[1];
+       $form = $form_function[0]->$method($form, $form_state);
+    }
+    else {
+      $form = $form_function($form, $form_state);
+    }
   }
   sps_get_manager()->previewFormSubmitted($form_state['root_condition']);
 }
