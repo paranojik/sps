@@ -42,16 +42,16 @@ class WrapperCondition extends BasicCondition {
   }
 
   /**
-  * Pull Conditions from the plugin system and load them all in as sub conditions
-  *
-  * @return 
-  *   Self
-  */
+   * Pull Conditions from the plugin system and load them all in as sub conditions
+   *
+   * @return \Drupal\sps\Plugins\Condition\WrapperCondition
+   *  Self
+   */
   protected function setDefaultConditions() {
     foreach($this->manager->getPluginInfo('condition') as $name => $info) {
       if(!isset($info["root_condition"])) {
         $this->conditions[$name] = $this->manager->getPlugin('condition', $name);
-        $this->conditions_config[$name]['title'] = $name; 
+        $this->conditions_config[$name]['title'] = $name;
       }
     }
     return $this;
@@ -72,7 +72,7 @@ class WrapperCondition extends BasicCondition {
   /**
   * generate a key to use as the basis for the form items
   *
-  * This is here so that when recusion is added this can be change to 
+  * This is here so that when recusion is added this can be change to
   * something that varies for each instance.
   *
   * @return String
@@ -106,7 +106,7 @@ class WrapperCondition extends BasicCondition {
     $wrapper_wrapper = "$wrapper-wrapper";
 
     $element[$wrapper] = array(
-      '#type' => 'container', 
+      '#type' => 'container',
       '#tree' => TRUE,
       '#prefix' => "<div id = '$wrapper_wrapper'>",
       '#suffix' => "</div>",
@@ -115,7 +115,7 @@ class WrapperCondition extends BasicCondition {
     // this should be set after an ajax call to select a condition
     if(isset($form_state['values'][$wrapper][$selector])) {
       $this->active_condition = $form_state['values'][$wrapper][$selector];
-      $condition = $this->conditions[$this->active_condition]; 
+      $condition = $this->conditions[$this->active_condition];
       $sub_state = $form_state;
       $sub_state['values'] = isset($form_state['values'][$wrapper][$this->active_condition]) ? $form_state['values'][$wrapper][$this->active_condition] : array();
       $element[$wrapper][$this->active_condition] = $condition->getElement(array(), $sub_state);
@@ -155,14 +155,21 @@ class WrapperCondition extends BasicCondition {
   }
 
 
+  /**
+   * @param $element
+   * @param $form_state
+   *
+   * @return array
+   */
   protected function extractSubState($element, $form_state) {
-    
+
     $active_condition_key = $this->getActiveConditionKey();
     $wrapper = $active_condition_key .'wrapper';
     $selector = $active_condition_key . 'selector';
 
     $sub_state = $form_state;
-    $sub_state['values'] = isset($form_state['values'][$wrapper][$this->active_condition]) ? $form_state['values'][$wrapper][$this->active_condition] : array();
+    $sub_state['values'] = isset($form_state['values'][$wrapper][$this->active_condition]) ?
+      $form_state['values'][$wrapper][$this->active_condition] : array();
 
     $sub_element = $element[$wrapper][$this->active_condition];
 
@@ -221,7 +228,7 @@ class WrapperCondition extends BasicCondition {
    * @param $method
    *  A string which is the name of the method to call on the widget
    *
-   * @return
+   * @return mixed
    *  Null
    */
   protected function handleWidgetForm($element, &$form_state, $method) {

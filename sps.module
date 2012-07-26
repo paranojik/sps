@@ -65,7 +65,7 @@ function sps_sps_plugin_types() {
 }
 
 /**
- * Implements hook_hook_info()
+ * Implements hook_hook_info().
  */
 function sps_hook_info() {
   foreach(sps_sps_plugin_types() as $name => $type) {
@@ -131,11 +131,11 @@ function sps_condition_preview_form_validate($form, &$form_state) {
  * A submit will find the root condition (from the build args)
  * and call its submitElement method
  *
- * Then the manager is notified that the sumbit happened.
+ * Then the manager is notified that the submit happened.
  *
  */
 function sps_condition_preview_form_submit($form, &$form_state) {
-  
+
   if (!empty($form_state['build_info']['args'][0])) {
     $condition = $form_state['build_info']['args'][0];
     $form_state['root_condition'] = $condition;
@@ -173,7 +173,7 @@ function sps_get_manager() {
   return $manager;
 }
 /**
- * implements hook_query_alter()
+ * Implements hook_query_alter().
  *
  * This is done on behave of the node_select_query_alter reaction
  */
@@ -184,7 +184,7 @@ function sps_query_alter($query) {
 }
 
 /**
- * implements hook_entitY_info_alter
+ * Implements hook_entity_info_alter().
  *
  * changing the node controller on behalf of the node_load Reaction
  */
@@ -193,21 +193,22 @@ function sps_entity_info_alter(&$entity_info) {
 }
 
 /**
- * implements hook_iib_page_item()
+ * Implements hook_iib_page_item().
  */
 function sps_iib_page_item() {
   $manager = sps_get_manager();
+  $preview_form = $manager->getPreviewForm();
   $items['left'] = array(
     '#weight' => -10,
     '#prefix' => '<div>',
-    '#markup' => drupal_render($manager->getPreviewForm()),
+    '#markup' => drupal_render($preview_form),
     '#suffix' => '</div>',
   );
   return $items;
 }
 
 /**
-* This callback is used by the wrapper condition to change out which 
+* This callback is used by the wrapper condition to change out which
 * condition is being used
 *
 * @see \Drupal\sps\Plugins\Condition\WrapperCondition::getElement()
@@ -215,7 +216,7 @@ function sps_iib_page_item() {
 *   A drupal form array
 * @param $form_state
 *  A drupal form state array
-* @return 
+* @return
 *   a drupal render array
 */
 function sps_wrapper_condition_ajax_callback($form, $form_state) {

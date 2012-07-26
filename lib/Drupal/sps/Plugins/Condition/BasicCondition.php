@@ -125,8 +125,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    * @param $method
    *  A string which is the name of the method to call on the widget
    *
-   * @return
-   *  Null
+   * @return mixed
    */
   protected function handleWidgetForm($element, &$form_state, $method) {
     $widget_el = $element['widget'];
