@@ -7,4 +7,6 @@ class SPSERSIntegrationWebTest extends SPSBaseWebTest {
       'group' => 'SPSPostTests',
     );
   }
+
+  
 }
