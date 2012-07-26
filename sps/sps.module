@@ -65,7 +65,7 @@ function sps_sps_plugin_types() {
 }
 
 /**
- * Implements hook_hook_info()
+ * Implements hook_hook_info().
  */
 function sps_hook_info() {
   foreach(sps_sps_plugin_types() as $name => $type) {
@@ -91,53 +91,57 @@ function sps_hook_info() {
  */
 function sps_condition_preview_form($form, &$form_state) {
   if (!empty($form_state['build_info']['args'][0])) {
-    $form_function = $form_state['build_info']['args'][0];
-    if (is_callable($form_function)) {
-      $form = call_user_func_array($form_function, array($form, $form_state));
+    $condition = $form_state['build_info']['args'][0];
+    $form_state['root_condition'] = $condition;
+    $form = $condition->getElement($form, $form_state);
 
-      $form['preview'] = array(
-        '#type' => 'submit',
-        '#value' => 'Preview',
-      );
-      $form['Cancel'] = array(
-        '#type' => 'submit',
-        '#value' => 'Cancel',
-      );
-
-      return $form;
-    }
+    $form['preview'] = array(
+      '#type' => 'submit',
+      '#value' => 'Preview',
+    );
+    $form['Cancel'] = array(
+      '#type' => 'submit',
+      '#value' => 'Cancel',
+    );
+    return $form;
   }
 }
 
 /**
- * A validate callback for forms which will subsequently call the forms
- * #sps_validate function.
+ * A validate will find the root condition (from the build args)
+ * and call its validateElement method
  *
- * This allows us to call class methods as form validators.  To use #sps_validate,
- * should be set to a callable item and the form generated through sps_condition_preview_form.
+ * also if we have a cancel selected we clear the site state
+ *
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
+  // if cancel was press blow away the site state and refresh
   if($form_state['clicked_button']['#id'] == 'edit-cancel') {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
   }
-  if (!empty($form['#sps_validate']) && is_callable($form['#sps_validate'])) {
-    call_user_func_array($form['#sps_validate'], array($form, $form_state));
+  if (!empty($form_state['build_info']['args'][0])) {
+    $condition = $form_state['build_info']['args'][0];
+    $form_state['root_condition'] = $condition;
+    $condition->validateElement($form, $form_state);
   }
 }
 
 /**
- * A submit callback for forms which will subsequently call the forms
- * #sps_submit function.
+ * A submit will find the root condition (from the build args)
+ * and call its submitElement method
  *
- * This allows us to call class methods as form submitters.  To use #sps_submit,
- * should be set to a callable item and the form generated through sps_condition_preview_form.
+ * Then the manager is notified that the submit happened.
+ *
  */
 function sps_condition_preview_form_submit($form, &$form_state) {
-  if (!empty($form['#sps_submit']) && is_callable($form['#sps_submit'])) {
-    call_user_func_array($form['#sps_submit'], array($form, $form_state));
+
+  if (!empty($form_state['build_info']['args'][0])) {
+    $condition = $form_state['build_info']['args'][0];
+    $form_state['root_condition'] = $condition;
+    $condition->submitElement($form, $form_state);
+    sps_get_manager()->previewFormSubmitted($condition);
   }
-  sps_get_manager()->previewFormSubmitted();
 }
 
 /**
@@ -150,9 +154,7 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
-    $controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'first_revision_condition'));
   }
-
   return $controller;
 }
 
@@ -171,7 +173,7 @@ function sps_get_manager() {
   return $manager;
 }
 /**
- * implements hook_query_alter()
+ * Implements hook_query_alter().
  *
  * This is done on behave of the node_select_query_alter reaction
  */
@@ -182,7 +184,7 @@ function sps_query_alter($query) {
 }
 
 /**
- * implements hook_entitY_info_alter
+ * Implements hook_entity_info_alter().
  *
  * changing the node controller on behalf of the node_load Reaction
  */
@@ -191,7 +193,7 @@ function sps_entity_info_alter(&$entity_info) {
 }
 
 /**
- * implements hook_iib_page_item()
+ * Implements hook_iib_page_item().
  */
 function sps_iib_page_item() {
   $manager = sps_get_manager();
@@ -203,4 +205,24 @@ function sps_iib_page_item() {
     '#suffix' => '</div>',
   );
   return $items;
+}
+
+/**
+* This callback is used by the wrapper condition to change out which
+* condition is being used
+*
+* @see \Drupal\sps\Plugins\Condition\WrapperCondition::getElement()
+* @param $form
+*   A drupal form array
+* @param $form_state
+*  A drupal form state array
+* @return
+*   a drupal render array
+*/
+function sps_wrapper_condition_ajax_callback($form, $form_state) {
+  array_pop($form_state['triggering_element']['#parents']);
+  foreach($form_state['triggering_element']['#parents'] as $key) {
+    $form = $form[$key];
+  }
+  return $form;
 }
