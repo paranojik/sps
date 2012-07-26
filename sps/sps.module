@@ -117,7 +117,7 @@ function sps_condition_preview_form($form, &$form_state) {
  * should be set to a callable item and the form generated through sps_condition_preview_form.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
-  if($form_state['clicked_button']['#id'] == 'edit-cancel') {
+  if($form_state['clicked_button']['#id'] == 'edit-cancel' || !empty($_GET['clear'])) {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
   }
@@ -150,7 +150,7 @@ function sps_get_default_config_controller() {
 
   if(!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
-    $controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'first_revision_condition'));
+    $controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'date_condition'));
   }
 
   return $controller;
