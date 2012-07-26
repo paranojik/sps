@@ -1,20 +1,6 @@
 <?php
 
 /**
- * implements hook_sos_condition_plugins
- */
-function sps_sps_condition_plugins() {
-  return array(
-    'default_root_condition'=> array(
-      'class' => '\Drupal\sps\Plugins\Condition\WrapperCondition',
-      'instance_settings' => array(
-      ),
-      'root_condition' => 'True',
-    ),
-  );
-}
-
-/**
  * implements hook_sps_reaction_plugins()
  */
 function sps_sps_reaction_plugins() {
@@ -86,6 +72,12 @@ function sps_sps_condition_plugins() {
         'name' => 'date_condition',
         'widget' => 'date_widget',
       ),
+    ),
+    'default_root_condition'=> array(
+      'class' => '\Drupal\sps\Plugins\Condition\WrapperCondition',
+      'instance_settings' => array(
+      ),
+      'root_condition' => 'True',
     ),
   );
 }
