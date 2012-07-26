@@ -13,8 +13,8 @@ class ERSOverride extends NodeDateOverride {
   public function getOverrides() {
     $select = db_select('ers_schedule', 'es')
       ->fields('es', array('schedule_id', 'entity_type', 'entity_id', 'revision_id'))
-      ->condition('publish_date', $this->timestamp, '<=')
       ->condition('completed', 0)
+      ->condition('publish_date', $this->timestamp, '<=')
       ->orderBy('publish_date')
       ->orderBy('revision_id');
 
