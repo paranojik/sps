@@ -14,14 +14,6 @@ abstract class NodeDateOverride extends Override {
     parent::__construct($settings, $manager);
   }
 
-	/**
-   * Returns a list of vid's to override the default vids to load.
-   *
-   * @return
-   *  An array of override vids.
-   */
-  abstract public function getOverrides();
-
   /**
    * Set the data for this override.
    *

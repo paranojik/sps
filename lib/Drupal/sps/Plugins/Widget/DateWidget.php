@@ -11,7 +11,7 @@ class DateWidget extends Widget {
    */
   public function getPreviewForm($element, &$form_state) {
     $element['#type'] = 'fieldset';
-    $element['#title'] = t('Date/Time:');
+    $element['#title'] = empty($this->settings['title']) ? t('Date/Time:') : $this->settings['title'];
 
     $element['preview_date'] = array(
       '#type' => 'date',
