@@ -284,17 +284,17 @@ class Manager {
   public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
 
-    return $this->getHookController()->drupalGetForm('sps_condition_preview_form', array($root_condition, 'getElement'));
+    return $this->getHookController()->drupalGetForm('sps_condition_preview_form', $root_condition);
   }
 
   /**
    * Notify the manager that the preview form submission is complete.
    *
+   *
    * @return \Drupal\sps\Manager
    *  Self
    */
-  public function previewFormSubmitted() {
-    $root_condition = $this->getRootCondition();
+  public function previewFormSubmitted($root_condition) {
     $this->setSiteState($root_condition);
     return $this;
   }
@@ -311,13 +311,12 @@ class Manager {
   *   the current root condition object
   */
   protected function getRootCondition() {
-    if(!isset($this->root_condition)) {
-      $settings = $this->config_controller->get(SPS_CONFIG_ROOT_CONDITION);
-      $root_condition_plugin = $settings['name'];
-      $this->root_condition = $this->getPlugin('condition', $root_condition_plugin);
-      //$this->root_condition->setConfig($settings['config']);
+    if($site_state = $this->getSiteState()) {
+      return $site_state->getCondition();
     }
-    return $this->root_condition;
+    $settings = $this->config_controller->get(SPS_CONFIG_ROOT_CONDITION);
+    $root_condition_plugin = $settings['name'];
+    return  $this->getPlugin('condition', $root_condition_plugin);
   }
 
   /**

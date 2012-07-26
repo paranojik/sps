@@ -88,15 +88,12 @@ class SPSConditionIntegrationTest extends SPSBaseUnitTest {
       )
     );
 
-    $state_controller = new Drupal\sps\Test\StorageController();
-    $override_controller = new Drupal\sps\Test\StorageController();
-
-    $config_controller = new Drupal\sps\Test\StorageController();
+    $config_controller = new Drupal\sps\Test\ConfigController();
     $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
 
-    $plugin_controller = new Drupal\sps\Test\PluginController($plugins);
+    $config_controller->default[SPS_CONFIG_PLUGIN_CONTROLLER]['instance_settings'] = $plugins;
     $hook_controller = new Drupal\sps\Test\HookController();
 
-    return new Drupal\sps\Manager($state_controller, $override_controller, $config_controller, $plugin_controller, $hook_controller);
+    return new Drupal\sps\Test\Manager($config_controller);
   }
 }

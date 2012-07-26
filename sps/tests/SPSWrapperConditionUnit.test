@@ -1,0 +1,11 @@
+<?php
+class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS Wrapper Condition Unit Tests',
+      'description' => 'Test the public interface to the WrapperCondition object',
+      'group' => 'SPS',
+    );
+  }
+}
+
