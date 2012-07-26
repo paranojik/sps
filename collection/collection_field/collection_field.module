@@ -206,7 +206,8 @@ function collection_field_collection_usage_info() {
  */
 function collection_field_view_collection_usage($collection, $entity_type, $field_names) {
   $build = array();
-
+  // @TODO something should go here
+/*
   foreach ($field_names as $field_name) {
     $query = _collection_field_build_query($field_name);
     $column_name = collection_field_get_table_info('column', $field_name);
@@ -225,5 +226,7 @@ function collection_field_view_collection_usage($collection, $entity_type, $fiel
         '#markup' => l()
       )
     }
-  }
+  }*/
+
+  return $build;
 }
