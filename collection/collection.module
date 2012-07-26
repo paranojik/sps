@@ -12,6 +12,14 @@ function collection_menu() {
     'access arguments' => array('access collection list')
   );
 
+  $items['admin/structure/collection/%collection'] = array(
+    'type' => MENU_NORMAL_ITEM,
+    'page callback' => 'collection_view',
+    'access arguments' => array('view', 3),
+    'access callback' => 'collection_access',
+    'page arguments' => array(3),
+  );
+
   return $items;
 }
 
@@ -76,7 +84,8 @@ function collection_load_multiple($cids = array(), $conditions = array(), $reset
  * Load a collection
  */
 function collection_load($name) {
-  return entity_load('collection', array($name));
+  $collection = entity_load('collection', array($name));
+  return reset($collection);
 }
 
 /**
@@ -216,17 +225,6 @@ function collection_permission() {
   return $perms;
 }
 
-function collection_view($collection) {
-  /*$form['usage'] = array(
-    '#type' => 'container',
-    '#attributes' => array(
-      'class' => array('collection-usage-tab'),
-    ),
-    '#process' => 'collection_form_process_usage',
-    '#theme' => 'collection_form_usage',
-  );*/
-}
-
 /**
  * A function other modules can use for auto-complete Lists
  *
@@ -266,4 +264,82 @@ function collection_get_collection_list(array $exclude = array()) {
   }
 
   return $query->execute()->fetchAllKeyed();
+}
+
+function collection_view($collection) {
+  $title = t('Usage report for @title', array('@title' => $collection->label()));
+  drupal_set_title($title);
+  drupal_add_library('system', 'ui.tabs');
+
+  $build = array(
+    '#prefix' => '<div id="collection-usage">',
+    '#suffix' => '</div>',
+  );
+
+  $build['header'] = array(
+    '#prefix' => '<div id="collection-usage-top">',
+    '#suffix' => '</div>',
+    '#markup' => $title,
+    '#weight' => 1,
+  );
+
+  $build['usage_tabs'] = array(
+    '#prefix' => '<div id="collection-usage-tabs">',
+    'links' => array(),
+    '#theme' => 'theme_links',
+    '#suffix' => '</div>',
+    '#weight' => 2,
+  );
+
+  $build['usage'] = array(
+    '#weight' => 3,
+    'items' => array(),
+  );
+
+  foreach (collection_build_usage($collection) as $usage_name => $usage_info) {
+    $build['usage_tabs']['links'] = array(
+      'title' => $usage_info['label'],
+      'href' => '',
+      'fragment' => "collection-usage-tab-$usage_name",
+    );
+
+    $build['usage']['items'][$usage_name] = array(
+      '#markup' => $usage_info['usage'],
+      '#type' => 'markup',
+      '#prefix' => '<div id="collection-usage-tab-' . $usage_name . '">',
+      '#suffix' => '</div>',
+    );
+  }
+
+  return $build;
+}
+
+/**
+ * Get the collection types
+ */
+function collection_get_types() {
+  /**
+   * 'label'
+   * 'view callback'
+   * 'arguments'
+   */
+  return module_invoke_all('collection_usage_info');
+}
+
+/**
+ * Build the collection usage lists
+ */
+function collection_build_usage($collection) {
+  $return = array();
+  foreach (collection_get_types() as $type => $info) {
+    $function = $info['view_callback'];
+    $args = empty($info['arguments']) ? array() : $info['arguments'];
+    array_unshift($args, $collection);
+    $return[$type] = array(
+      'label' => $info['label'],
+      'usage' => call_user_func_array($function, $args),
+    );
+  }
+
+  return $return;
 }

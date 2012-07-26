@@ -4,5 +4,6 @@ description = A collection of content
 core = 7.x
 
 dependencies[] = entity
+dependencies[] = xautoload
 
 files[] = tests/*.test

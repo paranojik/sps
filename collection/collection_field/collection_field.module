@@ -77,7 +77,13 @@ function collection_field_formatter_view($entity_type, $entity, $field, $instanc
  * Implements hook_field_widget_form().
  */
 function collection_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
-  $current_collections = collection_field_get_collections($element['#entity'], $element['#entity_type'], $element['#field_name']);
+  if (isset($element['#entity'])) {
+    $current_collections = collection_field_get_collections($element['#entity_type'], $element['#bundle'], $element['#field_name']);
+  }
+  else {
+    $current_collections = array();
+  }
+
   $options = collection_get_collection_list();
   foreach ($current_collections as $condition) {
     unset($options[$condition->identifier()]);
@@ -109,27 +115,115 @@ function collection_field_field_is_empty($item, $field) {
 /**
  * Get the collections for an entity
  *
- * @param $entity
  * @param $entity_type
+ * @param $bundle
  * @param $field_name
- * @param $collection_name
  *
  * @return array
  */
-function collection_field_get_collections($entity, $entity_type, $field_name) {
-  $entity_info = entity_get_info($entity_type);
-  $id_key = $entity_info['entity keys']['id'];
+function collection_field_get_collections($entity_type, $bundle, $field_name) {
 
-  $query = new EntityFieldQuery();
-  $values = $query->entityCondition('entity_type', $entity_type)
-    ->age(FIELD_LOAD_REVISION)
-    ->entityCondition('entity_id', $entity->$id_key)
-    ->execute();
+  $query = _collection_field_build_query($field_name);
+  $column_name = collection_field_get_table_info('column', $field_name);
 
-  if (empty($values[$entity_type])) {
-    return array();
+  $collection_ids = $query->fields('c', array($column_name))
+    ->distinct(TRUE)
+    ->condition('entity_type', $entity_type)
+    ->condition('bundle', $bundle)
+    ->condition('deleted', 0)
+    ->execute()
+    ->fetchCol();
+
+  return collection_load_multiple($collection_ids);
+}
+
+/**
+ * Get the table info for the field
+ *
+ * @param $type
+ *  either table name or column name.
+ */
+function collection_field_get_table_info($type, $field_name) {
+  $info = &drupal_static(__FUNCTION__);
+  if (empty($info[$field_name])) {
+    if ($field_info = field_info_field($field_name)) {
+      $info[$field_name]['table'] = _field_sql_storage_revision_tablename($field_info);
+      $info[$field_name]['column'] = _field_sql_storage_columnname($field_name, 'value');
+    }
   }
 
-  $colleciton_ids = array_keys($values[$entity_type]);
-  return collection_load_multiple($colleciton_ids);
+  return isset($info[$field_name][$type]) ? $info[$field_name][$type] : NULL;
+}
+
+/**
+ * Build a query based up on the field
+ *
+ * @return query object with table alias of etc
+ */
+function _collection_field_build_query($field_name) {
+  if ($field_info = field_info_field($field_name)) {
+    $table_name = collection_field_get_table_info('table', $field_name);
+    return db_select($table_name, 'c');
+  }
+
+  return FALSE;
+}
+
+/**
+ * Implements hook_collection_usage_info()
+ */
+function collection_field_collection_usage_info() {
+  // Get the field settings for the entity
+  $info = _field_info_collate_fields();
+
+  $return = array();
+  foreach ($info['instances'] as $field_name => $instance_info) {
+    $field_info = field_info_field($field_name);
+    if ($field_info['type']== 'collection_field') {
+      if (empty($return[$instance_info['bundle']])) {
+        $bundle_info = field_info_bundles($instance_info['entity_type']);
+        $return[$instance_info['entity_type']] = array(
+          'label' => $bundle_info['label'],
+          'view_callback' => 'collection_field_view_collection_usage',
+          'arguments' => array($bundle_info, $instance_info['entity_type'], $instance_info['bundle']),
+          'fields' => array(),
+        );
+      }
+      $return[$instance_info['bundle']]['fields'][] = array();
+    }
+  }
+
+  foreach ($return as $bundle => &$info) {
+    $info['arguments'][] = $info['fields'];
+    unset($info['fields']);
+  }
+
+  return $return;
+}
+
+/**
+ * Callback for usage page
+ */
+function collection_field_view_collection_usage($collection, $entity_type, $field_names) {
+  $build = array();
+
+  foreach ($field_names as $field_name) {
+    $query = _collection_field_build_query($field_name);
+    $column_name = collection_field_get_table_info('column', $field_name);
+
+    $result = $query->fields('c', array($column_name, 'revision_id', 'entity_id'))
+      ->distinct(TRUE)
+      ->condition('entity_type', $entity_type)
+      ->condition('bundle', $bundle_key)
+      ->condition('deleted', 0)
+      ->execute();
+
+    foreach ($result as $row) {
+      $id = "{$row->$column_name}-{$row->entity_id}-{$row->revision_id}";
+      $build[$id] = array(
+        '#type' => 'markup',
+        '#markup' => l()
+      )
+    }
+  }
 }
