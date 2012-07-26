@@ -1,0 +1,10 @@
+<?php
+class SPSERSIntegrationWebTest extends SPSBaseWebTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS ERS Integration Web Tests',
+      'description' => 'Test the ERS integration.',
+      'group' => 'SPSPostTests',
+    );
+  }
+}
