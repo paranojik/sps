@@ -45,8 +45,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   public function getOverride() {
     if ($this->override_set) {
-      $override = new \Drupal\sps\Plugins\Override\AggregatorOverride(
-        $this->settings, $this->manager);
+      $override = new \Drupal\sps\Plugins\Override\AggregatorOverride($this->settings, $this->manager);
 
       $override->setData($this->overrides);
       return $override;
