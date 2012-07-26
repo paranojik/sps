@@ -3,7 +3,7 @@ namespace Drupal\sps_test;
 
 use \Drupal\sps\Plugins\Override\Override;
 
-abstract class NodeDateOverride extends Override {
+class NodeFirstRevisionOverride extends Override {
   protected $timestamp;
 
   /**
@@ -12,6 +12,24 @@ abstract class NodeDateOverride extends Override {
    */
   public function __construct(array $settings, \Drupal\sps\Manager $manager) {
     parent::__construct($settings, $manager);
+  }
+
+  /**
+   * Returns a list of vid's to override the default vids to load.
+   *
+   * @return
+   *  An array of override vids.
+   */
+  public function getOverrides() {
+    if($this->first) {
+      $query = db_query("select nid as id, min(vid) as revision_id, 'node' as type from {node_revision} group by nid");
+      $rnt = array();
+      while($row = $query->fetchAssoc()) {
+        $rnt[] = $row;
+      }
+      return $rnt;
+    }
+    return array();
   }
 
   /**
