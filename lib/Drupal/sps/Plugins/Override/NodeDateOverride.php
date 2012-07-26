@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps\Override;
+namespace Drupal\sps\Plugins\Override;
 
 use \Drupal\sps\Plugins\Override\Override;
 
@@ -14,15 +14,6 @@ abstract class NodeDateOverride extends Override {
     parent::__construct($settings, $manager);
     $this->timestamp = 0;
   }
-
-	/**
-   * Returns a list of vid's to override the default vids to load.
-   *
-   * @return
-   *  An array of override vids.
-   */
-  abstract public function getOverrides();
-
   /**
    * Set the data for this override.
    *
