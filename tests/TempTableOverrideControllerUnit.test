@@ -1,0 +1,70 @@
+<?php
+class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
+  static function getInfo() {
+    return array(
+      'name' => 'SPS TempTableOverrideController Unit Tests',
+      'description' => 'Test the public interface to SimpleCacheOverrrideController objects',
+      'group' => 'SPS',
+    );
+  }
+
+  public function testTableTempOverrideController_addOverrideJoin() {
+  //@TODO test for altering the query
+  //@TOD add web test for the creation of the DB (or better yet abstract the call to db_query_temporary)
+  }
+  public function testTableTempOverrideController_getPropertyMap() {
+    $manager = new \Drupal\sps\Test\Manager();
+    $controller = new \Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
+
+    $overrides = array(
+      array(
+        'id' => 5,
+        'revision_id' => 7,
+        'type' => 'node',
+      ),
+      array(
+        'id' => 1,
+        'type' => 'node',
+        'status' => 1,
+
+      ),
+    );
+   $controller->set($overrides);
+
+   $this->assertEqual(
+     $controller->getPropertyMap(),
+     array('status' => 'status', 'revision_id' => 'revision_id'),
+     '::getPropertyMap should return a look up for property name to field on the table'
+   );
+  }
+  public function testSimpleCacheOverrideController_validateRow() {
+    $manager = new \Drupal\sps\Test\Manager();
+    $controller = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
+
+   $overrides = array(
+      array(
+        'revision_id' => 5,
+        'type' => 'node',
+      ),
+   );
+   $this->assertThrows(
+     function() use ($controller, $overrides) { $controller->set($overrides) ;},
+     '\Drupal\sps\Exception\InvalidOverrideRowException',
+     'Override row must have id field',
+     '::set throws exeption when an row missing the id field is passed'
+   );
+   $overrides = array(
+      array(
+        'revision_id' => 5,
+        'id' => 3,
+      ),
+   );
+   $this->assertThrows(
+     function() use ($controller, $overrides) { $controller->set($overrides) ;},
+     '\Drupal\sps\Exception\InvalidOverrideRowException',
+     'Override row must have type field',
+     '::set throws exeption when an row missing the type field is passed'
+   );
+
+  }
+}

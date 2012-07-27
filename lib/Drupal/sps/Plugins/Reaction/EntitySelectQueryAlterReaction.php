@@ -111,7 +111,8 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       $base_id = $entity['base_id'];
       $overrides_alias = $this->getOverrideAlias($entity);
       if($base_alias) {
-        $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias);
+        $type = $entity['base_table'];
+        $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias, $type);
       }
     }
 

@@ -19,7 +19,7 @@ interface TableOverrideStorageControllerInterface extends \Drupal\sps\Plugins\Ov
   *
   * @return 
   */
-  public function addOverrideJoin(\SelectQueryInterface $query, $base_alais, $base_id, $overrides_alais);
+  public function addOverrideJoin(\SelectQueryInterface $query, $base_alais, $base_id, $overrides_alais, $type);
 
   /**
   * @brief 
