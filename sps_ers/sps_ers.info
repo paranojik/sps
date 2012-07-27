@@ -1,0 +1,8 @@
+name = SPS ERS Integration
+description = Integrates the SPS module with Entity Revision Scheduling (ERS)
+core = 7.x
+
+dependencies[] = sps
+dependencies[] = ers
+
+files[] = tests/*.test

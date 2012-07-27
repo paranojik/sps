@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps\Plugins\Override;
+namespace Drupal\sps_ers;
 
 use \Drupal\sps\Plugins\Override\NodeDateOverride;
 

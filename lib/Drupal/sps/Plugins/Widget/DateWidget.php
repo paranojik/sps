@@ -12,18 +12,18 @@ class DateWidget extends Widget {
   public function getPreviewForm($element, &$form_state) {
     $element['#type'] = 'fieldset';
     $element['#title'] = empty($this->settings['title']) ? t('Date/Time:') : $this->settings['title'];
-
+    $element['#description']= t('Preview nodes published on or after this date.');
+    $element['#attributes']['class'] = array('sps-date-widget');
     $element['preview_date'] = array(
       '#type' => 'date',
       '#title' => t('Date to Preview'),
-      '#description' => t('Preview nodes published on or after this date.'),
       '#default_value' => isset($form_state['values']['preview_date']) ? $form_state['values']['preview_date'] : NULL,
     );
 
     $element['preview_time'] = array(
       '#type' => 'textfield',
-      '#title' => t('Time on given date to show.'),
-      '#description' => t('Limit the preview to items published after this time.'),
+      '#title' => t('Time'),
+      '#size' => 9,
       '#default_value' => isset($form_state['values']['preview_time']) ? $form_state['values']['preview_time'] : '00:00:00',
     );
 
