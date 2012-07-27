@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps_ers\Test;
 
-use \Drupal\sps\Plugins\Override\ERSOverride;
+use \Drupal\sps_ers\ERSOverride;
 
 class ERSTestOverride extends ERSOverride {
   /**
