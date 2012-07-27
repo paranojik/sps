@@ -82,17 +82,3 @@ function sps_sps_condition_plugins() {
   );
 }
 
-/**
- * Implements hook_sps_override_plugins().
- *
- * Provide some basic overrides for workflow modules.
- */
-function sps_sps_override_plugins() {
-  return array(
-    'ers_override'=> array(
-      'class' => 'Drupal\sps\Plugins\Override\ERSOverride',
-      'condition' => 'date_condition',
-    ),
-  );
-}
-

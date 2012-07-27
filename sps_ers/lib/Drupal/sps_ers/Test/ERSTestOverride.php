@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps\Test;
+namespace Drupal\sps_ers\Test;
 
 use \Drupal\sps\Plugins\Override\ERSOverride;
 
