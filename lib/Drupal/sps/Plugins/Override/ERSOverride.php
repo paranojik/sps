@@ -4,6 +4,7 @@ namespace Drupal\sps\Plugins\Override;
 use \Drupal\sps\Plugins\Override\NodeDateOverride;
 
 class ERSOverride extends NodeDateOverride {
+  protected $results = array();
   /**
    * Returns a list of vid's to override the default vids to load.
    *
@@ -18,12 +19,15 @@ class ERSOverride extends NodeDateOverride {
       ->orderBy('publish_date')
       ->orderBy('revision_id');
 
-    $results = $select->execute()->fetchAllAssoc('entity_type', \PDO::FETCH_ASSOC);
+    $this->results = $select->execute()->fetchAllAssoc('entity_type', \PDO::FETCH_ASSOC);
+    return $this->processOverrides();
+  }
 
+  protected function processOverrides() {
     $list = array();
-    foreach($results as $key => $result) {
+    foreach($this->results as $key => $result) {
       if (isset($result['entity_id'])) {
-        $results[$key] = $result = array($result);
+        $this->results[$key] = $result = array($result);
       }
 
       foreach($result as $sub => $row) {
