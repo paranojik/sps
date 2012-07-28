@@ -17,7 +17,7 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
    $querys = array();
     foreach($this->table as $row) {
       if($row['type'] == $type) {
-        $columns = array();
+        $columns = array("{$row['id']} as id");
         foreach($this->getPropertyMap() as $property => $field) {
           $value = isset($row[$property]) ? $row[$property] : 'NULL';
           $columns[] = "$value as $field";
@@ -30,7 +30,6 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
     if(empty($querys)) {
       $querys[] = "SELECT 0 as id";
     }
-    print_r(implode(" UNION ", $querys));
     return  db_query_temporary(implode(" UNION ", $querys));
   }
 
