@@ -105,10 +105,12 @@ function sps_condition_preview_form($form, &$form_state) {
       ),
     );
 
-    $form['buttons']['cancel'] = array(
-      '#type' => 'submit',
-      '#value' => t('Cancel'),
-    );
+    if (!empty($form_state['values'])) {
+      $form['buttons']['cancel'] = array(
+        '#type' => 'submit',
+        '#value' => t('Cancel'),
+      );
+    }
 
     $form['buttons']['preview'] = array(
       '#type' => 'submit',
