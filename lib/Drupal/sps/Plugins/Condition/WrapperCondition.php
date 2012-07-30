@@ -110,7 +110,7 @@ class WrapperCondition extends BasicCondition {
       '#tree' => TRUE,
       '#prefix' => "<div id = '$wrapper_wrapper'>",
       '#suffix' => "</div>",
-      );
+    );
 
     // this should be set after an ajax call to select a condition
     if(isset($form_state['values'][$wrapper][$selector])) {
@@ -129,6 +129,9 @@ class WrapperCondition extends BasicCondition {
           'wrapper' => $wrapper_wrapper,
           'method' => 'replace',
           'effect' => 'fade',
+        ),
+        '#attributes' => array(
+          'class' => array('sps-change-condition'),
         ),
       );
     }
