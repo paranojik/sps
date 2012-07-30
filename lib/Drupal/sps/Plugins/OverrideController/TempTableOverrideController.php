@@ -90,11 +90,12 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
     $properties = array();
     if(!empty($this->table)) {
       $properties = array_keys(call_user_func_array('array_merge', $this->table));
-      $properties = array_combine($properties, $properties);
+      $values = array_map(function($v) { return "override_$v"; }, $properties);
+      $properties = array_combine($properties, $values);
       unset($properties['type']);
       unset($properties['id']);
     }
-    $properties['revision_id'] = isset($properties['revision_id']) ? $properties['revision_id'] : 'revision_id';
+    $properties['revision_id'] = isset($properties['revision_id']) ? $properties['revision_id'] : 'override_revision_id';
     
     return $properties;
   }
