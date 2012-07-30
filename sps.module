@@ -97,14 +97,22 @@ function sps_condition_preview_form($form, &$form_state) {
     $form_state['root_condition'] = $condition;
     $form = $condition->getElement($form, $form_state);
 
-    $form['Cancel'] = array(
-      '#type' => 'submit',
-      '#value' => 'Cancel',
+    $form['buttons'] = array(
+      '#tree' => FALSE,
+      '#type' => 'fieldset',
+      '#attributes' => array(
+        'class' => array('sps-preview-buttons'),
+      ),
     );
 
-    $form['preview'] = array(
+    $form['buttons']['cancel'] = array(
       '#type' => 'submit',
-      '#value' => 'Preview',
+      '#value' => t('Cancel'),
+    );
+
+    $form['buttons']['preview'] = array(
+      '#type' => 'submit',
+      '#value' => t('Preview'),
     );
 
     $form['#prefix'] = '<div class="sps-preview-form clearfix">';
@@ -206,9 +214,7 @@ function sps_iib_page_item() {
   $preview_form = $manager->getPreviewForm();
   $items['left'] = array(
     '#weight' => -10,
-    '#prefix' => '<div>',
-    '#markup' => drupal_render($preview_form),
-    '#suffix' => '</div>',
+    'form' => $preview_form,
   );
   return $items;
 }
