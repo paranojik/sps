@@ -1,20 +1,6 @@
 <?php
 
 /**
- * implements hook_sos_condition_plugins
- */
-function sps_sps_condition_plugins() {
-  return array(
-    'default_root_condition'=> array(
-      'class' => '\Drupal\sps\Plugins\Condition\WrapperCondition',
-      'instance_settings' => array(
-      ),
-      'root_condition' => 'True',
-    ),
-  );
-}
-
-/**
  * implements hook_sps_reaction_plugins()
  */
 function sps_sps_reaction_plugins() {
@@ -57,3 +43,42 @@ function sps_sps_override_controller_plugins() {
     ),
   );
 }
+
+/**
+ * Implements hook_sps_widget_plugins().
+ *
+ * Provide some default widgets.
+ */
+function sps_sps_widget_plugins() {
+  return array(
+    'date_widget'=> array(
+      'class' => 'Drupal\sps\Plugins\Widget\DateWidget',
+      'instance_settings' => array(
+        'title' => 'Preview Date'
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_sps_condition_plugins().
+ *
+ * Provide a basic condition to show.
+ */
+function sps_sps_condition_plugins() {
+  return array(
+    'date_condition'=> array(
+      'instance_settings' => array(
+        'name' => 'date_condition',
+        'widget' => 'date_widget',
+      ),
+    ),
+    'default_root_condition'=> array(
+      'class' => '\Drupal\sps\Plugins\Condition\WrapperCondition',
+      'instance_settings' => array(
+      ),
+      'root_condition' => 'True',
+    ),
+  );
+}
+

@@ -90,19 +90,25 @@ function sps_hook_info() {
  * @see \Drupal\sps\Manager::getPreviewForm();
  */
 function sps_condition_preview_form($form, &$form_state) {
+  drupal_add_css(drupal_get_path('module', 'sps').'/css/sps.css');
+
   if (!empty($form_state['build_info']['args'][0])) {
     $condition = $form_state['build_info']['args'][0];
     $form_state['root_condition'] = $condition;
     $form = $condition->getElement($form, $form_state);
 
-    $form['preview'] = array(
-      '#type' => 'submit',
-      '#value' => 'Preview',
-    );
     $form['Cancel'] = array(
       '#type' => 'submit',
       '#value' => 'Cancel',
     );
+
+    $form['preview'] = array(
+      '#type' => 'submit',
+      '#value' => 'Preview',
+    );
+
+    $form['#prefix'] = '<div class="sps-preview-form clearfix">';
+    $form['#suffix'] = '</div>';
     return $form;
   }
 }

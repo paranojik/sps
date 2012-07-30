@@ -14,7 +14,7 @@ class NodeFirstRevisionOverride extends Override {
     parent::__construct($settings, $manager);
   }
 
-	/**
+  /**
    * Returns a list of vid's to override the default vids to load.
    *
    * @return
