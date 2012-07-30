@@ -8,24 +8,19 @@
   display:inline;
 }
 
-.sps-preview-form label:after {
-  content:':';
-}
-
-.sps-preview-form .form-submit {
-  float:right;
+.sps-preview-form .sps-change-condition {
+  float: left;
+  margin:11px 0 0 10px;
 }
 
 .sps-preview-form .form-item {
   float:left;
   padding:3px;
+  margin-top: 1em;
 }
 
 .sps-date-widget {
   max-width:700px;
-  float:left;
-  border:0;
-  margin-bottom:5px;
 }
 
 .sps-date-widget .form-type-date .form-item {
@@ -43,4 +38,17 @@
 
 .sps-date-widget select {
   font-size:12px;
+}
+
+.sps-date-widget legend, .sps-date-widget .fieldset-description {
+  display:none;
+}
+
+.sps-date-widget .form-item,
+.sps-date-widget .fieldset-wrapper {
+  margin:0;
+}
+
+.sps-preview-form .sps-preview-buttons {
+  padding: 10px 0 4px 0;
 }
