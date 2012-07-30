@@ -3,7 +3,7 @@ class SPSPreviewFormWebTest extends SPSBaseWebTest {
   static function getInfo() {
     return array(
       'name' => 'SPS Preview Form Web Tests',
-      'description' => 'Test the preview form fetching and submission for Conditions.  MUST BE RUN FROM WEB INTERFACE.',
+      'description' => 'Test the preview form fetching and submission for Conditions.  BASE URL MUST BE SET.',
       'group' => 'SPSPostTests',
     );
   }

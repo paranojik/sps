@@ -1,9 +1,9 @@
 <?php
-namespace Drupal\sps\Override;
+namespace Drupal\sps\Plugins\Override;
 
 use \Drupal\sps\Plugins\Override\Override;
 
-class NodeDateOverride extends Override {
+abstract class NodeDateOverride extends Override {
   protected $timestamp;
 
   /**
@@ -13,24 +13,6 @@ class NodeDateOverride extends Override {
   public function __construct(array $settings, \Drupal\sps\Manager $manager) {
     parent::__construct($settings, $manager);
     $this->timestamp = 0;
-  }
-
-	/**
-   * Returns a list of vid's to override the default vids to load.
-   *
-   * @return
-   *  An array of override vids.
-   */
-  public function getOverrides() {
-    //for right now just load node vids that are set to be published in the future
-    $results = db_select('node_revision', 'v')
-      ->fields('v', array('nid, vid'))
-      ->condition('status', 0)
-      ->condition('timestamp', $this->timestamp, '>')
-      ->execute()
-      ->fetchAllAssoc('nid');
-
-    return $results;
   }
 
   /**

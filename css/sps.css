@@ -1,0 +1,46 @@
+.sps-preview-form {
+  padding:15px;
+  max-width:800px;
+}
+
+.sps-preview-form label,
+.sps-preview-form input {
+  display:inline;
+}
+
+.sps-preview-form label:after {
+  content:':';
+}
+
+.sps-preview-form .form-submit {
+  float:right;
+}
+
+.sps-preview-form .form-item {
+  float:left;
+  padding:3px;
+}
+
+.sps-date-widget {
+  max-width:700px;
+  float:left;
+  border:0;
+  margin-bottom:5px;
+}
+
+.sps-date-widget .form-type-date .form-item {
+  float:none;
+}
+
+.sps-date-widget .form-type-date .description {
+  margin-top:8px;
+  width: 200px;
+}
+
+.sps-date-widget label {
+  display:block;
+}
+
+.sps-date-widget select {
+  font-size:12px;
+}
