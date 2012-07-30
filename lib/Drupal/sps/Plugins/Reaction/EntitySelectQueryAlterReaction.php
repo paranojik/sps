@@ -123,7 +123,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   protected function replaceDatum($datum, $alias, $override_property_map = array()) {
     foreach($this->entities as $entity) {
       //replace revision_id
-      $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".revision_id, $1)", $datum);
+      $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
         
 
       //filter the override_property_map to only inlcude items that in revision fields
@@ -211,7 +211,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     return preg_replace_callback(
       "/".$base_alias."\.(".implode("|", array_keys($fields_map)).")/", 
       function ($m) use ($override_alias, $base_alias, $fields_map) {
-        return 'COALESCE('.$override_alias .'.'. $m[1]  .', '. $base_alias.'.'.$fields_map[$m[1]] .')';
+        return 'COALESCE('.$override_alias .'.'. $fields_map[$m[1]]  .', '. $base_alias.'.'.$m[1] .')';
       },
       $datum
     );

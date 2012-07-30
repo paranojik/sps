@@ -28,9 +28,9 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
     }
     // if we do not have any overrides we need to add a dummy one so that the temp table can be created
     if(empty($querys)) {
-      $querys[] = "SELECT 0 as id, 0 as revision_id";
+      $querys[] = "SELECT 0 as id, NULL as revision_id";
     }
-    return  db_query_temporary(implode(" UNION ", $querys));
+    return  sps_drupal()->db_query_temporary(implode(" UNION ", $querys));
   }
 
   /**
@@ -87,15 +87,17 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
   *
   */
   public function getPropertyMap() {
+    $properties = array();
     if(!empty($this->table)) {
       $properties = array_keys(call_user_func_array('array_merge', $this->table));
-      $properties = array_combine($properties, $properties);
+      $values = array_map(function($v) { return "override_$v"; }, $properties);
+      $properties = array_combine($properties, $values);
       unset($properties['type']);
       unset($properties['id']);
-      return $properties;
     }
-    return array( 'revision_id' => 'revision_id');
-  
+    $properties['revision_id'] = isset($properties['revision_id']) ? $properties['revision_id'] : 'override_revision_id';
+    
+    return $properties;
   }
 
   public function __construct(array $config, \Drupal\sps\Manager $manager) {}
