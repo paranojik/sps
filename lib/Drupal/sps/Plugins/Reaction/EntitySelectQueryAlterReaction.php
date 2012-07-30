@@ -111,11 +111,42 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       $base_id = $entity['base_id'];
       $overrides_alias = $this->getOverrideAlias($entity);
       if($base_alias) {
-        $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias);
+        $type = $entity['base_table'];
+        $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias, $type);
       }
     }
 
     return $this;
+  }
+
+
+  protected function replaceDatum($datum, $alias, $override_property_map = array()) {
+    foreach($this->entities as $entity) {
+      //replace revision_id
+      $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".revision_id, $1)", $datum);
+        
+
+      //filter the override_property_map to only inlcude items that in revision fields
+      $coalesce_revision_map = array_intersect_key($override_property_map, array_fill_keys($entity['revision_fields'], TRUE));
+      
+      //we have a revision table so lets set values to use that table
+      if(isset($alias[$entity['revision_table']])) {
+          $datum = $this->replaceTableSwitch($datum, $entity['revision_fields'],$alias[$entity['base_table']], $alias[$entity['revision_table']]);
+        // we have propties to override lets give the override table priority
+        // on those fields
+        if(!empty($coalesce_revision_map)) {
+          $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['revision_table']],  $this->getOverrideAlias($entity));
+        }
+      }
+      else {
+        // we have propties to override lets give the override table priority
+        // on those fields
+        if(!empty($coalesce_revision_map)) {
+          $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['base_table']],  $this->getOverrideAlias($entity));
+        }
+      }
+    }
+    return $datum;
   }
 
   /**
@@ -137,43 +168,32 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    * @return  EntitySelectQueryAlterReaction
    *  Self
    */
-  protected function recusiveReplace(&$data, $alias) {
+  protected function recusiveReplace(&$data, $alias, $override_property_map = array()) {
     $reorder = array();
     foreach($data as $key => &$datum) {
 
       //check to see if we need to rewrite the keys.
-      foreach($this->entities as $entity) {
-        if(isset($alias[$entity['revision_table']])) {
-          $new_key = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $key);
+          //$new_key = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $key);
+          $new_key = $this->replaceDatum($key, $alias, $override_property_map);
           if($new_key != $key) {
             $reorder[$key] = $new_key;
-          }
-        }
       }
 
       //if an array lets run the kids
       if (is_array($datum)) {
-        $this->recusiveReplace($datum, $alias);
+        $this->recusiveReplace($datum, $alias, $override_property_map);
       }
       //@TODO this is for exceptions basicly
       else if (is_object($datum)) {
         if(in_array("QueryConditionInterface", class_implements($datum))){
           $sub_condition =& $datum->conditions();
-          $this->recusiveReplace($sub_condition, $alias);
+          $this->recusiveReplace($sub_condition, $alias, $override_property_map);
         }
       }
       //ok we have a single datum lets work on it.
       else {
         if($datum !== NULL) {
-          foreach($this->entities as $entity) {
-            //replace revision_id
-            $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) .".revision_id, $1)", $datum);
-            if(isset($alias[$entity['revision_table']])) {
-
-
-              $datum = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $datum);
-            }
-          }
+          $datum = $this->replaceDatum($datum, $alias, $override_property_map);
         }
       }
     }
@@ -182,6 +202,19 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     }
 
     return $this;
+  }
+
+  protected function replaceTableSwitch($datum, $fields, $base_alias, $revision_alias) {
+    return preg_replace("/".$base_alias."\.(".implode("|", $fields).")/", $revision_alias.'.$1', $datum);
+  }
+  protected function replaceCoalesce($datum, $fields_map, $base_alias, $override_alias) {
+    return preg_replace_callback(
+      "/".$base_alias."\.(".implode("|", array_keys($fields_map)).")/", 
+      function ($m) use ($override_alias, $base_alias, $fields_map) {
+        return 'COALESCE('.$override_alias .'.'. $m[1]  .', '. $base_alias.'.'.$fields_map[$m[1]] .')';
+      },
+      $datum
+    );
   }
 
   /**
@@ -234,6 +267,27 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   }
 
   /**
+  * Move Items in a field for a query to a expression
+  *
+  * @param $query
+  *   the query to manipulate
+  * @param $fields_to_move
+  *   name of fields to move
+  *
+  * @return 
+  * NULL
+  */
+  protected function fieldsToExpressions(&$query, $fields_to_move) {
+    $fields = & $query->getFields();
+    foreach ($fields as $field_alias => $field) {
+      if (in_array($field['field'], array_keys($fields_to_move))) {
+        $query->addExpression($field['table'] .'.'. $field['field'], $field_alias);
+        unset($fields[$field_alias]);
+      }
+    }
+  }
+
+  /**
    * Alter a query to use the overridden revision id as well as
    * revision fields.
    *
@@ -254,27 +308,30 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     }
     $alias = $this->extractAlias($query);
     if($alias) {
+      $property_map = $override_controller->getPropertyMap();
       $this->addOverrideTable($query, $override_controller);
       $fields =& $query->getFields();
-      $this->fieldReplace($fields, $alias);
-
-      $tables =& $query->getTables();
-      $this->recusiveReplace($tables, $alias);
-
-      $where =& $query->conditions();
-      $this->recusiveReplace($where, $alias);
+      $this->fieldReplace($fields, $alias, $property_map);
 
       $expressions =& $query->getExpressions();
-      $this->recusiveReplace($expressions, $alias);
+      $this->fieldsToExpressions($query,  array_keys($property_map));
+
+      $this->recusiveReplace($expressions, $alias, $property_map);
+
+      $tables =& $query->getTables();
+      $this->recusiveReplace($tables, $alias, $property_map);
+
+      $where =& $query->conditions();
+      $this->recusiveReplace($where, $alias, $property_map);
 
       $order =& $query->getOrderBy();
-      $this->recusiveReplace($order, $alias);
+      $this->recusiveReplace($order, $alias, $property_map);
 
       $group =& $query->getGroupBy();
-      $this->recusiveReplace($group, $alias);
+      $this->recusiveReplace($group, $alias, $property_map);
 
       $having =& $query->havingConditions();
-      $this->recusiveReplace($having, $alias);
+      $this->recusiveReplace($having, $alias, $property_map);
       /*
       $this->recusiveReplace($fields);
 
