@@ -14,18 +14,23 @@ class DateWidget extends Widget {
     $element['#title'] = empty($this->settings['title']) ? t('Date/Time:') : $this->settings['title'];
     $element['#description']= t('Preview nodes published on or after this date.');
     $element['#attributes']['class'] = array('sps-date-widget');
+
     $element['preview_date'] = array(
-      '#type' => 'date',
+      '#type' => 'date_popup',
       '#title' => t('Date to Preview'),
       '#default_value' => isset($form_state['values']['preview_date']) ? $form_state['values']['preview_date'] : NULL,
     );
 
-    $element['preview_time'] = array(
-      '#type' => 'textfield',
-      '#title' => t('Time'),
-      '#size' => 9,
-      '#default_value' => isset($form_state['values']['preview_time']) ? $form_state['values']['preview_time'] : '00:00:00',
-    );
+    //have a fallback if they don't have date_popup installed.
+    if (!module_exists('date_popup')) {
+      $element['preview_data']['#type'] = 'date';
+      $element['preview_time'] = array(
+        '#type' => 'textfield',
+        '#title' => t('Time'),
+        '#size' => 9,
+        '#default_value' => isset($form_state['values']['preview_time']) ? $form_state['values']['preview_time'] : '00:00:00',
+      );
+    }
 
     return $element;
   }
@@ -67,10 +72,15 @@ class DateWidget extends Widget {
    */
   protected static function getTimeStamp($form_state) {
     $date_arr = $form_state['values']['preview_date'];
-    $date = $date_arr['month'] . '/' . $date_arr['day'] . '/' . $date_arr['year'];
-    if (!empty($form_state['values']['preview_time'])) {
-      $date .= ' ' . $form_state['values']['preview_time'];
+    if (is_array($date_arr)) {
+      $date = $date_arr['month'] . '/' . $date_arr['day'] . '/' . $date_arr['year'];
+      if (!empty($form_state['values']['preview_time'])) {
+        $date .= ' ' . $form_state['values']['preview_time'];
+      }
+      return strtotime($date);
     }
-    return strtotime($date);
+    else {
+      return strtotime($date_arr);
+    }
   }
 }
