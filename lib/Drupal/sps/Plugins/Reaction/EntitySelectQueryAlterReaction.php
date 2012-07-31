@@ -210,9 +210,40 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     return $this;
   }
 
+  /**
+  * This alter the $datum replacing the base_alias with the revision_alias when we have fields
+  *
+  * @param $datum
+  *   the piece of content to alter
+  * @param $fields
+  *   which fields should have there table moved
+  * @param $base_alias
+  *   what is the table we are moving from
+  * @param $revision_alias
+  *   what is the table we are moving to
+  *
+  * @return 
+  */
   protected function replaceTableSwitch($datum, $fields, $base_alias, $revision_alias) {
     return preg_replace("/".$base_alias."\.(".implode("|", $fields).")/", $revision_alias.'.$1', $datum);
   }
+
+  
+  /**
+  * This returns the datum alter as a coalesce of the base field and its partner field in the 
+  * override tables
+  *
+  * @param $datum
+  *   the piece of content to alter
+  * @param $fields_map
+  *   the mapping of field names to the same field in the override table
+  * @param $base_alias
+  *   the alias of the base table
+  * @param $override_alias
+  *   the alias of the override table
+  *
+  * @return 
+  */
   protected function replaceCoalesce($datum, $fields_map, $base_alias, $override_alias) {
     return preg_replace_callback(
       "/".$base_alias."\.(".implode("|", array_keys($fields_map)).")/", 
@@ -223,23 +254,6 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     );
   }
          
-  /**
-  * Replace a \DatabaseCondition with a \Drupal\sps\DatabaseCondition
-  *
-  * @param $condition
-  *  the \DatabaseCondition to replace
-  *
-  * @return 
-  *   NULL
-  */
-  protected function upgradeCondition(&$condition) {
-    $sub_condition =& $condition->conditions();
-    $replacement = new \Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
-    $replacement_c = &$replacement->conditions();
-    $replacement_c = $sub_condition;
-    $condition = $replacement;
-  }
-
   /**
    * helper function to rename keys in an assoc array but keep the order
    *
@@ -292,6 +306,16 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   /**
   * Move Items in a field for a query to a expression
   *
+  * As we are going to use COALECSE on fields we are transfering them form
+  * fields into expressions.
+  *
+  * We make sure that we run our version of escapeField and escapeTable
+  * to insure we are not allowing through fields and table that would have been
+  * stopped if we were not transforming the field into an expression.
+  *
+  * It is worth noting that this is only happening on fields and tables that 
+  * are identified by sps and its plugins.
+  *
   * @param $query
   *   the query to manipulate
   * @param $fields_to_move
@@ -310,11 +334,62 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       foreach ($fields as $field_alias => $field) {
         if (in_array($field['field'], $fields_to_move_entity) &&
             ($field['table'] == $alias[$entity['base_table']])) {
-          $query->addExpression($field['table'] .'.'. $field['field'], $field_alias);
+          
+          //We are turning this into an expression so we need to do the escape that would be
+          //use if it was a field on the table and field
+          $query->addExpression($field['table'] .'.'. $this->escapeField($field['field']), $field_alias);
           unset($fields[$field_alias]);
         }
       }
     }
+  }
+
+  /** 
+  * Replace a \DatabaseCondition with a \Drupal\sps\DatabaseCondition
+  *
+  * The standard DatabaseCondition calls escapeField on the field element in
+  * compile.  As we need to add COALESCE to the field, the '(),' chars will all
+  * get striped cause silent failure.  So we are replacing the
+  * DatabaseCondition with our own that does not call escapeField in compile.  
+  *
+  * To insure that the fields that we are getting are proper before we change
+  * the condition type, we are running our own version of escapeField on the
+  * field property.
+  *
+  * @param $condition 
+  *   the \DatabaseCondition to replace
+  *
+  * @return NULL
+  */
+  protected function upgradeCondition(&$condition) {
+    $sub_condition =& $condition->conditions();
+    foreach($sub_condition as $key => $item) {
+      if(!isset($item['operator'])) {
+        $item['field'] = $this->escapeField($item['field']);
+      }
+    }
+    $replacement = new \Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
+    $replacement_c = &$replacement->conditions();
+    $replacement_c = $sub_condition;
+    $condition = $replacement;
+  }
+
+ /**
+  * copy of DatabaseConnection::escapeField
+  * @see DatabaseConnection::escapeField
+  *
+  */
+  protected function escapeField($field) {
+    return preg_replace('/[^A-Za-z0-9_.]+/', '', $field);
+  }
+
+ /**
+  * copy of DatabaseConnection::escapeTable
+  * @see DatabaseConnection::escapeTable
+  *
+  */
+  public function escapeTable($table) {
+    return preg_replace('/[^A-Za-z0-9_.]+/', '', $table);
   }
 
   /**
