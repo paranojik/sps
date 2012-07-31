@@ -324,57 +324,59 @@ class Manager {
    *
    * The manager is use as an interface for Drupal hooks that need to have a
    * reaction react
+   * 
    * ___________________
    * \                  \
    *  \  Manager::react  \
    *   ) called           )----Reaction Name and Data
-   *  /                  /       |
-   * /__________________/        |
-   *            ^                v
-   *            |        ______________
-   *            |        \             \                      .------------------.
-   *            |         \  Get Site   \                     | State Controller |
-   *       No SiteState----) State       )------------------->|------------------|
-   *            |         /             / ^                   | get()            |
-   *            |        /_____________/  |                   '------------------'
-   *            |                         |                             |
-   *            |                         '----SiteState object---------'
+   *  /                  /     |
+   * /__________________/      |
+   *            ^              v
+   *            |      ______________
+   *            |      \             \                        .------------------.
+   *            |       \  Get Site   \                       | State Controller |
+   *       No SiteState--) State       )--------------------->|------------------|
+   *            |       /             / ^                     | get()            |
+   *            |      /_____________/  |                     '------------------'
+   *            |              |        |                               |
+   *            |              v        '------SiteState object---------'
    *            |    _________________
    *            |    \                \
    *            |     \  Get Reaction  \
    *      No Reaction  ) ORC api key    )---------reaction name---------.
    *            |     /  and object    / ^                              v
    *            |    /________________/  |                    .-------------------.
-   *            |                        |                    | Plugin Controller |
-   *            |                        |                    |-------------------|
-   *            |                        |                    | getPluginInfo()   |
-   *            |                        |                    | getPlugin()       |
-   *            |                        |                    '-------------------'
-   *            |                        |                              |
-   *            |   _________________    '--Override Controller API Key-'
-   *            |   \                \      Reaction Object            
-   *            |    \  Get Override  \
-   *          No ORC--) Controller     )--Override Controller API Key-.
-   *            |    /                /                               v
-   *            |   /________________/                   .-------------------------.
-   *            |              ^                         |       Site State        |
-   *            |              |                         |-------------------------|
-   *            |              |                         | getOverrideController() |
-   *            |              |                         '-------------------------'
-   *            |              |                                      |
-   *            |              '-----------OverrideController object -'
-   *            |  _________________
-   *            |  \                \
-   *            |   \  Call          \
-   *     retrun data-) React          )-data and OverrideController obj-.
-   *                /                /                                  v
-   *               /________________/                         .------------------.
-   *                         ^                                |     Reaction     |
-   *                         |                                |------------------|
-   *                         |                                | react()          |
-   *                         |                                '------------------'
-   *                         |                                          |
-   *                         '----------retrun data---------------------'
+   *            |              |         |                    | Plugin Controller |
+   *            |              |         |                    |-------------------|
+   *            |              |         |                    | getPluginInfo()   |
+   *            |              |         |                    | getPlugin()       |
+   *            |              |         |                    '-------------------'
+   *            |              v         |                              |
+   *            |    _________________   '--Override Controller API Key-'
+   *            |    \                \     Reaction Object            
+   *            |     \  Get Override  \
+   *          No ORC---) Controller     )-Override Controller API Key-.
+   *            |     /                / ^                            v
+   *            |    /________________/  |               .-------------------------.
+   *            |              |         |               |       Site State        |
+   *            |              |         |               |-------------------------|
+   *            |              |         |               | getOverrideController() |
+   *            |              |         |               '-------------------------'
+   *            |              |         |                            |
+   *            |              v         '-OverrideController object -'
+   *            |        _________
+   *            |        \        \
+   *            |         \  Call  \
+   *     retrun data-------) React  )---data and OverrideController obj-.
+   *                      /        /                                    v
+   *                     /________/                           .------------------.
+   *                           ^                              |     Reaction     |
+   *                           |                              |------------------|
+   *                           |                              | react()          |
+   *                           |                              '------------------'
+   *                           |                                        |
+   *                           '--------retrun data---------------------'
+   * 
    *
    * @param String $reaction
    *   the name of a reaction plugin;
