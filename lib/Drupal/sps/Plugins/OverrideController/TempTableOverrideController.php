@@ -28,7 +28,7 @@ class TempTableOverrideController extends AbstractTableOverrideStorageController
     }
     // if we do not have any overrides we need to add a dummy one so that the temp table can be created
     if(empty($querys)) {
-      $querys[] = "SELECT 0 as id, NULL as revision_id";
+      $querys[] = "SELECT 0 as id, NULL as override_revision_id";
     }
     return  sps_drupal()->db_query_temporary(implode(" UNION ", $querys));
   }
