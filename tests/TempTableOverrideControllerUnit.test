@@ -88,7 +88,7 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
    $controller->addOverrideJoin($query, 'b', 'nid', 'node_overrides', 'node');
    $this->assertEqual(
      testTableTempOverrideController_tempTableCreate(),
-     'SELECT 5 as id,7 as revision_id,NULL as status UNION SELECT 1 as id,NULL as revision_id,1 as status',
+     'SELECT 5 as id,7 as override_revision_id,NULL as override_status UNION SELECT 1 as id,NULL as override_revision_id,1 as override_status',
      '::addOverrideJoin should create a temp table with all fields from getPropertyMap, id and revision_id'
    );
   }
@@ -113,7 +113,7 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
 
    $this->assertEqual(
      $controller->getPropertyMap(),
-     array('status' => 'status', 'revision_id' => 'revision_id'),
+     array('status' => 'override_status', 'revision_id' => 'override_revision_id'),
      '::getPropertyMap should return a look up for property name to field on the table'
    );
   }
@@ -137,7 +137,7 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
 
    $this->assertEqual(
      $controller->getPropertyMap(),
-     array('revision_id' => 'revision_id'),
+     array('revision_id' => 'override_revision_id'),
      '::getPropertyMap should return a look up for property name to field on the table revsion_id should always show'
    );
   }

@@ -67,6 +67,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
         if (
           ($field['table'] == $alias[$entity['base_table']]) &&
           ($field['field'] == $entity['revision_id'])
+           && FALSE
           ){
           $field['table'] = $this->getOverrideAlias($entity);
         }
@@ -123,7 +124,9 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   protected function replaceDatum($datum, $alias, $override_property_map = array()) {
     foreach($this->entities as $entity) {
       //replace revision_id
-      $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
+      if(isset($override_property_map['revision_id'])) {
+        $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
+      }
         
 
       //filter the override_property_map to only inlcude items that in revision fields
@@ -186,7 +189,10 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       //@TODO this is for exceptions basicly
       else if (is_object($datum)) {
         if(in_array("QueryConditionInterface", class_implements($datum))){
+
+          $this->upgradeCondition($datum);
           $sub_condition =& $datum->conditions();
+
           $this->recusiveReplace($sub_condition, $alias, $override_property_map);
         }
       }
@@ -215,6 +221,23 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       },
       $datum
     );
+  }
+         
+  /**
+  * Replace a \DatabaseCondition with a \Drupal\sps\DatabaseCondition
+  *
+  * @param $condition
+  *  the \DatabaseCondition to replace
+  *
+  * @return 
+  *   NULL
+  */
+  protected function upgradeCondition(&$condition) {
+    $sub_condition =& $condition->conditions();
+    $replacement = new \Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
+    $replacement_c = &$replacement->conditions();
+    $replacement_c = $sub_condition;
+    $condition = $replacement;
   }
 
   /**
@@ -277,12 +300,19 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   * @return 
   * NULL
   */
-  protected function fieldsToExpressions(&$query, $fields_to_move) {
+  protected function fieldsToExpressions(&$query, $fields_to_move, $alias) {
     $fields = & $query->getFields();
-    foreach ($fields as $field_alias => $field) {
-      if (in_array($field['field'], array_keys($fields_to_move))) {
-        $query->addExpression($field['table'] .'.'. $field['field'], $field_alias);
-        unset($fields[$field_alias]);
+    foreach($this->entities as $entity) {
+      $fields_to_move_entity = $fields_to_move;
+      if(in_array('revision_id', $fields_to_move)) {
+        $fields_to_move_entity[array_search('revision_id', $fields_to_move_entity)] = $entity['revision_id'];
+      }
+      foreach ($fields as $field_alias => $field) {
+        if (in_array($field['field'], $fields_to_move_entity) &&
+            ($field['table'] == $alias[$entity['base_table']])) {
+          $query->addExpression($field['table'] .'.'. $field['field'], $field_alias);
+          unset($fields[$field_alias]);
+        }
       }
     }
   }
@@ -302,6 +332,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
     $query = $data->query;
+
     //exit prematurly if we ha a no alter tag
     if($query->hasTag(SPS_NO_ALTER_QUERY_TAG)) {
       return;
@@ -310,11 +341,12 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     if($alias) {
       $property_map = $override_controller->getPropertyMap();
       $this->addOverrideTable($query, $override_controller);
+
       $fields =& $query->getFields();
+      $this->fieldsToExpressions($query,  array_keys($property_map), $alias);
       $this->fieldReplace($fields, $alias, $property_map);
 
       $expressions =& $query->getExpressions();
-      $this->fieldsToExpressions($query,  array_keys($property_map));
 
       $this->recusiveReplace($expressions, $alias, $property_map);
 

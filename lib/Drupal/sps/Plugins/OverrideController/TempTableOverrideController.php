@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins\OverrideController;
 
-class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideController\TableOverrideStorageControllerInterface {
+class TempTableOverrideController extends AbstractTableOverrideStorageController {
   public $table = array();
 
   /**
@@ -77,27 +77,6 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
     foreach($table as $row) {
       
     }
-  }
-
-  /**
-  * @brief 
-  *
-  * @return 
-  * A dictionary of properties and the field name on the override table
-  *
-  */
-  public function getPropertyMap() {
-    $properties = array();
-    if(!empty($this->table)) {
-      $properties = array_keys(call_user_func_array('array_merge', $this->table));
-      $values = array_map(function($v) { return "override_$v"; }, $properties);
-      $properties = array_combine($properties, $values);
-      unset($properties['type']);
-      unset($properties['id']);
-    }
-    $properties['revision_id'] = isset($properties['revision_id']) ? $properties['revision_id'] : 'override_revision_id';
-    
-    return $properties;
   }
 
   public function __construct(array $config, \Drupal\sps\Manager $manager) {}
