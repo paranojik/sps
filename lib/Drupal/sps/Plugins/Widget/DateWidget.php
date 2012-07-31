@@ -23,7 +23,7 @@ class DateWidget extends Widget {
 
     //have a fallback if they don't have date_popup installed.
     if (!module_exists('date_popup')) {
-      $element['preview_data']['#type'] = 'date';
+      $element['preview_date']['#type'] = 'date';
       $element['preview_time'] = array(
         '#type' => 'textfield',
         '#title' => t('Time'),
@@ -72,7 +72,7 @@ class DateWidget extends Widget {
    */
   protected static function getTimeStamp($form_state) {
     $date_arr = $form_state['values']['preview_date'];
-    if (is_array($date_arr)) {
+    if (!module_exists('date_popup')) {
       $date = $date_arr['month'] . '/' . $date_arr['day'] . '/' . $date_arr['year'];
       if (!empty($form_state['values']['preview_time'])) {
         $date .= ' ' . $form_state['values']['preview_time'];
@@ -80,7 +80,12 @@ class DateWidget extends Widget {
       return strtotime($date);
     }
     else {
-      return strtotime($date_arr);
+      if (is_array($date_arr)) {
+        return strtotime(implode(' ', $date_arr));
+      }
+      else {
+        return strtotime($date_arr);
+      }
     }
   }
 }
