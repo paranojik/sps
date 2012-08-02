@@ -405,11 +405,15 @@ class Manager {
    * @param String $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    *
+   * @param Array $settings
+   *   an array that should be used for instance settings (instance settings from the plugin info are
+   *   add to this array
+   *
    * @return \Drupal\sps\Plugins\PluginInterface
    *   An instance of the requested Plugin
    */
-  public function getPlugin($type, $name) {
-    return $this->plugin_controller->getPlugin($type, $name, $this);
+  public function getPlugin($type, $name, $settings = NULL) {
+    return $this->plugin_controller->getPlugin($type, $name, $this, $settings);
   }
 
   /**

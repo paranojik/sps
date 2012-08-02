@@ -66,6 +66,99 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
       '::getElement should have a selector with the proper ajax wrapper'
     );
   }
+  public function testWrapperCondition_getElement_withConfig() {
+    $config = new \Drupal\sps\Test\ConfigController();
+    $manager = new \Drupal\sps\Test\Manager();
+    $settings = array(
+      'element_form' => array(
+        'test' => array(
+          '#markup' => 'This is Test Markup',
+        ),
+      ),
+      'validate_fail_message' => "There was an error",
+      'validate_fail_name' => "error_item",
+      'override' => new \Drupal\sps\Test\Override(array(), $manager),
+      'title' => 'Condition Test',
+      'has_overrides' => TRUE
+    );
+    $plugin_info = array(
+      'condition' => array(
+        'condition_test' => array(
+          'class' => '\Drupal\sps\Test\Condition',
+          'instance_settings' => $settings,
+        ),
+        'condition_test2' => array(
+          'class' => '\Drupal\sps\Test\Condition',
+          'instance_settings' => $settings,
+        ),
+        'condition_test3' => array(
+          'class' => '\Drupal\sps\Test\Condition',
+          'instance_settings' => $settings,
+        ),
+        'condition_test4' => array(
+          'class' => '\Drupal\sps\Test\Condition',
+          'instance_settings' => $settings,
+        ),
+        'condition_test5' => array(
+          'class' => '\Drupal\sps\Test\Condition',
+          'instance_settings' => $settings,
+        ),
+      ),
+    );
+    $config->default[SPS_CONFIG_PLUGIN_CONTROLLER]['instance_settings'] = $plugin_info;
+    $config->default[SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS]['condition_test']['title'] = 'test 1';
+    $config->default[SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS]['condition_test2']['title'] = 'test 2';
+    $config->default[SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS]['condition_test3']['title'] = 'test 3';
+    $config->default[SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS]['condition_test7']['title'] = 'test 7';
+
+
+    $manager = new \Drupal\sps\Test\Manager($config);
+    $condition = new \Drupal\sps\Plugins\Condition\WrapperCondition(array(), $manager);
+    $form = array();
+    $form_state = array();
+
+    $element = $condition->getElement($form,$form_state);
+    print_r(array(
+      $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
+      array(
+        'none' => 'Select Condition', 
+        'condition_test' => 'test 1',
+        'condition_test2' => 'test 2',
+        'condition_test3' => 'test 3'
+      ),
+    ));
+    $this->assertEqual(
+      $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
+      array(
+        'none' => 'Select Condition', 
+        'condition_test' => 'test 1',
+        'condition_test2' => 'test 2',
+        'condition_test3' => 'test 3'
+      ),
+      '::getElement should have a select with each condition in in the system that are also in the config'
+    );
+
+    $this->assertEqual(
+      $element[$condition->getContainerId()][$condition->getSelectorId()]['#type'],
+      'select',
+      '::getElement should havea selector of type select'
+    );
+    $this->assertEqual(
+      $element[$condition->getContainerId()][$condition->getSelectorId()]['#title'],
+      'Condition',
+      '::getElement should havea selector of title Condition'
+    );
+    $this->assertEqual(
+      $element[$condition->getContainerId()][$condition->getSelectorId()]['#ajax']['callback'],
+      'sps_wrapper_condition_ajax_callback',
+      '::getElement should have a selector with the proper ajax callback'
+    );
+    $this->assertEqual(
+      $element[$condition->getContainerId()][$condition->getSelectorId()]['#ajax']['wrapper'],
+      $condition->getContainerWrapperId(),
+      '::getElement should have a selector with the proper ajax wrapper'
+    );
+  }
   public function testWrapperCondition_getElementNoOverrides() {
     $config = new \Drupal\sps\Test\ConfigController();
     $manager = new \Drupal\sps\Test\Manager();

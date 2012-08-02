@@ -42,8 +42,15 @@ class WrapperCondition extends BasicCondition {
   }
 
   protected function setConditions_config($configs, $plugin_info) {
-    foreach($plugin_info as $name => $info) {
-      $this->conditions_config[$name] = isset($configs[$name]) ? $configs[$name] : array();
+    if(empty($configs)) {
+      $this->conditions_config = array_map(function($info) { return array();}, $plugin_info);
+    }
+    else  {
+      foreach($plugin_info as $name => $info) {
+        if(isset($configs[$name])) {
+        $this->conditions_config[$name] = $configs[$name];
+        }
+      }
     }
     return $this;
   }

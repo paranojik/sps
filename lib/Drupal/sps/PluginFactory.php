@@ -68,6 +68,10 @@ class PluginFactory implements PluginControllerInterface {
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    * @param \Drupal\sps\Manager $manager
    *
+   * @param Array $settings
+   *   an array that should be used for instance settings (instance settings from the plugin info are
+   *   add to this array
+   *
    * @return mixed|\Drupal\sps\Plugins\PluginInterface|NULL
    *   An instance of the plugin object or NULL if the plugin does not use a class
    *
@@ -76,8 +80,10 @@ class PluginFactory implements PluginControllerInterface {
    * @throws \Drupal\sps\Exception\DoesNotImplementException
    */
   public function getPlugin($type, $name, Manager $manager, $settings = NULL) {
+    $plugin_info = $this->getPluginInfo($type, $name);
+    //start with settings for our instance settings
     $settings = $settings ?: array();
-    $plugin_info = $settings + $this->getPluginInfo($type, $name);
+    $plugin_info['instance_settings'] = $settings + $plugin_info['instance_settings'];
 
     if (isset($plugin_info['class'])) {
       $plugin_type_info = $this->getPluginInfo($type);
