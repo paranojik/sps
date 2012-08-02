@@ -45,7 +45,6 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
       }
       if (isset($error_message)) {
         if ($e->getMessage() != $error_message) {
-          print_r(array($e->getMessage(),$error_message));
           $this->fail($message, "SPS");
           return;
         }
@@ -53,7 +52,6 @@ abstract class SPSBaseUnitTest extends DrupalUnitTestCase {
       $this->pass($message, "SPS");
       return;
     }
-    print_r(array("no error" =>func_get_args()));
     $this->fail($message, "SPS");
   }
 
