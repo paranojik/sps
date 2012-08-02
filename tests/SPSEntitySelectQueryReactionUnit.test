@@ -177,6 +177,80 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       "::react alter a query so that order fields that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
     );
   }
+  public function test_EntitySelectQueryAlterReaction_revisionFields_with_Overrides_withError() {
+    $query = $this->revisionFields_withError_start();
+    $info = $this->getNodeReactionInfo();
+
+    $controller = $this->getTestCondition(array(array('id'=> 4, 'status!$%' => 0, 'promote' => 0 , ';;sticky' => 0, 'uid' => 8, 'title' => 'joe')));
+    $reaction = $this->getNodeReaction();
+    $data= new stdClass();
+    $data->query = $query;
+    $reaction->react($data, $controller);
+
+    $expected = $this->revisionFields_start();
+    $expected->expressions['title']['expression'] = 'COALESCE(node_overrides.override_title, r.title)';
+    $expected->expressions['title']['alias'] = 'title';
+    $expected->expressions['title']['arguments'] = array();
+    $expected->expressions['status']['expression'] = 'r.status';
+    $expected->expressions['status']['alias'] = 'status';
+    $expected->expressions['status']['arguments'] = array();
+    $expected->expressions['promote']['expression'] = 'COALESCE(node_overrides.override_promote, r.promote)';
+    $expected->expressions['promote']['alias'] = 'promote';
+    $expected->expressions['promote']['arguments'] = array();
+    $expected->expressions['sticky']['expression'] = 'r.sticky';
+    $expected->expressions['sticky']['alias'] = 'sticky';
+    $expected->expressions['sticky']['arguments'] = array();
+    $expected->expressions['uid']['expression'] = 'COALESCE(node_overrides.override_uid, r.uid)';
+    $expected->expressions['uid']['alias'] = 'uid';
+    $expected->expressions['uid']['arguments'] = array();
+    $expected->expressions['expression']['expression'] = 'COALESCE(node_overrides.override_title, r.title) is NULL';
+    unset($expected->fields['title']);
+    unset($expected->fields['status']);
+    unset($expected->fields['promote']);
+    unset($expected->fields['sticky']);
+    unset($expected->fields['uid']);
+    ksort($query->expressions);
+    ksort($expected->expressions);
+    $this->assertEqual(
+      $query->expressions,
+      $expected->expressions,
+      "::react alter a query changing the table of all fields on the base table in revisions_fields to to an expression of the Coalese of the overrides table and the revision table and should filter bad chars"
+    );
+    $this->assertEqual(
+      $query->fields,
+      $expected->fields,
+      "::react alter a query changing the table of all fields on the base table in revisions_fields to to an expression of the Coalese of then doe_overrides table and the revision table and remove them from fields"
+    );
+
+    $this->assertEqual(
+      array_keys($query->tables),
+      array('b', 'node_overrides', 'r'),
+      "::react alter a query so that the overrides table is right after the base table"
+    );
+
+    $this->assertEqual(
+      $query->tables['r']['condition'],
+      'r.vid = COALESCE(node_overrides.override_revision_id, b.vid)',
+      "::react alter a query so that the revision table joins on a coalesce of the overides and the base revision ids"
+    );
+
+    $this->assertEqual(
+      $query->where->conditions[0]['field'],
+      'r.status',
+      "::react alter a query so that conditions that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
+    );
+    $this->assertEqual(
+      $query->expressions['expression']['expression'],
+      'COALESCE(node_overrides.override_title, r.title) is NULL',
+      "::react alter a query so that expressions that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
+    );
+
+    $this->assertEqual(
+      $query->order,
+      array ('r.sticky' => 'ASC', 'COALESCE(node_overrides.override_title, r.title)' => 'ASC'),
+      "::react alter a query so that order fields that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
+    );
+  }
   public function test_EntitySelectQueryAlterReaction_groupBy() {
     $query = $this->groupBy_start();
     $info = $this->getNodeReactionInfo();
@@ -458,6 +532,134 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
         'status' => 
         array (
           'field' => 'status',
+          'table' => 'b',
+          'alias' => 'status',
+        ),
+        'uid' => 
+        array (
+          'field' => 'uid',
+          'table' => 'b',
+          'alias' => 'uid',
+        ),
+        'promote' => 
+        array (
+          'field' => 'promote',
+          'table' => 'b',
+          'alias' => 'promote',
+        ),
+      ),
+       'expressions' => 
+      array (
+        'expression' => 
+        array (
+          'expression' => 'b.title is NULL',
+          'alias' => 'expression',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+       'tables' => 
+      array (
+        'b' => 
+        array (
+          'join type' => NULL,
+          'table' => 'node',
+          'alias' => 'b',
+          'condition' => NULL,
+          'arguments' => 
+          array (
+          ),
+        ),
+        'r' => 
+        array (
+          'join type' => 'INNER',
+          'table' => 'node_revision',
+          'alias' => 'r',
+          'condition' => 'r.vid = b.vid',
+          'arguments' => 
+          array (
+          ),
+        ),
+      ),
+       'order' => 
+      array (
+        'b.sticky' => 'ASC',
+        'b.title' => 'ASC',
+      ),
+       'group' => 
+      array (
+      ),
+       'where' => 
+      Drupal\sps\Test\DatabaseCondition::__set_state(array(
+         'conditions' => 
+        array (
+          '#conjunction' => 'AND',
+          0 => 
+          array (
+            'field' => 'b.status',
+            'value' => 1,
+            'operator' => '=',
+          ),
+        ),
+         'arguments' => 
+        array (
+        ),
+         'changed' => true,
+         'queryPlaceholderIdentifier' => NULL,
+      )),
+       'having' => 
+      Drupal\sps\Test\DatabaseCondition::__set_state(array(
+         'conditions' => 
+        array (
+          '#conjunction' => 'AND',
+        ),
+         'arguments' => 
+        array (
+        ),
+         'changed' => true,
+         'queryPlaceholderIdentifier' => NULL,
+      )),
+       'distinct' => false,
+       'range' => NULL,
+       'union' => 
+      array (
+      ),
+       'prepared' => false,
+       'forUpdate' => false,
+       'connectionTarget' => 'default',
+       'connectionKey' => 'default',
+       'queryOptions' => 
+      array (
+        'target' => 'default',
+        'return' => 1,
+      ),
+       'uniqueIdentifier' => '5004e873f40640.15709914',
+       'nextPlaceholder' => 0,
+       'comments' => 
+      array (
+      ),
+    )); 
+  }
+  protected function revisionFields_withError_start() {
+     return Drupal\sps\Test\SelectQuery::__set_state(array(
+       'fields' => 
+      array (
+        'sticky' => 
+        array (
+          'field' => ';;sticky',
+          'table' => 'b',
+          'alias' => 'sticky',
+        ),
+        'title' => 
+        array (
+          'field' => 'title',
+          'table' => 'b',
+          'alias' => 'title',
+        ),
+        'status' => 
+        array (
+          'field' => 'status!$%',
           'table' => 'b',
           'alias' => 'status',
         ),
