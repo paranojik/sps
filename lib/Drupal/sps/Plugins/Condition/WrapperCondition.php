@@ -29,16 +29,23 @@ class WrapperCondition extends BasicCondition {
    */
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
     $this->manager = $manager;
-    if (!$this->manager->getConfigController()->exists(SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS)) {
-      $this->setDefaultConditions();
-    }
-    else {
-      $this->conditions_config = $this->manager->getConfigController()->get(SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS);
-      foreach($this->conditions_config as $name => $config) {
-        $this->conditions[$name] = $this->manager->getPlugin('condition', $name);
-      }
-    }
+    $plugin_infos = array_filter(
+      $this->manager->getPluginInfo('condition'),
+      function($info) {
+        return !(isset($info['root_condition']) && $info['root_condition']);
+      });
+    $configs =  
+    $this->manager->getConfigController()->exists(SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS) ?
+    $this->manager->getConfigController()->get(SPS_CONFIG_WRAPPER_CONDITION_SUB_CONDITIONS) : array();
+    $this->setconditions_config($configs, $plugin_infos);
+    $this->setConditions();
+  }
 
+  protected function setConditions_config($configs, $plugin_info) {
+    foreach($plugin_info as $name => $info) {
+      $this->conditions_config[$name] = isset($configs[$name]) ? $configs[$name] : array();
+    }
+    return $this;
   }
 
   /**
@@ -47,10 +54,18 @@ class WrapperCondition extends BasicCondition {
    * @return \Drupal\sps\Plugins\Condition\WrapperCondition
    *  Self
    */
-  protected function setDefaultConditions() {
-    foreach($this->manager->getPluginInfo('condition') as $name => $info) {
-      if(!isset($info["root_condition"])) {
-        $this->conditions[$name] = $this->manager->getPlugin('condition', $name);
+  protected function setConditions($configs = NULL) {
+    $configs = $configs ?: $this->conditions_config;
+    foreach($configs as $name => $config) {
+      try {
+        $this->conditions[$name] = $this->manager->getPlugin('condition', $name, $config);
+      }
+      catch (\Exception $e){
+        //if we have  NonoperativePluginException we can move on
+        //if not we need to throw it.
+        if(!(method_exists($e, 'originalIs') && $e->originalIs('\Drupal\sps\Exception\NonoperativePluginException')))  {
+          throw $e;
+        }
       }
     }
     return $this;
@@ -147,7 +162,7 @@ class WrapperCondition extends BasicCondition {
     else {
       $element[$container_id][$selector_id] = array(
         '#type' => 'select',
-        '#title' => 'Condition',
+        '#title' => $this->getTitle(),
         '#options' => array('none' => 'Select Condition'),
         '#ajax' => array(
           'callback' => 'sps_wrapper_condition_ajax_callback',
@@ -166,6 +181,9 @@ class WrapperCondition extends BasicCondition {
     return $element;
   }
 
+  public function getTitle() {
+    return t('Condition');
+  }
 
   /**
    * @param $element

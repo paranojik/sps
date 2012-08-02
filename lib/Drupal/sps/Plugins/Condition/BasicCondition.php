@@ -27,6 +27,10 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
     $this->overrides_info = $manager->getPluginByMeta('override', 'condition', $config['name']);
 
+    if(empty($this->overrides_info)) {
+      throw \Drupal\sps\Exception\ NonoperativePluginException("condition {$config['name']} does not have any overrides avaiable");
+    }
+
     if (!empty($config['widget']) && is_string($config['widget'])) {
       $config['widget'] = $manager->getPlugin('widget', $config['widget']);
     }

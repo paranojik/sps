@@ -15,6 +15,10 @@ class Condition extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sp
     $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
     $this->override = isset($settings['override']) ? $settings['override'] : new \Drupal\sps\Test\Override(array(), $manager);
     $this->has_overrides = isset($settings['has_overrides']) ? $settings['has_overrides'] : TRUE;
+
+    if(!$this->has_overrides) {
+      throw new \Drupal\sps\Exception\NonoperativePluginException("condition test condition does not have any overrides avaiable");
+    }
     $this->title = isset($settings['title']) ? $settings['title'] : '';
   }
 
