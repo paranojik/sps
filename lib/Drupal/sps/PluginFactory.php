@@ -75,8 +75,10 @@ class PluginFactory implements PluginControllerInterface {
    * @throws \Drupal\sps\Exception\ClassLoadException
    * @throws \Drupal\sps\Exception\DoesNotImplementException
    */
-  public function getPlugin($type, $name, Manager $manager) {
-    $plugin_info = $this->getPluginInfo($type, $name);
+  public function getPlugin($type, $name, Manager $manager, $settings = NULL) {
+    $settings = $settings ?: array();
+    $plugin_info = $settings + $this->getPluginInfo($type, $name);
+
     if (isset($plugin_info['class'])) {
       $plugin_type_info = $this->getPluginInfo($type);
 

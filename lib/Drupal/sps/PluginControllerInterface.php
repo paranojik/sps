@@ -16,7 +16,7 @@ interface PluginControllerInterface {
    * @return
    *   The plugin object
    */
-  public function getPlugin($type, $name, \Drupal\sps\Manager $manager);
+  public function getPlugin($type, $name, \Drupal\sps\Manager $manager, $settings = NULL);
 
   /**
    * get meta info on a plugin

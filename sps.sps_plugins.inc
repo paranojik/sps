@@ -71,6 +71,7 @@ function sps_sps_condition_plugins() {
       'instance_settings' => array(
         'name' => 'date_condition',
         'widget' => 'date_widget',
+        'title' => 'Site as of ...',
       ),
     ),
     'default_root_condition'=> array(

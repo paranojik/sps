@@ -30,9 +30,18 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
     if (!empty($config['widget']) && is_string($config['widget'])) {
       $config['widget'] = $manager->getPlugin('widget', $config['widget']);
     }
-
+    $this->title = isset($config['title']) ? $config['title'] : $config['name'];
     $this->widget = $config['widget'];
     $this->manager = $manager;
+  }
+
+
+  public function getTitle() {
+    return $this->title;
+  }
+
+  public function hasOverrides() {
+    return !empty($this->overrides_info);
   }
 
   /**

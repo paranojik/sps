@@ -14,7 +14,19 @@ class Condition extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sp
     $this->validate_fail_message = isset($settings['validate_fail_message']) ? $settings['validate_fail_message'] : NULL;
     $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
     $this->override = isset($settings['override']) ? $settings['override'] : new \Drupal\sps\Test\Override(array(), $manager);
+    $this->has_overrides = isset($settings['has_overrides']) ? $settings['has_overrides'] : TRUE;
+    $this->title = isset($settings['title']) ? $settings['title'] : '';
   }
+
+  public function getTitle() {
+    return $this->title;
+  }
+
+  public function hasOverrides() {
+    return $this->has_overrides;
+  }
+
+
 
   /**
    * Provide the config to allow this Condition to construct itself.
@@ -76,7 +88,7 @@ class Condition extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sp
    */
   public function validateElement($element, &$form_state) {
     if ($this->validate_fail_message || $this->validate_fail_name) {
-      form_set_error($this->validate_fail_name, $this->validate_fail_message);
+      sps_drupal()->form_set_error($this->validate_fail_name, $this->validate_fail_message);
     }
     return $this;
   }
