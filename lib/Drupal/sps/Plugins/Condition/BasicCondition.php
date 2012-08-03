@@ -16,23 +16,37 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    *
    * Create a new BasicCondition.
    *
-   * @param $config
+   * @param $config array
    *  An array of configuration which includes the widget to use
    *  These should be specified as the 'widget' key.
    *  The widget key may be specified as class names or instantiated
    *  classes.
-   * @param $manager
+   * @param $manager \Drupal\sps\Manager
    *  The current instance of the sps manager.
    */
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
     $this->overrides_info = $manager->getPluginByMeta('override', 'condition', $config['name']);
 
+    if(empty($this->overrides_info)) {
+      print_r(array_map(function($a) { return $a['function'];}, debug_backtrace()));
+      throw new \Drupal\sps\Exception\NonoperativePluginException("condition {$config['name']} does not have any overrides avaiable");
+    }
+
     if (!empty($config['widget']) && is_string($config['widget'])) {
       $config['widget'] = $manager->getPlugin('widget', $config['widget']);
     }
-
+    $this->title = isset($config['title']) ? $config['title'] : $config['name'];
     $this->widget = $config['widget'];
     $this->manager = $manager;
+  }
+
+
+  public function getTitle() {
+    return $this->title;
+  }
+
+  public function hasOverrides() {
+    return !empty($this->overrides_info);
   }
 
   /**

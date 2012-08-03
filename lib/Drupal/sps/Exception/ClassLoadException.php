@@ -2,4 +2,4 @@
 
 namespace Drupal\sps\Exception;
 
-class ClassLoadException extends \Exception {}
+class ClassLoadException extends SPSException {}

@@ -36,18 +36,6 @@ class SPSSimpleCacheOverrideControllerUnitTest extends SPSBaseUnitTest {
     $manager = new \Drupal\sps\Test\Manager();
     $controller = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
 
-    $overrides = array(
-      array(
-        'id' => 5,
-        'type' => 'node',
-      ),
-   );
-   $this->assertThrows(
-     function() use ($controller, $overrides) { $controller->set($overrides) ;},
-     '\Drupal\sps\Exception\InvalidOverrideRowException',
-     'Override row must have revision_id field',
-     '::set throws exeption when an row missing the revision id field is passed'
-   );
    $overrides = array(
       array(
         'revision_id' => 5,

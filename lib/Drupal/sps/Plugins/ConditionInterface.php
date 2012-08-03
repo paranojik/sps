@@ -60,4 +60,12 @@ interface ConditionInterface {
    *  Self
    */
   public function submitElement($element, &$form_state);
+
+  /**
+  * Retrive the User friendly name of the Condition
+  *
+  * @return 
+  *   Title of Condition
+  */
+  public function getTitle();
 }
