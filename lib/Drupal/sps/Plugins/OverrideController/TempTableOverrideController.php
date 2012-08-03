@@ -1,7 +1,7 @@
 <?php
 namespace Drupal\sps\Plugins\OverrideController;
 
-class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideController\TableOverrideStorageControllerInterface {
+class TempTableOverrideController extends AbstractTableOverrideStorageController {
   public $table = array();
 
   /**
@@ -28,9 +28,9 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
     }
     // if we do not have any overrides we need to add a dummy one so that the temp table can be created
     if(empty($querys)) {
-      $querys[] = "SELECT 0 as id, 0 as revision_id";
+      $querys[] = "SELECT 0 as id, NULL as override_revision_id";
     }
-    return  db_query_temporary(implode(" UNION ", $querys));
+    return  sps_drupal()->db_query_temporary(implode(" UNION ", $querys));
   }
 
   /**
@@ -77,25 +77,6 @@ class TempTableOverrideController implements \Drupal\sps\Plugins\OverrideControl
     foreach($table as $row) {
       
     }
-  }
-
-  /**
-  * @brief 
-  *
-  * @return 
-  * A dictionary of properties and the field name on the override table
-  *
-  */
-  public function getPropertyMap() {
-    if(!empty($this->table)) {
-      $properties = array_keys(call_user_func_array('array_merge', $this->table));
-      $properties = array_combine($properties, $properties);
-      unset($properties['type']);
-      unset($properties['id']);
-      return $properties;
-    }
-    return array( 'revision_id' => 'revision_id');
-  
   }
 
   public function __construct(array $config, \Drupal\sps\Manager $manager) {}

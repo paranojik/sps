@@ -105,10 +105,12 @@ function sps_condition_preview_form($form, &$form_state) {
       ),
     );
 
-    $form['buttons']['cancel'] = array(
-      '#type' => 'submit',
-      '#value' => t('Cancel'),
-    );
+    if (!empty($form_state['values'])) {
+      $form['buttons']['cancel'] = array(
+        '#type' => 'submit',
+        '#value' => t('Cancel'),
+      );
+    }
 
     $form['buttons']['preview'] = array(
       '#type' => 'submit',
@@ -238,3 +240,30 @@ function sps_wrapper_condition_ajax_callback($form, $form_state) {
   }
   return $form;
 }
+
+/**
+ * This is to assit in calling function outside of the sps
+ * module that might have side effect. It allows for test to
+ * change the function for there tests
+ * the syntax to use is
+ *
+ * sps_drupal()->FUNCTIONNAME(Param1, Param2, Param3);
+ * eg.g sps_drupal()->drupal_get_form('sps_preview_form');
+ *
+ * if a param needs to be passed by reference the following syntax can be used
+ * sps_drupal()->ref[FUNCTIONNAME](Param1, Param2, Param3);
+ * eg.g sps_drupal()->set('drupal_get_form','sps_preview_form');
+ *
+ * if a test need to reset that function it can run
+ * sps->call['drupal_get_form'] = 'test_drupal_get_form';
+ * and then if something called drupal_get_form it would call
+ * test_drupal_get_form instead.
+ */
+function sps_drupal() {
+  $drupal = &drupal_static(__FUNCTION__);
+  if(!$drupal) {
+    $drupal = new \Drupal\sps\Drupal();
+  }
+  return $drupal;
+}
+

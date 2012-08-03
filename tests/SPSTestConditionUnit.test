@@ -53,7 +53,7 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
     $manager = self::getManager();
 
     $settings = array(
-      'name' => 'BasicCondition',
+      'name' => 'basic',
       'widget' => new \Drupal\sps\Test\Widget(array(), $manager)
     );
 

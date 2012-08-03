@@ -2,4 +2,4 @@
 
 namespace Drupal\sps\Exception;
 
-class InvalidOverrideRowException extends \Exception {}
+class InvalidOverrideRowException extends SPSException {}

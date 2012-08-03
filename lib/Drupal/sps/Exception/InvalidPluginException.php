@@ -2,4 +2,4 @@
 
 namespace Drupal\sps\Exception;
 
-class InvalidPluginException extends \Exception {}
+class InvalidPluginException extends SPSException {}

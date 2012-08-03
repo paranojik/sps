@@ -35,7 +35,8 @@ class ERSOverride extends NodeDateOverride {
         $transform = array();
         $transform['id'] = $row['entity_id'];
         $transform['type'] = $row['entity_type'];
-        $transform['revision_id'] = $row['revision_id'];
+        $transform['revision_id'] = $row['revision_id'] == 0 ? NULL : $row['revision_id'];
+        $transform['status'] = $row['revision_id'] > 0 ? 1 : 0;
         $list[$row['entity_type'].'-'.$row['entity_id']] = $transform;
       }
     }

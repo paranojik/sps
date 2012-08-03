@@ -55,20 +55,15 @@ class Manager {
   protected $hook_controller;
   protected $root_condition;
   protected $plugin_controller;
+  protected $override_controller;
 
   /**
    * Constructor for \Drupal\sps\Manager
    *
-   * @param \Drupal\sps\StorageControllerInterface $state_controller
-   *   The control to use when accessing State info (like site state)
-   * @param \Drupal\sps\StorageControllerInterface $override_controller
-   *   the control to use when accessing overrides
+   * Load the Hook, Plugin and State controller form the configuration.
+   *
    * @param \Drupal\sps\StorageControllerInterface $config_controller
    *   the control to be used when accessing config
-   * @param \Drupal\sps\PluginControllerInterface  $plugin_controller
-   *   The control to use when accessing plugins
-   *
-   * @param HookControllerInterface $hook_controller
    *
    * @return \Drupal\sps\Manager
    */
@@ -81,10 +76,10 @@ class Manager {
   }
 
   /**
-   * Create a Controller Object based upon a configuraiton key
+   * Create a Controller Object based upon a configuration key
    *
    * @param $key
-   *  The key from the configuration array that contains the controller informaiton.
+   *  The key from the configuration array that contains the controller information.
    *
    * @return StateControllerInterface|PluginControllerInterface|HookControllerInterface
    */
@@ -98,7 +93,7 @@ class Manager {
   /**
    * store the state controller
    *
-   * @param \Drupal\sps\StorageControllerInterface $controller
+   * @param \Drupal\sps\StateControllerInterface $controller
    *   The control to use when accessing State info (like site state)
    *
    * @return \Drupal\sps\Manager
@@ -199,9 +194,10 @@ class Manager {
     $this->state_controller->set($site_state);
     return $this;
   }
-  
+
   public function clearSiteState() {
     $this->getStateController()->clear();
+    return $this;
   }
 
   protected function getActiveReactionInfo() {
@@ -209,14 +205,15 @@ class Manager {
   }
 
   /**
-  * product a map from controller api to override controller instances
-  * we start with a list of apis need by reations
-  * then we add to it the first override controller we come to for apis
-  * not in the config. Also if a controller implements 2 apis we do not 
-  * create two instances but instead point to the same one.
-  *
-  * @return 
-  */
+   * product a map from controller api to override controller instances
+   *
+   * we start with a list of apis need by reations
+   * then we add to it the first override controller we come to for apis
+   * not in the config. Also if a controller implements 2 apis we do not
+   * create two instances but instead point to the same one.
+   *
+   * @return
+   */
   protected function getOverrideControllerMap() {
 
     $controllers = array();
@@ -250,7 +247,7 @@ class Manager {
                 $name = $info_name;
               }
             }
-          } 
+          }
         }
       }
       if (!isset($instances[$name])) {
@@ -290,11 +287,12 @@ class Manager {
   /**
    * Notify the manager that the preview form submission is complete.
    *
+   * @param Plugins\ConditionInterface $root_condition
    *
    * @return \Drupal\sps\Manager
    *  Self
    */
-  public function previewFormSubmitted($root_condition) {
+  public function previewFormSubmitted(\Drupal\sps\Plugins\ConditionInterface $root_condition) {
     $this->setSiteState($root_condition);
     return $this;
   }
@@ -311,7 +309,7 @@ class Manager {
   *   the current root condition object
   */
   protected function getRootCondition() {
-    if($site_state = $this->getSiteState()) {
+    if ($site_state = $this->getSiteState()) {
       return $site_state->getCondition();
     }
     $settings = $this->config_controller->get(SPS_CONFIG_ROOT_CONDITION);
@@ -324,11 +322,59 @@ class Manager {
    *
    * The manager is use as an interface for Drupal hooks that need to have a
    * reaction react
-   *                    .-----------------------.   .-----------------------------------.
-   * .--------------.   |        Manager        |   |            Reaction               |
-   * | Drupal hooks |-->|-----------------------|-->|-----------------------------------|
-   * '--------------'   | react($plugin, $data) |   | react($data, $overridecontroller) |
-   *                    '-----------------------'   '-----------------------------------'
+   *
+   * ___________________
+   * \                  \
+   *  \  Manager::react  \
+   *   ) called           )----Reaction Name and Data
+   *  /                  /     |
+   * /__________________/      |
+   *            ^              v
+   *            |      ______________
+   *            |      \             \                        .------------------.
+   *            |       \  Get Site   \                       | State Controller |
+   *       No SiteState--) State       )--------------------->|------------------|
+   *            |       /             / ^                     | get()            |
+   *            |      /_____________/  |                     '------------------'
+   *            |              |        |                               |
+   *            |              v        '------SiteState object---------'
+   *            |    _________________
+   *            |    \                \
+   *            |     \  Get Reaction  \
+   *      No Reaction  ) ORC api key    )---------reaction name---------.
+   *            |     /  and object    / ^                              v
+   *            |    /________________/  |                    .-------------------.
+   *            |              |         |                    | Plugin Controller |
+   *            |              |         |                    |-------------------|
+   *            |              |         |                    | getPluginInfo()   |
+   *            |              |         |                    | getPlugin()       |
+   *            |              |         |                    '-------------------'
+   *            |              v         |                              |
+   *            |    _________________   '--Override Controller API Key-'
+   *            |    \                \     Reaction Object
+   *            |     \  Get Override  \
+   *          No ORC---) Controller     )-Override Controller API Key-.
+   *            |     /                / ^                            v
+   *            |    /________________/  |               .-------------------------.
+   *            |              |         |               |       Site State        |
+   *            |              |         |               |-------------------------|
+   *            |              |         |               | getOverrideController() |
+   *            |              |         |               '-------------------------'
+   *            |              |         |                            |
+   *            |              v         '-OverrideController object -'
+   *            |        _________
+   *            |        \        \
+   *            |         \  Call  \
+   *     retrun data-------) React  )---data and OverrideController obj-.
+   *                      /        /                                    v
+   *                     /________/                           .------------------.
+   *                           ^                              |     Reaction     |
+   *                           |                              |------------------|
+   *                           |                              | react()          |
+   *                           |                              '------------------'
+   *                           |                                        |
+   *                           '--------retrun data---------------------'
+   *
    *
    * @param String $reaction
    *   the name of a reaction plugin;
@@ -345,7 +391,6 @@ class Manager {
        ($controller = $site_state->getOverrideController($infos[$reaction]['use_controller_api']))
       ) {
       return $this->getPlugin("reaction", $reaction)->react($data, $controller);
-      
     }
   }
 
@@ -357,11 +402,15 @@ class Manager {
    * @param String $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
    *
+   * @param Array $settings
+   *   an array that should be used for instance settings (instance settings from the plugin info are
+   *   add to this array
+   *
    * @return \Drupal\sps\Plugins\PluginInterface
    *   An instance of the requested Plugin
    */
-  public function getPlugin($type, $name) {
-    return $this->plugin_controller->getPlugin($type, $name, $this);
+  public function getPlugin($type, $name, $settings = NULL) {
+    return $this->plugin_controller->getPlugin($type, $name, $this, $settings);
   }
 
   /**
