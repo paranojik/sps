@@ -19,7 +19,8 @@ class ERSOverride extends NodeDateOverride {
       ->orderBy('publish_date')
       ->orderBy('revision_id');
 
-    $this->results = $select->execute()->fetchAllAssoc('entity_type', \PDO::FETCH_ASSOC);
+    $this->results = $select->execute()->fetchAllAssoc('schedule_id', \PDO::FETCH_ASSOC);
+
     return $this->processOverrides();
   }
 
@@ -27,7 +28,7 @@ class ERSOverride extends NodeDateOverride {
     $list = array();
     foreach($this->results as $key => $result) {
       if (isset($result['entity_id'])) {
-        $this->results[$key] = $result = array($result);
+        $result = array($result);
       }
 
       foreach($result as $sub => $row) {
