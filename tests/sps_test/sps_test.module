@@ -1,12 +1,6 @@
 <?php
 function sps_test_menu() {
   return array(
-    'test_sps' => array(
-      'title' => 'Test SPS Preview Form',
-      'description' => '',
-      'page callback' => 'sps_test_test_widget_form',
-      'access callback' => TRUE,
-    ),
     'sps_test_call/%' => array(
       'title' => 'Test SPS Preview Form',
       'description' => '',
@@ -16,53 +10,6 @@ function sps_test_menu() {
     ),
   );
 }
-
-function sps_test_test_widget_form() {
-  $plugins = array(
-    'override' => array(
-      'test1' => array(
-        'name' => 'test1',
-        'condition' => 'BasicCondition',
-        'class' => '\Drupal\sps\Test\Override',
-        'instance_settings' => array(
-          'type' => 'node',
-        ),
-      ),
-      'test2' => array(
-        'name' => 'test2',
-        'condition' => 'BasicCondition',
-        'class' => '\Drupal\sps\Test\Override',
-        'instance_settings' => array(
-          'type' => 'box',
-        ),
-      ),
-    ),
-    'condition' => array(
-      'basic' => array(
-        'name' => 'basic',
-        'class' => '\Drupal\sps\Plugins\Condition\BasicCondition',
-        'instance_settings' => array(
-          'widget' => 'basicWidget',
-          'name' => 'basic',
-        ),
-      ),
-    ),
-    'widget' => array(
-      'basicWidget' => array(
-        'name' => 'basicWidget',
-        'class' => '\Drupal\sps\Plugins\Widget\DateWidget',
-        'instance_settings' => array(),
-      ),
-    )
-  );
-  $config_controller = new Drupal\sps\Test\ConfigController();
-  $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array('name' => 'basic'));
-  $config_controller->default[SPS_CONFIG_PLUGIN_CONTROLLER]['instance_settings'] = $plugins;
-  $config_controller->default[SPS_CONFIG_HOOK_CONTROLLER]['class'] = '\Drupal\sps\DrupalHookController';
-  $manager = new Drupal\sps\Manager($config_controller);
-  return $manager->getPreviewForm();
-}
-
 
 function sps_test_call_set($name, $rtn) {
   $returns = variable_get('sps_test_call', array());

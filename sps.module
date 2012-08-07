@@ -323,4 +323,3 @@ function sps_add_override($message, $entity_id, $entity_type, $overrides = array
   $manager->setSiteState($condition);
 
 }
-
