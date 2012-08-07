@@ -9,6 +9,13 @@ define('SPS_CONFIG_OVERRIDE_CONTROLLERS', "override_controllers_settings");
 define('SPS_CONFIG_PREFIX', "sps_config");
 define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
+/**
+* implements hook_menu()
+*/
+function sps_menu_alter(&$items) {
+  $items['node/%node/revisions/%/view']['page callback'] = 'sps_node_revision';
+  $items['node/%node/revisions/%/view']['page arguments'] = array(1, 3);
+}
 
 /**
  *  Implements hook_sps_plugin_types()
@@ -265,5 +272,55 @@ function sps_drupal() {
     $drupal = new \Drupal\sps\Drupal();
   }
   return $drupal;
+}
+
+/**
+* Override of the node/%node/revisions/%/view page callback
+*
+* set a override for this version and go to node view page
+*
+* @return 
+*/
+function sps_node_revision($node, $revision_id) {
+
+  $message = array('#markup' => t('Viewing %title; revision %date', array('%date' => format_date($node->revision_timestamp), '%title' => $node->title)));
+  sps_add_override($message, $node->nid, 'node', array('revision_id' => $revision_id));
+  drupal_goto("node/{$node->nid}");
+  
+  return '';
+}
+
+/**
+* Set the SiteState to a single Override
+*
+* @param $message
+*   a render array that should be used by the sps form to say what is showing
+* @param $entity_id
+*   the id of the entity that should have overrides
+* @param $entity_type
+*   the type of entity that is overridden
+* @param $overrides
+*   A assoc array of overrides, with they keys the fields to override
+* @param $manager 
+*   The manager to set the site state (if NULL this will come from sps_get_manager()
+*
+* @return 
+*   NULL
+*/
+function sps_add_override($message, $entity_id, $entity_type, $overrides = array(), $manager = NULL) {
+  $manager = $manager ?: sps_get_manager();
+  $overrides = array(array(
+    'type' => $entity_type,
+    'id' => $entity_id,
+  ) + $overrides);
+  $condition = new \Drupal\sps\Plugins\Condition\FixedOverrideCondition(
+    array(
+      'message' => $message,
+      'override' => new \Drupal\sps\Plugins\Override\FixedOverride(array('overrides' => $overrides), $manager),
+    ),
+    $manager
+  );
+  $manager->setSiteState($condition);
+
 }
 

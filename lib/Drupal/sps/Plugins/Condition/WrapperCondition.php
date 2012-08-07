@@ -201,9 +201,9 @@ class WrapperCondition extends BasicCondition {
    *
    * @return array
    */
-  protected function extractSubState($element, $form_state) {
+  protected function extractSubState($element, $form_state, $container_id= NULL) {
 
-    $container_id= $this->getContainerId();
+    $container_id= $container_id ?: $this->getContainerId();
 
 
     $sub_state = $form_state;
