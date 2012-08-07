@@ -8,7 +8,7 @@ namespace Drupal\sps\Plugins\Condition;
 *
 * It has a message that it used to display in the sps preview and the override that it pass on
 */
-class FixedOverrideCondition extends WrapperCondition {
+class FixedOverrideCondition extends BasicCondition {
   /**
   * expect to get message and overrides in the $config
   */

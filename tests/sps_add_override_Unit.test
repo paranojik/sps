@@ -11,15 +11,14 @@ class sps_add_override_UnitTest extends SPSBaseUnitTest {
     $manager = new \Drupal\sps\Test\Manager();
     $message = array( '#markup' => 'This is the message');
     $entity_id = 5;
-    $entity_type = 'not_a_node';
+    $entity_type = 'node';
     $overrides = array("property1" => TRUE, "property2" => 6);
     sps_add_override($message, $entity_id, $entity_type, $overrides, $manager);
 
     $state = $manager->getSiteState();
-    
     $this->assertEqual(
       $manager->getSiteState()->getCondition()->getOverride()->getOverrides(),
-      $overrides + array("entitiy_id" => $entity_id, "entity_type" => $entity_type),
+      array(array("id" => $entity_id, "type" => $entity_type)+$overrides),
       "sps_add_override, should create a new site state with the proper override in place"
     );
   }

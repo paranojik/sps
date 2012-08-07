@@ -118,15 +118,6 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $form_state = array();
 
     $element = $condition->getElement($form,$form_state);
-    print_r(array(
-      $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
-      array(
-        'none' => 'Select Condition', 
-        'condition_test' => 'test 1',
-        'condition_test2' => 'test 2',
-        'condition_test3' => 'test 3'
-      ),
-    ));
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
       array(

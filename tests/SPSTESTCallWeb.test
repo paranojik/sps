@@ -11,7 +11,6 @@ class SPSTESTCallWebTest extends SPSBaseWebTest {
   public function testCToolsObjectCache_exists() {
     sps_test_call_set("test", 'return "This is a Test";');
     $this->drupalGet("sps_test_call/test");
-    print_r($this->drupalGetContent());
 
     $this->assertText("This is a Test");
   }
