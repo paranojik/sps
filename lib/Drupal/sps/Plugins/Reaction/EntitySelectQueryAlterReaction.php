@@ -373,7 +373,37 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     $replacement_c = $sub_condition;
     $condition = $replacement;
   }
-
+  
+  /**
+  * This function takes an array from a DatabaseCondition::conditions() call
+  * and use that info to create a new DatabaseCondition. it then replace the 
+  * original array with a single item that is the new DatabaseCondition.
+  *
+  * This is used to move conditions out of the base where and having parts of
+  * a query, so that the class of the DatabaseCondition can  be changed
+  *
+  * @param $condition_info
+  *   and array from a DatabaseCondition::conditions()
+  *
+  * @return 
+  * NULL
+  */
+  protected function encapCondition(&$condition_info) {
+    if(isset($condition_info[0])) {
+      $where_info = $condition_info;
+      $replacement = db_and();
+      $relacement_info = &$replacement->conditions();
+      $relacement_info = $where_info;
+      $condition_info = array(
+        '#conjunction' => 'AND',
+        0 => array(
+          'field' => $replacement,
+          'operator' => '=',
+          'value' => array(),
+        )
+      );
+    }
+  }
  /**
   * copy of DatabaseConnection::escapeField
   * @see DatabaseConnection::escapeField
@@ -429,6 +459,8 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       $this->recusiveReplace($tables, $alias, $property_map);
 
       $where =& $query->conditions();
+      $this->encapCondition($where);
+
       $this->recusiveReplace($where, $alias, $property_map);
 
       $order =& $query->getOrderBy();
