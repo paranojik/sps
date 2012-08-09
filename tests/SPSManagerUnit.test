@@ -240,6 +240,40 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     );
   }
 
+  public function testManager_react_admin_path() {
+    $settings = array(
+      'callback' => function($data, $override_controller) { return array($override_controller, $data + 1);},
+    );
+    $info = array(
+      'reaction' => array(
+        'test_reaction' => array(
+          'class' => '\Drupal\sps\Test\Reaction',
+          'instance_settings' => $settings,
+          'use_controller_api' => 'testapi1',
+        ),
+      ),
+      'override_controller' => array(
+        'testor1' => array(
+          'class' => '\Drupal\sps\Test\TableOverrideStorageController',
+          'implements_controller_api' => 'testapi1',
+          'instance_settings' => array(),
+        ),
+      ),
+    );
+    
+    sps_drupal()->set('path_is_admin', function() { return TRUE;});
+    $env = $this->getManagerEnv();
+    $manager = $env->manager;
+    $manager->getConfigController()->set(SPS_CONFIG_OVERRIDE_CONTROLLERS, array());
+    $manager->getPluginController()->setInfo($info);
+    $manager->setSiteState(new \Drupal\sps\Test\Condition(array(), $manager));
+    $this->assertEqual(
+      $manager->react("test_reaction", 4),
+      NULL,
+      "Manager::react should return NULL if we are on a admin page"
+    );
+  }
+
   public function testManager_react_noSiteState() {
     $settings = array(
       'callback' => function($data, $override_controller) { return array($override_controller, $data + 1);},
