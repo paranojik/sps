@@ -10,6 +10,11 @@ function sps_sps_reaction_plugins() {
       'use_controller_api' =>'simple_cache',
       'instance_settings' => array('type' => 'node'),
     ),
+    'add_class'=> array(
+      'class' => 'Drupal\sps\Plugins\Reaction\AddClassReaction',
+      'use_controller_api' =>'simple_cache',
+      'instance_settings' => array(),
+    ),
     'node_select_query_alter' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction',
       'use_controller_api' =>'mysql_table',

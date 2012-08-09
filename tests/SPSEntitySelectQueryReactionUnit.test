@@ -176,7 +176,6 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       array ('COALESCE(node_overrides.override_sticky, r.sticky)' => 'ASC', 'COALESCE(node_overrides.override_title, r.title)' => 'ASC'),
       "::react alter a query so that order fields that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
     );
-    print_r($query);
   }
   public function test_EntitySelectQueryAlterReaction_revisionFields_with_Overrides_withError() {
     $query = $this->revisionFields_withError_start();
