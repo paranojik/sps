@@ -19,17 +19,18 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    * @param $config array
    *  An array of configuration which includes the widget to use
    *  These should be specified as the 'widget' key.
-   *  The widget key may be specified as class names or instantiated
-   *  classes.
+   *  The widget key may be specified as class names or instantiated classes.
    * @param $manager \Drupal\sps\Manager
-   *  The current instance of the sps manager.
+   *                 The current instance of the sps manager.
+   *
+   * @throws \Drupal\sps\Exception\NonoperativePluginException
    */
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
     $this->overrides_info = $manager->getPluginByMeta('override', 'condition', $config['name']);
 
     if(empty($this->overrides_info)) {
-      //print_r(array_map(function($a) { return $a['function'];}, debug_backtrace()));
-      throw new \Drupal\sps\Exception\NonoperativePluginException("condition {$config['name']} does not have any overrides avaiable");
+      throw new \Drupal\sps\Exception\NonoperativePluginException(
+        "condition {$config['name']} does not have any overrides avaiable");
     }
 
     if (!empty($config['widget']) && is_string($config['widget'])) {
@@ -77,7 +78,8 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   public function getElement($element, &$form_state) {
     if (empty($this->widget)) {
-      throw new \Drupal\sps\Exception\ClassLoadException('Element requested but no valid Widget found for the Condition.');
+      throw new \Drupal\sps\Exception\ClassLoadException(
+        'Element requested but no valid Widget found for the Condition.');
     }
 
     $sub_state = $form_state;

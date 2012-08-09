@@ -41,6 +41,13 @@ class WrapperCondition extends BasicCondition {
     $this->setConditions();
   }
 
+  /**
+   * @param $configs
+   * @param $plugin_info
+   *
+   * @return WrapperCondition
+   *  Self
+   */
   protected function setConditions_config($configs, $plugin_info) {
     if(empty($configs)) {
       $this->conditions_config = array_map(function($info) { return array();}, $plugin_info);
@@ -198,12 +205,13 @@ class WrapperCondition extends BasicCondition {
   /**
    * @param $element
    * @param $form_state
+   * @param $container_id
    *
    * @return array
    */
-  protected function extractSubState($element, $form_state) {
+  protected function extractSubState($element, $form_state, $container_id= NULL) {
 
-    $container_id= $this->getContainerId();
+    $container_id= $container_id ?: $this->getContainerId();
 
 
     $sub_state = $form_state;

@@ -181,11 +181,10 @@ class Manager {
    *
    * This might get made private
    *
-   * @param \Drupal\sps\Plugins\OverrideInterface  $override
-   *   the override to use when creating the SiteState
+   * @param \Drupal\sps\Plugins\ConditionInterface $condition
    *
    * @return \Drupal\sps\Manager
-   *   Self
+   *           Self
    */
   public function setSiteState(\Drupal\sps\Plugins\ConditionInterface $condition) {
     $controller_map = $this->getOverrideControllerMap();
@@ -212,7 +211,7 @@ class Manager {
    * not in the config. Also if a controller implements 2 apis we do not
    * create two instances but instead point to the same one.
    *
-   * @return
+   * @return array
    */
   protected function getOverrideControllerMap() {
 
@@ -224,7 +223,8 @@ class Manager {
     foreach($this->getActiveReactionInfo() as $info) {
       $controllers[$info['use_controller_api']] = NULL;
     }
-    $config = $this->getConfigController()->get(SPS_CONFIG_OVERRIDE_CONTROLLERS) ?: array();
+    $config = $this->getConfigController()->exists(SPS_CONFIG_OVERRIDE_CONTROLLERS) ?
+      $this->getConfigController()->get(SPS_CONFIG_OVERRIDE_CONTROLLERS) : array();
     $infos = $this->getPluginInfo('override_controller');
 
     //if the config has valid controllers use them
@@ -250,10 +250,12 @@ class Manager {
           }
         }
       }
-      if (!isset($instances[$name])) {
-        $instances[$name] = $this->getPlugin('override_controller', $name);
+      if($name) {
+        if (!isset($instances[$name])) {
+          $instances[$name] = $this->getPlugin('override_controller', $name);
+        }
+        $controllers_instances[$api] = $instances[$name];
       }
-      $controllers_instances[$api] = $instances[$name];
     }
     return $controllers_instances;
   }
