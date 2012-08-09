@@ -120,12 +120,35 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     return $this;
   }
 
+  /**
+  * 
+  * Add Revision tables to a query if we have the base table but no revision table 
+  *
+  * This has to be add so that if we are showing a different revsion field 
+  * can be pulled from the correct revision
+  *
+  * @param $query
+  *   the query to alter
+  *
+  * @return 
+  */
+  protected function addRevisionTables($query) {
+    $alias = $this->extractAlias($query);
+    $tables = $query->getTables();
+    $aliases = array();
+    foreach($this->entities as $entity) {
+      if(isset($alias[$entity['base_table']]) && !isset($alias[$entity['revision_table']])) {
+        $query->join($entity['revision_table'], 'override_' . $entity['revision_table'], "{$alias[$entity['base_table']]}.{$entity['revision_id']} = override_{$entity['revision_table']}.{$entity['revision_id']}"); 
+      }
+    }
+  }
+
 
   protected function replaceDatum($datum, $alias, $override_property_map = array()) {
     foreach($this->entities as $entity) {
       //replace revision_id
       if(isset($override_property_map['revision_id'])) {
-        $datum = preg_replace("/(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
+        $datum = preg_replace("/\b(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
       }
         
 
@@ -414,6 +437,9 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
     }
     $alias = $this->extractAlias($query);
     if($alias) {
+      $this->addRevisionTables($query);
+      $alias = $this->extractAlias($query);
+
       $property_map = $override_controller->getPropertyMap();
       $this->addOverrideTable($query, $override_controller);
 

@@ -23,6 +23,13 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       'condition' => 'b.nid = node_overrides.id',
       'arguments' => array (),
     );
+    $expected->tables['override_node_revision'] = array (
+      'join type' => 'INNER',
+      'table' => 'node_revision',
+      'alias' => 'override_node_revision',
+      'condition' => 'COALESCE(node_overrides.override_revision_id, b.vid) = override_node_revision.vid',
+      'arguments' => array (),
+    );
     $this->assertEqual(
       $query->tables,
       $expected->tables,
