@@ -333,6 +333,14 @@ class Manager {
    * /__________________/      |
    *            ^              v
    *            |      ______________
+   *            |      \             \
+   *            |       \  Check if   \
+   *       On Admin Page-) on admin    )
+   *            |       /             /
+   *            |      /_____________/
+   *            |              |
+   *            |              v
+   *            |      ______________
    *            |      \             \                        .------------------.
    *            |       \  Get Site   \                       | State Controller |
    *       No SiteState--) State       )--------------------->|------------------|
@@ -389,6 +397,7 @@ class Manager {
   public function react($reaction, $data) {
     $infos = $this->getActiveReactionInfo();
     if(isset($infos[$reaction]) &&
+       !sps_drupal()->path_is_admin(sps_drupal()->current_path()) &&
        ($site_state = $this->getSiteState()) &&
        ($controller = $site_state->getOverrideController($infos[$reaction]['use_controller_api']))
       ) {
