@@ -325,3 +325,82 @@ function sps_add_override($message, $entity_id, $entity_type, $overrides = array
 
   $manager->setSiteState($condition);
 }
+
+
+
+/**
+* implements hook_preprocess()
+*/
+function sps_preprocess(&$vars, $hook) {
+  _sps_preprocess($vars, $hook, sps_get_manager());
+}
+
+/**
+* For node process we add the overridden class if the node has an override
+* and for all of the style level view theme functions we are doing the same
+*
+* @param $vars
+*   from hook_preprocess
+* @param $hook
+*   from hook_preprocess
+* @param $manager
+*   The manager to use for reactions
+*
+*/
+function _sps_preprocess(&$vars, $hook, $manager) {
+  switch ($hook) {
+
+    case 'node';
+      if ($class = $manager->react('add_class', array('id'=> $vars['nid'], 'type' => 'node'))) {
+        $vars['classes_array'][] = $class;
+      }
+    break;
+    case 'views_view_unformatted':
+    case 'views_view_list':
+      if($vars['view']->base_table == 'node') {
+        foreach($vars['view']->result as $index => $row) {
+          if ($class = $manager->react('add_class', array('id'=> $row->nid, 'type' => 'node'))) {
+            $vars['classes_array'][$index] .= " $class";
+          }
+        }
+      }
+    break;
+    case 'views_view_table':
+      if($vars['view']->base_table == 'node') {
+        foreach($vars['view']->result as $index => $row) {
+          if ($class = $manager->react('add_class', array('id'=> $row->nid, 'type' => 'node'))) {
+            $vars['row_classes'][$index][]= $class;
+          }
+        }
+      }
+    break;
+    case 'views_view_grid':
+      if($vars['view']->base_table == 'node') {
+        $view     = $vars['view'];
+        $result   = $view->result;
+        $options  = $view->style_plugin->options;
+        $columns  = $options['columns'];
+        foreach($result as $index => $row) {
+          if ($class = $manager->react('add_class', array('id'=> $row->nid, 'type' => 'node'))) {
+            $row_index = 0;
+            $col_index = 0;
+            $total = count($result);
+            $rows = ceil($total/$columns);
+            if ($options['alignment'] == 'horizontal') {
+              $row_index = floor($index/$rows);
+              $col_index = $index - ($row_index*$rows);
+            }
+            else {
+              $col_index = floor($index/$columns);
+              $row_index = $index - ($col_index*$columns);
+            }
+            $vars['column_classes'][$row_index][$col_index] .= " $class";
+          }
+        }
+      }
+    break;
+    default :
+  }
+}
+
+

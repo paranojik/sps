@@ -90,9 +90,9 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       'r.vid = COALESCE(node_overrides.override_revision_id, b.vid)',
       "::react alter a query so that the revision table joins on a coalesce of the overides and the base revision ids"
     );
-
+    $condition = $query->where->conditions[0]['field']->conditions();
     $this->assertEqual(
-      $query->where->conditions[0]['field'],
+      $condition[0]['field'],
       'r.status',
       "::react alter a query so that conditions that reference revision fields on the base, are change to the revision table"
     );
@@ -166,9 +166,9 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       'r.vid = COALESCE(node_overrides.override_revision_id, b.vid)',
       "::react alter a query so that the revision table joins on a coalesce of the overides and the base revision ids"
     );
-
+    $condition = $query->where->conditions[0]['field']->conditions();
     $this->assertEqual(
-      $query->where->conditions[0]['field'],
+      $condition[0]['field'],
       'COALESCE(node_overrides.override_status, r.status)',
       "::react alter a query so that conditions that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
     );
@@ -241,8 +241,9 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
       "::react alter a query so that the revision table joins on a coalesce of the overides and the base revision ids"
     );
 
+    $condition = $query->where->conditions[0]['field']->conditions();
     $this->assertEqual(
-      $query->where->conditions[0]['field'],
+      $condition[0]['field'],
       'r.status',
       "::react alter a query so that conditions that reference revision fields on the base, are change to a coalesce of the overrides table and the revision table if the field is controller->getProperyMap"
     );
@@ -292,6 +293,7 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     $reaction->react($data, $controller);
     $conditions = $query->conditions();
     $conditions = $conditions[0]['field']->conditions();
+    $conditions = $conditions[0]['field']->conditions();
     $this->assertEqual(
       $conditions[0]['field'],
       'r.sticky',
@@ -310,6 +312,7 @@ class SPSEntitySelectQueryAlterReactionUnitTest extends SPSBaseUnitTest {
     $reaction->react($data, $controller);
    
     $conditions = $query->conditions();
+    $conditions = $conditions[0]['field']->conditions();
     $conditions = $conditions[0]['field']->conditions();
     $this->assertEqual(
       $conditions[0]['field'],
