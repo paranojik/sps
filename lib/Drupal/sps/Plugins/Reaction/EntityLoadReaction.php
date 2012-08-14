@@ -17,7 +17,6 @@ class EntityLoadReaction implements \Drupal\sps\Plugins\ReactionInterface {
    * @return \Drupal\sps\Plugins\Reaction\EntityLoadReaction
    */
   public function __construct(array $config, \Drupal\sps\Manager $manager) {
-    $this->type = $config['type'];
   }
 
   /**
@@ -33,9 +32,6 @@ class EntityLoadReaction implements \Drupal\sps\Plugins\ReactionInterface {
    *  the revision id;
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
-    $row = $override_controller->getRevisionId($data, $this->type);
-    if(isset($row['revision_id'])) {
-      return $row['revision_id'];
-    }
+    return 'sps';
   }
 }

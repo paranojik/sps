@@ -15,6 +15,10 @@ define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 function sps_menu_alter(&$items) {
   $items['node/%node/revisions/%/view']['page callback'] = 'sps_node_revision';
   $items['node/%node/revisions/%/view']['page arguments'] = array(1, 3);
+  $items['block/%bean_delta/revisions/%/view']['page callback'] = 'sps_bean_revision';
+  $items['block/%bean_delta/revisions/%/view']['page arguments'] = array(1, 3);
+  $items['block/%bean_delta/revisions/%']['page callback'] = 'sps_bean_revision';
+  $items['block/%bean_delta/revisions/%']['page arguments'] = array(1, 3);
 }
 
 /**
@@ -203,7 +207,7 @@ function sps_get_manager() {
 function sps_query_alter($query) {
   $data = new stdClass();
   $data->query=$query;
-  sps_get_manager()->react('node_select_query_alter', $data);
+  sps_get_manager()->react('entity_select_query_alter', $data);
 }
 
 /**
@@ -213,6 +217,7 @@ function sps_query_alter($query) {
  */
 function sps_entity_info_alter(&$entity_info) {
   $entity_info['node']['controller class'] = '\Drupal\sps\NodeController';
+  $entity_info['bean']['controller class'] = '\Drupal\sps\EntityController\BeanEntityAPIController';
 }
 
 /**
@@ -292,6 +297,16 @@ function sps_node_revision($node, $revision_id) {
   return '';
 }
 
+function sps_bean_revision($node, $revision_id) {
+  dpm($node);
+  dpm(t('Viewing %title; revision %date', array('%date' => $node->vid, '%title' => $node->title)));
+  $message = array('#markup' => t('Viewing %title; revision %date', array('%date' => $node->vid, '%title' => $node->title)));
+  sps_add_override($message, $node->bid, 'bean', array('revision_id' => $revision_id));
+  drupal_goto("block/{$node->label}");
+
+  return '';
+}
+
 /**
  * Set the SiteState to a single Override
  *
@@ -349,7 +364,17 @@ function sps_preprocess(&$vars, $hook) {
 */
 function _sps_preprocess(&$vars, $hook, $manager) {
   switch ($hook) {
+    case 'block':
+      if($vars['block']->module == 'bean') {
+        $id = array_reduce(array_keys($vars['elements']['bean']), function($key, $v) { 
+          return is_numeric($key) ? $key : $v;
+        });
 
+        if ($class = $manager->react('add_class', array('id'=> $id, 'type' => 'bean'))) {
+          $vars['classes_array'][] = $class;
+        }
+      }
+    break;
     case 'node';
       if ($class = $manager->react('add_class', array('id'=> $vars['nid'], 'type' => 'node'))) {
         $vars['classes_array'][] = $class;

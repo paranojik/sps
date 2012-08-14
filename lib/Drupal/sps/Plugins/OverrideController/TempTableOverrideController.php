@@ -22,8 +22,8 @@ class TempTableOverrideController extends AbstractTableOverrideStorageController
           $value = isset($row[$property]) ? $row[$property] : 'NULL';
           $columns[] = "$value as $field";
         }
+        $querys[] = "SELECT " . implode(",", $columns);
       }
-      $querys[] = "SELECT " . implode(",", $columns);
 
     }
     // if we do not have any overrides we need to add a dummy one so that the temp table can be created

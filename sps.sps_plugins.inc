@@ -4,33 +4,40 @@
  * implements hook_sps_reaction_plugins()
  */
 function sps_sps_reaction_plugins() {
-  return array(
-    'node_load'=> array(
+  $reactions = array(
+    'entity_load'=> array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntityLoadReaction',
       'use_controller_api' =>'simple_cache',
-      'instance_settings' => array('type' => 'node'),
+      'instance_settings' => array(),
     ),
     'add_class'=> array(
       'class' => 'Drupal\sps\Plugins\Reaction\AddClassReaction',
       'use_controller_api' =>'simple_cache',
       'instance_settings' => array(),
     ),
-    'node_select_query_alter' => array(
+   'entity_select_query_alter' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction',
       'use_controller_api' =>'mysql_table',
       'instance_settings' => array(
-        'entities' => array(
-          array(
-            'base_table' => 'node',
-            'base_id' => 'nid',
-            'revision_table' => 'node_revision',
-            'revision_id' => 'vid',
-            'revision_fields' => array('title', 'uid', 'status', 'promote', 'sticky'),
-          ),
-        ),
+        'entities' => array(),
       ),
     ),
   );
+  //Lets add all of the entites that have revisions to the query_alter
+  //and then lets add in the node revision fields
+  foreach(module_invoke_all('entity_info') as $type => $info) {
+    if(isset($info['revision table'])) {
+      $reactions['entity_select_query_alter']['instance_settings']['entities'][$type] = array(
+        'base_table' => $info['base table'],
+        'revision_table' => $info['revision table'],
+        'base_id' => $info['entity keys']['id'],
+        'revision_id' => $info['entity keys']['revision'],
+        'revision_fields' => isset($info['field replacement']) ? array_keys($info['field replacement']) : array(),
+      );
+    }
+  $reactions['entity_select_query_alter']['instance_settings']['entities']['node']['revision_fields'] = array('title', 'uid', 'status', 'promote', 'sticky');
+  }
+  return $reactions;
 }
 
 /**

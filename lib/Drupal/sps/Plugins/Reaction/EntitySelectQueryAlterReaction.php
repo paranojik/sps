@@ -54,22 +54,24 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   protected function fieldReplace(&$fields, $alias) {
     foreach($fields as &$field) {
       foreach($this->entities as $entity) {
-        //check for revision fields in base
-        if (
-          isset($alias[$entity['revision_table']]) &&
-          ($field['table'] == $alias[$entity['base_table']]) &&
-          (in_array($field['field'], $entity['revision_fields']))
-          ){
-          $field['table'] = $alias[$entity['revision_table']];
-        }
+        if(isset($alias[$entity['base_table']])) {
+          //check for revision fields in base
+          if (
+            isset($alias[$entity['revision_table']]) &&
+            ($field['table'] == $alias[$entity['base_table']]) &&
+            (in_array($field['field'], $entity['revision_fields']))
+            ){
+            $field['table'] = $alias[$entity['revision_table']];
+          }
 
-        //Check for vid in base
-        if (
-          ($field['table'] == $alias[$entity['base_table']]) &&
-          ($field['field'] == $entity['revision_id'])
-           && FALSE
-          ){
-          $field['table'] = $this->getOverrideAlias($entity);
+          //Check for vid in base
+          if (
+            ($field['table'] == $alias[$entity['base_table']]) &&
+            ($field['field'] == $entity['revision_id'])
+             && FALSE
+            ){
+            $field['table'] = $this->getOverrideAlias($entity);
+          }
         }
       }
     }
@@ -108,12 +110,15 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   protected function addOverrideTable($query, $override_controller) {
     $alias = $this->extractAlias($query);
     foreach($this->entities as $entity) {
-      $base_alias = $alias[$entity['base_table']];
-      $base_id = $entity['base_id'];
-      $overrides_alias = $this->getOverrideAlias($entity);
-      if($base_alias) {
-        $type = $entity['base_table'];
-        $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias, $type);
+      if(isset($alias[$entity['base_table']])) {
+        $base_alias = $alias[$entity['base_table']];
+        $base_id = $entity['base_id'];
+        $overrides_alias = $this->getOverrideAlias($entity);
+        if($base_alias) {
+          $type = $entity['base_table'];
+          $override_controller->addOverrideJoin($query, $base_alias, $base_id, $overrides_alias, $type);
+          $t = $query->getTables();
+        }
       }
     }
 
@@ -156,29 +161,31 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   protected function replaceDatum($datum, $alias, $override_property_map = array()) {
     foreach($this->entities as $entity) {
-      //replace revision_id
-      if(isset($override_property_map['revision_id'])) {
-        $datum = preg_replace("/\b(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
-      }
-
-
-      //filter the override_property_map to only inlcude items that in revision fields
-      $coalesce_revision_map = array_intersect_key($override_property_map, array_fill_keys($entity['revision_fields'], TRUE));
-
-      //we have a revision table so lets set values to use that table
-      if(isset($alias[$entity['revision_table']])) {
-          $datum = $this->replaceTableSwitch($datum, $entity['revision_fields'],$alias[$entity['base_table']], $alias[$entity['revision_table']]);
-        // we have propties to override lets give the override table priority
-        // on those fields
-        if(!empty($coalesce_revision_map)) {
-          $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['revision_table']],  $this->getOverrideAlias($entity));
+      if(isset($alias[$entity['base_table']])) {
+        //replace revision_id
+        if(isset($override_property_map['revision_id'])) {
+          $datum = preg_replace("/\b(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
         }
-      }
-      else {
-        // we have propties to override lets give the override table priority
-        // on those fields
-        if(!empty($coalesce_revision_map)) {
-          $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['base_table']],  $this->getOverrideAlias($entity));
+
+
+        //filter the override_property_map to only inlcude items that in revision fields
+        $coalesce_revision_map = array_intersect_key($override_property_map, array_fill_keys($entity['revision_fields'], TRUE));
+
+        //we have a revision table so lets set values to use that table
+        if(isset($alias[$entity['revision_table']])) {
+            $datum = $this->replaceTableSwitch($datum, $entity['revision_fields'],$alias[$entity['base_table']], $alias[$entity['revision_table']]);
+          // we have propties to override lets give the override table priority
+          // on those fields
+          if(!empty($coalesce_revision_map)) {
+            $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['revision_table']],  $this->getOverrideAlias($entity));
+          }
+        }
+        else {
+          // we have propties to override lets give the override table priority
+          // on those fields
+          if(!empty($coalesce_revision_map)) {
+            $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['base_table']],  $this->getOverrideAlias($entity));
+          }
         }
       }
     }
@@ -362,18 +369,20 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   protected function fieldsToExpressions(&$query, $fields_to_move, $alias) {
     $fields = & $query->getFields();
     foreach($this->entities as $entity) {
-      $fields_to_move_entity = $fields_to_move;
-      if(in_array('revision_id', $fields_to_move)) {
-        $fields_to_move_entity[array_search('revision_id', $fields_to_move_entity)] = $entity['revision_id'];
-      }
-      foreach ($fields as $field_alias => $field) {
-        if (in_array($field['field'], $fields_to_move_entity) &&
-            ($field['table'] == $alias[$entity['base_table']])) {
+      if(isset($alias[$entity['base_table']])) {
+        $fields_to_move_entity = $fields_to_move;
+        if(in_array('revision_id', $fields_to_move)) {
+          $fields_to_move_entity[array_search('revision_id', $fields_to_move_entity)] = $entity['revision_id'];
+        }
+        foreach ($fields as $field_alias => $field) {
+          if (in_array($field['field'], $fields_to_move_entity) &&
+              ($field['table'] == $alias[$entity['base_table']])) {
 
-          //We are turning this into an expression so we need to do the escape that would be
-          //use if it was a field on the table and field
-          $query->addExpression($field['table'] .'.'. $this->escapeField($field['field']), $field_alias);
-          unset($fields[$field_alias]);
+            //We are turning this into an expression so we need to do the escape that would be
+            //use if it was a field on the table and field
+            $query->addExpression($field['table'] .'.'. $this->escapeField($field['field']), $field_alias);
+            unset($fields[$field_alias]);
+          }
         }
       }
     }
@@ -472,7 +481,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
     $query = $data->query;
-
+      $alias = $this->extractAlias($query);
     //exit prematurly if we ha a no alter tag
     if($query->hasTag(SPS_NO_ALTER_QUERY_TAG)) {
       return;
