@@ -15,7 +15,7 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
    *   The entity type for which the instance is created.
    */
   public function __construct($entityType) {
-    $this->info = entity_get_info($entityType);
+    $this->info = sps_drupal()->entity_get_info($entityType);
     $class = $this->info['controller class base'];
     $this->controller = new $class($entityType);
     $this->type = $entityType;
@@ -30,7 +30,7 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
    *   given ids only.
    */
   public function resetCache(array $ids = NULL) {
-    return $this->controller($ids);
+    return $this->controller->resetCache($ids);
   }
 
   /**
@@ -56,7 +56,7 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
       $data->base_table = $this->info['base table'];
       $data->type = $this->type;
       $data->ids = $ids;
-      if($revision_ids  = sps_get_manager()->react('entity_load', $data)) {
+      if($revision_ids  = sps_drupal()->sps_get_manager()->react('entity_load', $data)) {
         $conditions[$revision_id_key] = $revision_ids;
       }
     }

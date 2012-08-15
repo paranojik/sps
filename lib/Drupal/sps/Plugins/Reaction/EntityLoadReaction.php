@@ -22,29 +22,31 @@ class EntityLoadReaction implements \Drupal\sps\Plugins\ReactionInterface {
   /**
    * Return the revision id for a passed in id for the type stored from the constructor
    *
-   * @param int $data
-   *   the entity id
+   * @param $data
+   *   and object with the following properies
+   *   revision_id_key
+   *   base_id_key
+   *   base_table
+   *   ids : the 
    * @param $override_controller
    *   This is an override controller to use to find
    *   override data
    *
-   * @return int | NULL
-   *  the revision id;
+   * @return 
+   *  array of revision ids;
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
-    if ($data === 'active') { return TRUE;}
-
     $revision_id_query = db_select($data->base_table, 'b');
     $revision_id_query->fields('b', array($data->revision_id_key, $data->base_id_key));
     $revision_id_query->condition('b.'. $data->base_id_key, $data->ids);
     $revision_id_query->addTag(SPS_NO_ALTER_QUERY_TAG);
-    $result = $revision_id_query->execute()->fetchAllAssoc($data->base_id_key);
-
+    $result = $revision_id_query->execute()->fetchAllAssoc($data->base_id_key); 
+    $had_overrides = FALSE;
     foreach($result as $id => $row) {
-      $row = $override_controller->getRevisionId($id, $data->type);
-      $vids[] = $row['revision_id'] ?: $row[$data->revision_id_key];
+      $override = $override_controller->getRevisionId($id, $data->type);
+      $vids[] = $override['revision_id'] ?: $row->{$data->revision_id_key};
+      $had_overrides = $had_overrides || $override;
     }
-    //dpm($vids);
-    return $vids;
+    return $had_overrides ? $vids : array();
   }
 }
