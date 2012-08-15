@@ -1,0 +1,8 @@
+name = SPS Fieldable Panels Panes Integration
+description = Provides tests for integration between SPS and Fieldable Panels Panes.
+core = 7.x
+
+dependencies[] = fieldable_panels_panes
+dependencies[] = sps
+
+files[] = tests/*.test
