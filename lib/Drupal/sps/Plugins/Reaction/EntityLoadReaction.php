@@ -32,12 +32,19 @@ class EntityLoadReaction implements \Drupal\sps\Plugins\ReactionInterface {
    *  the revision id;
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
-    return 'sps';
-    $vids= array();
-    foreach($data->ids as $id) {
+    if ($data === 'active') { return TRUE;}
+
+    $revision_id_query = db_select($data->base_table, 'b');
+    $revision_id_query->fields('b', array($data->revision_id_key, $data->base_id_key));
+    $revision_id_query->condition('b.'. $data->base_id_key, $data->ids);
+    $revision_id_query->addTag(SPS_NO_ALTER_QUERY_TAG);
+    $result = $revision_id_query->execute()->fetchAllAssoc($data->base_id_key);
+
+    foreach($result as $id => $row) {
       $row = $override_controller->getRevisionId($id, $data->type);
-      $vids[] = $row['revision_id'];
+      $vids[] = $row['revision_id'] ?: $row[$data->revision_id_key];
     }
+    //dpm($vids);
     return $vids;
   }
 }

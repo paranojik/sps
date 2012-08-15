@@ -48,19 +48,17 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
   public function load($ids = array(), $conditions = array()) {
     // If not loading a specific revision, look for and load a revision matching
     // the currently active revision tag.
-    $revision_key = $this->info['entity keys']['revision'];
-       //dpm(print_r($ids,TRUE));
-     /*
-    if (empty($conditions[$revision_key])) {
-       $vids = sps_get_manager()->react('entity_load', (object)array('ids'=>$ids, 'type'=> $this->type));
-       dpm($ids, $this->type);
-       dpm($vids, $this->type);
-      $conditions[$revision_key] = $vids;
-    }
-*/
-    if (empty($conditions[$revision_key]) &&
-       ($key = sps_get_manager()->react('entity_load', array()))) {
-      $conditions[$revision_key] = 0;
+    if (($revision_id_key = $this->info['entity keys']['revision']) &&
+        empty($conditions[$revision_id_key])) {
+      $data = new \StdClass();
+      $data->base_id_key = $this->info['entity keys']['id'];
+      $data->revision_id_key = $revision_id_key;
+      $data->base_table = $this->info['base table'];
+      $data->type = $this->type;
+      $data->ids = $ids;
+      if($revision_ids  = sps_get_manager()->react('entity_load', $data)) {
+        $conditions[$revision_id_key] = $revision_ids;
+      }
     }
     return $this->controller->load($ids, $conditions);
   }

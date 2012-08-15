@@ -32,10 +32,20 @@ function sps_sps_reaction_plugins() {
         'revision_table' => $info['revision table'],
         'base_id' => $info['entity keys']['id'],
         'revision_id' => $info['entity keys']['revision'],
-        'revision_fields' => isset($info['field replacement']) ? array_keys($info['field replacement']) : array(),
+      );
+      $reactions['entity_select_query_alter']['instance_settings']['entities'][$type]['revision_fields'] = array_values(
+        array_diff(
+          array_intersect(
+            drupal_schema_fields_sql($info['base table']),
+            drupal_schema_fields_sql($info['revision table'])
+          ),
+          array(
+            $info['entity keys']['id'],
+            $info['entity keys']['revision']
+          )
+        )
       );
     }
-  $reactions['entity_select_query_alter']['instance_settings']['entities']['node']['revision_fields'] = array('title', 'uid', 'status', 'promote', 'sticky');
   }
   return $reactions;
 }
