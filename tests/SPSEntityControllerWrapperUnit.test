@@ -4,7 +4,7 @@ class SPSEntityControllerWrapperUnitTest extends SPSBaseUnitTest {
     return array(
       'name' => 'SPS Entity Controller Wrapper Tests',
       'description' => 'Test the public interface for Entiy controller Wrapper objects',
-      'group' => 'SPSInteractive',
+      'group' => 'SPS',
     );
   }
   public function testEntityControllerWrapper_load() {

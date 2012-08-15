@@ -1,10 +1,10 @@
 <?php
-class SPSConditionIntegrationTest extends SPSBaseUnitTest {
+class SPSBasicConditionUnitTest extends SPSBaseUnitTest {
   static function getInfo() {
     return array(
-      'name' => 'SPS Test Condition Integration Tests',
-      'description' => 'Test that BasicCondition properly works with ',
-      'group' => 'SPSIntegration',
+      'name' => 'SPS Basic condition Unit Test',
+      'description' => 'Test that BasicCondition public metholds',
+      'group' => 'SPS',
     );
   }
 

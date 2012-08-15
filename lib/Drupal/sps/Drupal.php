@@ -102,5 +102,13 @@ class Drupal implements \ArrayAccess {
     unset($this[$name]);
     return $this;
   }
+
+  public function revertAll() {
+    foreach($this as $id => $stuff) {
+      unset($this[$id]);
+    }
+    return $this;
+    
+  }
 }
 

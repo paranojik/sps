@@ -4,7 +4,7 @@ class SPSTestERSUnitTest extends SPSBaseUnitTest {
     return array(
       'name' => 'SPS Test ERS Unit Tests',
       'description' => 'Test the functionality of the ERSOverride object',
-      'group' => 'SPS',
+      'group' => 'SPSIntegration',
     );
   }
 

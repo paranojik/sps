@@ -4,7 +4,7 @@ class SPSPreviewFormWebTest extends SPSBaseWebTest {
     return array(
       'name' => 'SPS Preview Form Web Tests',
       'description' => 'Test the preview form fetching and submission for Conditions.  BASE URL MUST BE SET.',
-      'group' => 'SPSPostTests',
+      'group' => 'SPSInteractive',
     );
   }
   /**
