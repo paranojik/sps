@@ -216,8 +216,15 @@ function sps_query_alter($query) {
  * changing the node controller on behalf of the node_load Reaction
  */
 function sps_entity_info_alter(&$entity_info) {
-  $entity_info['node']['controller class'] = '\Drupal\sps\NodeController';
-  $entity_info['bean']['controller class'] = '\Drupal\sps\EntityController\BeanEntityAPIController';
+  foreach($entity_info as $name => &$info) {
+    if(isset($info['revision table'])) {
+      $info['controller class base'] = '\Drupal\sps\EntityController\\' .$info['controller class'];
+      $info['controller class base'] = $info['controller class'];
+      $info['controller class'] = '\Drupal\sps\EntityController\EntityControllerWrapper';
+    }
+  }
+  //$entity_info['node']['controller class'] = '\Drupal\sps\EntityController\NodeController';
+  //$entity_info['bean']['controller class'] = '\Drupal\sps\EntityController\BeanEntityAPIController';
 }
 
 /**

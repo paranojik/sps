@@ -1,5 +1,5 @@
 <?php
-namespace Drupal\sps;
+namespace Drupal\sps\EntityController;
 /*
  * @file
  * We are overriding the node controller to ensure that when fields are
@@ -10,22 +10,27 @@ namespace Drupal\sps;
  * multiple ids but there can only be one revision.
  */
 class NodeController extends \NodeController {
-public function load($ids = array(), $conditions = array()) {
+  /*
+  public function load($ids = array(), $conditions = array()) {
     // If not loading a specific revision, look for and load a revision matching
     // the currently active revision tag.
+    
     if (empty($conditions[$this->revisionKey]) &&
-      !path_is_admin(current_path()) ){
-      if(sps_get_manager()->getSiteState()) {
-        $conditions[$this->revisionKey] = 'sps';
-      }
+       ($key = sps_get_manager()->react('entity_load', array()))) {
+      $conditions[$this->revisionKey] = $key;
     }
 
     return parent::load($ids, $conditions);
   }
   protected function buildQuery($ids, $conditions = array(), $revision_id = FALSE) {
-    $revision_id = ($revision_id == 'sps') ? FALSE : $revision_id;
+    if (($key = sps_get_manager()->react('entity_load', array()))) {
+      $revision_id = ($revision_id == $key) ? FALSE : $revision_id;
+    }
 
+    $q = parent::buildQuery($ids, $conditions, $revision_id);
+    return $q;
     return parent::buildQuery($ids, $conditions, $revision_id);
   }
+  */
 }
 

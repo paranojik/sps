@@ -33,5 +33,11 @@ class EntityLoadReaction implements \Drupal\sps\Plugins\ReactionInterface {
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
     return 'sps';
+    $vids= array();
+    foreach($data->ids as $id) {
+      $row = $override_controller->getRevisionId($id, $data->type);
+      $vids[] = $row['revision_id'];
+    }
+    return $vids;
   }
 }

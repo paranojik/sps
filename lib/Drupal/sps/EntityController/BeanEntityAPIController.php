@@ -10,7 +10,7 @@ namespace Drupal\sps\EntityController;
  * multiple ids but there can only be one revision.
  */
 class BeanEntityAPIController extends \BeanEntityAPIController {
-public function load($ids = array(), $conditions = array()) {
+  public function load($ids = array(), $conditions = array()) {
     // If not loading a specific revision, look for and load a revision matching
     // the currently active revision tag.
     if (empty($conditions[$this->revisionKey]) &&
