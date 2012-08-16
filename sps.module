@@ -305,8 +305,6 @@ function sps_node_revision($node, $revision_id) {
 }
 
 function sps_bean_revision($node, $revision_id) {
-  dpm($node);
-  dpm(t('Viewing %title; revision %date', array('%date' => $node->vid, '%title' => $node->title)));
   $message = array('#markup' => t('Viewing %title; revision %date', array('%date' => $node->vid, '%title' => $node->title)));
   sps_add_override($message, $node->bid, 'bean', array('revision_id' => $revision_id));
   drupal_goto("block/{$node->label}");
