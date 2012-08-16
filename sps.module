@@ -373,11 +373,10 @@ function _sps_preprocess(&$vars, $hook, $manager) {
   switch ($hook) {
     case 'block':
       if($vars['block']->module == 'bean') {
-        $id = array_reduce(array_keys($vars['elements']['bean']), function($key, $v) { 
-          return is_numeric($key) ? $key : $v;
-        });
-
-        if ($class = $manager->react('add_class', array('id'=> $id, 'type' => 'bean'))) {
+        dpm($vars);
+        $bean = bean_delta_load($vars['block']->delta);
+        $id = $bean ? $bean->bid : FALSE;
+        if ($id && ($class = $manager->react('add_class', array('id'=> $id, 'type' => 'bean')))) {
           $vars['classes_array'][] = $class;
         }
       }
