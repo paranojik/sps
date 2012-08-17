@@ -1,6 +1,6 @@
 name = Site Preview System
 description = The framework for the Content Staging System
-
+package = "Site Preview System"
 core = 7.x
 php = 5.3
 

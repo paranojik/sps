@@ -1,6 +1,7 @@
 name = SPS ERS Integration
 description = Integrates the SPS module with Entity Revision Scheduling (ERS)
 core = 7.x
+package = "Site Preview System"
 
 dependencies[] = sps
 dependencies[] = ers
