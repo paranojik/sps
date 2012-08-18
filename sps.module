@@ -221,10 +221,33 @@ function sps_entity_info_alter(&$entity_info) {
       $info['controller class base'] = '\Drupal\sps\EntityController\\' .$info['controller class'];
       $info['controller class base'] = $info['controller class'];
       $info['controller class'] = '\Drupal\sps\EntityController\EntityControllerWrapper';
+      $info['creation callback'] = 'sps_entity_create';
     }
   }
   //$entity_info['node']['controller class'] = '\Drupal\sps\EntityController\NodeController';
   //$entity_info['bean']['controller class'] = '\Drupal\sps\EntityController\BeanEntityAPIController';
+}
+
+/**
+ * Create a new entity object.
+ *
+ * We need a custom creation callback because the entity API module requires
+ * the EntityAPIControllerInterface and \Drupal\sps\EntityController\EntityControllerWrapper
+ * does not contain EntityAPIControllerInterface.
+ *
+ * @param $entity_type
+ *   The type of the entity.
+ * @param $values
+ *   An array of values to set, keyed by property name. If the entity type has
+ *   bundles the bundle key has to be specified.
+ * @return
+ *   A new instance of the entity type or FALSE if there is no information for
+ *   the given entity type.
+ *
+ * @see entity_type_supports()
+ */
+function sps_entity_create($values, $entity_type) {
+  return entity_get_controller($entity_type)->create($values);
 }
 
 /**
