@@ -6,47 +6,51 @@ namespace Drupal\sps;
  * parts of the system and pushing them to the correct object for processing
  * it can be organized in to a few different sections
  *
- * Controller Access
- * The Manager manages access to drupal systems via different controllers. The
- * SPS system use the manger to access there when they need access to Drupal
- *  .---------------------------------------------------------------.
- *  |                            Systems                            |
- *  '---------------------------------------------------------------'
- *                                  |
- *                                  v
- *                             .---------.
- *                             | Manager |
- *                             |---------|
- *                             '---------'
- * .---------------------------.    |
- * |     State Controller      |    |    .---------------------------.
- * |---------------------------|    |    |     Plugin Controller     |
- * | Controls the interface    |    |    |---------------------------|
- * | to the State cache        |<---|    | Controls the interface    |
- * | used to hold the current  |    '--->| to the plugin system      |
- * | site state                |    |    | holds method for getting  |
- * '---------------------------'    |    | pluign info and objects   |
- * .---------------------------.    |    '---------------------------'
- * |     Config Controller     |    |
- * |---------------------------|    |    .---------------------------.
- * | Controls the interface    |    |    |    Override Controller    |
- * | to the config for sps     |<---|    |---------------------------|
- * | hold the root condition   |    '--->| Controls the interface    |
- * | and infomation of plugins |         | to the store of the       |
- * '---------------------------'         | current overrides         |
- *                                       '---------------------------'
+ * Managing SiteState
  *
- * Site State
- * THe Manager can create a site state object, and uses the State Controller
- * to keep it around from page load to page load. When creating site state it
- * hand off the Override Controller So that the Site state can Compile the
- * override data and store it in the Override Controller
+ * The Site State hold information about what should be alter for preview, mode
+ * as well as the form used to select those overrides.
  *
- *  @TODO this part of the system should be reviews when we start needing
- *  access to the site state
+ * @see getSiteState()
+ * @see setSiteState() 
+ * @see clearSiteState()
  *
- * Plugins
- * The Manager is a pass-through to the plugin controller
+ * Managing Preview Form
+ *
+ * The Preview form is the tool used by SPS to let the User select what
+ * entities show be overridden 
+ *
+ * @see getPreviewForm()
+ * @see previewFormSubmitted()
+ *
+ * Manging Preview Reactions
+ *
+ * The Reactions are the part of SPS that use override data, to change things
+ * in drupal so that the user can view a preview site
+ *
+ * @see react()
+ *
+ * Accessing Plugins
+ *
+ * SPS plugins are the abstact tool used to extend the what, when and how of
+ * overrides.
+ *
+ * @see getPlugin()
+ * @see getPluginInfo()
+ * @see getPluginByMeta()
+ * @see sps.plugin.api.php
+ *
+ * Accessing System controllers
+ *
+ * Controllers are used to abstract parts of the SPS system, where there is an
+ * expectation that plugins will be addative, Controllers are seen as
+ * singletons, that might be replaced but there will always be only one.
+ *
+ * @see getHookController()
+ * @see getPluginController()
+ * @see getStateController()
+ * @see getConfigController()
+ *
  */
 class Manager {
   protected $state_controller_site_state_key = 'sps_site_state_key';
@@ -176,17 +180,52 @@ class Manager {
 
   /**
    * Create A SiteState form an override, and store it.
-   *
-   *
-   * get map of override_controller apis to override controllers
-   * get the the class to be used for my site state
-   * create site state using condition and controller map
-   * set the site state in the state_controller
+   *   _________________________
+   *   \                        \
+   *    \  Manager::setSiteState \
+   *     ) called                 )
+   *    /                        /
+   *   /________________________/
+   *                 |
+   *        Condition Object
+   *                 |
+   *                 v
+   *  ____________________________
+   *  \                           \      .----------------------------.
+   *   \  Get map                  \     |       Manager (this)       |
+   *    ) API => OverrideController )--->|----------------------------|
+   *   /                           / ^   | getOverrideControllerMap() |
+   *  /___________________________/  |   '----------------------------'
+   *                 |               |                  |
+   *                 v               '-map api=>objects-'
+   *       _________________
+   *       \                \                     .-------------------.
+   *        \  Get Class     \                    | Config Controller |
+   *         ) for Site State )------------------>|-------------------|
+   *        /                / ^                  | get()             |
+   *       /________________/  |                  '-------------------'
+   *                 |         |                            |
+   *                 v         '-name of SiteState class----'
+   * _____________________________
+   * \                            \
+   *  \   Use the Condition Object \
+   *   \  and the Map to            \
+   *    ) Construct Site State       )
+   *   /  of the Class retrieve     /
+   *  /   from config              /
+   * /____________________________/
+   *                 |
+   *                 v
+   *       _________________
+   *       \                \                     .-------------------.
+   *        \  Store         \                    | State Controller  |
+   *         ) Site State     )-SiteState object->|-------------------|
+   *        /                /                    | set()             |
+   *       /________________/                     '-------------------'
    *
    * @param \Drupal\sps\Plugins\ConditionInterface $condition
-   *
    * @return \Drupal\sps\Manager
-   *           Self
+   *   Self
    */
   public function setSiteState(\Drupal\sps\Plugins\ConditionInterface $condition) {
     $controller_map = $this->getOverrideControllerMap();
@@ -195,12 +234,31 @@ class Manager {
     $this->state_controller->set($site_state);
     return $this;
   }
-
+  
+  /**
+   * If there is a current Site State Remove it.
+   *
+   * The method us mostly use when one is cancaling out of a preview state.
+   *
+   * @return 
+   *   self
+   */
   public function clearSiteState() {
     $this->getStateController()->clear();
     return $this;
   }
 
+  /**
+   * Find all active Reaction Plugins and return the info from hook_sps_reaction_info
+   *
+   * Currently there is no restriction on what reactions are active.
+   *
+   * @TODO add check to configuration to see if there is a list of reactions
+   * that should be active
+   *
+   * @return array
+   *   map of reaction plugin names to thier info 
+   */
   protected function getActiveReactionInfo() {
     return $this->getPluginInfo('reaction');
   }
@@ -212,8 +270,56 @@ class Manager {
    * then we add to it the first override controller we come to for apis
    * not in the config. Also if a controller implements 2 apis we do not
    * create two instances but instead point to the same one.
-   *
+   *  ____________________________________
+   *  \                                   \
+   *   \                                   \
+   *    ) Manager::getOverrideControllerMap )
+   *   /                                   /
+   *  /___________________________________/
+   *                     |
+   *                     v
+   *           __________________
+   *           \                 \             .-------------------.
+   *            \  Extract Needed \            | Plugin Controller |
+   *             ) Controller APIs )---------->|-------------------|
+   *            /  from Plugins   / ^          | getPluginInfo()   |
+   *           /_________________/  |          '-------------------'
+   *                     |          |                    |
+   *                     v          '---Reaction Info ---'
+   *           __________________
+   *           \                 \             .-------------------.
+   *            \  Get Override   \            | Config Controller |
+   *             ) Controller Map  )---------->|-------------------|
+   *            /  from Config    / ^          | get()             |
+   *           /_________________/  |          '-------------------'
+   *                     |          |                    |
+   *                     v       Override controller Map-'
+   *          ____________________
+   *          \                   \             .-------------------.
+   *           \  for missing APIs \            | Plugin Controller |
+   *            ) get Controllers   )---------->|-------------------|
+   *           /  from plugins     / ^          | getPluginInfo()   |
+   *          /___________________/  |          '-------------------'
+   *                     |           |                    |
+   *                     v           '--Override Controller Info
+   *           __________________
+   *           \                 \              .-------------------.
+   *            \  Get Controller \             | Plugin Controller |
+   *             ) Plugins         )----------->|-------------------|
+   *            /                 / ^           | getPlugin()       |
+   *           /_________________/  |           '-------------------'
+   *                     |          |                     |
+   *                     |          '--Override Controller Objects
+   *                     |
+   *                     |
+   *                     v
+   *  .------------------------------------.
+   *  | Return Map of                      |
+   *  | API => Override Controller Objects |
+   *  '------------------------------------'
+   * 
    * @return array
+   *   a maping of override controller api keys to override controller objects.
    */
   protected function getOverrideControllerMap() {
 
@@ -278,18 +384,25 @@ class Manager {
 
   /**
    * Passthrough from Drupal form to the correct condition for building the preview form
+   * 
+   * not that RootCondition is configurable using SPS_CONFIG_ROOT_CONDITION
+   *
+   * @see sps_condition_preview_form
    *
    * @return array|mixed
    *  A drupal form array created by the root condition
    */
   public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
-
     return $this->getHookController()->drupalGetForm('sps_condition_preview_form', $root_condition);
   }
 
   /**
    * Notify the manager that the preview form submission is complete.
+   *
+   * This method is call buy the sps_condition_preview_form submit function
+   *
+   * @see sps_condition_preview_form_submit
    *
    * @param Plugins\ConditionInterface $root_condition
    *
@@ -408,17 +521,15 @@ class Manager {
   }
 
   /**
-   * factory for building a plugin object
+   * Passthough function to the Plugin Controller for building plugin objects
    *
    * @param String $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param String $name
    *   the name of the plugin as defined in hook_sps_PLUGIN_TYPE_plugin_info;
-   *
    * @param Array $settings
    *   an array that should be used for instance settings (instance settings from the plugin info are
    *   add to this array
-   *
    * @return \Drupal\sps\Plugins\PluginInterface
    *   An instance of the requested Plugin
    */
@@ -427,7 +538,8 @@ class Manager {
   }
 
   /**
-   * get meta info on a plugin
+   * Passthough function to the Plugin Controller for retrieving plugin info
+   *
    * @param String $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param String | Null $name
@@ -441,7 +553,7 @@ class Manager {
   }
 
   /**
-   * get meta info on a plugin
+   * Passthough function to the Plugin Controller for retrieving plugin info on filtered results
    *
    * @param String $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
