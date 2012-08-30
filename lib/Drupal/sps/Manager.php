@@ -53,7 +53,6 @@ namespace Drupal\sps;
  *
  */
 class Manager {
-  protected $state_controller_site_state_key = 'sps_site_state_key';
   protected $state_controller;
   protected $config_controller;
   protected $hook_controller;
@@ -367,20 +366,6 @@ class Manager {
     }
     return $controllers_instances;
   }
-
-
-  /**
-   * Get what should be a relatively static variable used for storing the site state
-   *
-   * This is mostly used for tests
-   *
-   * @return String
-   *   the controller key, a string
-   */
-  public function getStateControllerSiteStateKey() {
-    return $this->state_controller_site_state_key;
-  }
-
 
   /**
    * Passthrough from Drupal form to the correct condition for building the preview form
