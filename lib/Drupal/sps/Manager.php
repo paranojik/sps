@@ -160,8 +160,6 @@ class Manager {
   }
 
   /**
-   * store the config controller
-  /**
    * Pull the site state form site state controller
    *
    * Note the state controller is responsible for reasonable caching of the site state
@@ -179,7 +177,11 @@ class Manager {
   /**
    * Create A SiteState form an override, and store it.
    *
-   * This might get made private
+   *
+   * get map of override_controller apis to override controllers
+   * get the the class to be used for my site state
+   * create site state using condition and controller map
+   * set the site state in the state_controller
    *
    * @param \Drupal\sps\Plugins\ConditionInterface $condition
    *
