@@ -181,8 +181,8 @@ class SPSManagerUnitTest extends SPSBaseUnitTest {
     );
     $manager->getPluginController()->setInfo($info);
     //set drupal_get_from to just return what was passed in
-    $manager->getHookController()->setDrupalGetForm("sps_condition_preview_form", function($callable) {
-      return $callable;
+    $manager->getDrupalController()->set('drupal_get_form', function($form_name, $condition) {
+      return $condition;
     });
     $config_controller = $manager->getConfigController();
     $config_controller->set(SPS_CONFIG_ROOT_CONDITION, array("name" => 'testCondition', 'config' => array()));

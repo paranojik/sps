@@ -7,8 +7,8 @@ class ConfigController implements \Drupal\sps\StorageControllerInterface {
       'class' => '\Drupal\sps\Test\PluginController',
       'instance_settings' => array(),
     ),
-    SPS_CONFIG_HOOK_CONTROLLER => array(
-      'class' => '\Drupal\sps\Test\HookController',
+    SPS_CONFIG_DRUPAL_CONTROLLER => array(
+      'class' => '\Drupal\sps\Drupal',
       'instance_settings' => array(),
     ),
     SPS_CONFIG_STATE_CONTROLLER => array(

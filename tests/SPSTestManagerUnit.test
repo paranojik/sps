@@ -14,11 +14,9 @@ class SPSTestManagerUnitTest extends SPSBaseUnitTest {
     $end['state_controller'] = $manager->state_controller;
     $end['config_controller'] = $manager->config_controller;
     $end['plugin_controller'] = $manager->plugin_controller;
-    $end['hook_controller'] = $manager->hook_controller;
     $start['state_controller'] = new \Drupal\sps\Test\StateController(array(), $manager);
     $start['config_controller'] = new \Drupal\sps\Test\ConfigController();
     $start['plugin_controller'] = new \Drupal\sps\Test\PluginController(array(), $manager);
-    $start['hook_controller'] = new \Drupal\sps\Test\HookController(array(), $manager);
     $this->assertEqual($start, $end, "A new Test Manager with no params stores default empty test controllers", "SPS");
   }
   public function testTestManager_AlterSettings() {

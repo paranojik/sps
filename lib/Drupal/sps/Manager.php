@@ -46,7 +46,7 @@ namespace Drupal\sps;
  * expectation that plugins will be addative, Controllers are seen as
  * singletons, that might be replaced but there will always be only one.
  *
- * @see getHookController()
+ * @see getDrupalController()
  * @see getPluginController()
  * @see getStateController()
  * @see getConfigController()
@@ -55,7 +55,7 @@ namespace Drupal\sps;
 class Manager {
   protected $state_controller;
   protected $config_controller;
-  protected $hook_controller;
+  protected $drupal_controller;
   protected $root_condition;
   protected $plugin_controller;
   protected $override_controller;
@@ -63,7 +63,7 @@ class Manager {
   /**
    * Constructor for \Drupal\sps\Manager
    *
-   * Load the Hook, Plugin and State controller form the configuration.
+   * Load the Drupal, Plugin and State controller form the configuration.
    *
    * @param \Drupal\sps\StorageControllerInterface $config_controller
    *   the control to be used when accessing config
@@ -73,7 +73,7 @@ class Manager {
   public function __construct(StorageControllerInterface $config_controller) {
 
     $this->setConfigController($config_controller)
-      ->setHookController($this->createControllerFromConfig(SPS_CONFIG_HOOK_CONTROLLER))
+      ->setDrupalController($this->createControllerFromConfig(SPS_CONFIG_DRUPAL_CONTROLLER))
       ->setPluginController($this->createControllerFromConfig(SPS_CONFIG_PLUGIN_CONTROLLER))
       ->setStateController($this->createControllerFromConfig(SPS_CONFIG_STATE_CONTROLLER));
   }
@@ -84,7 +84,7 @@ class Manager {
    * @param $key
    *  The key from the configuration array that contains the controller information.
    *
-   * @return StateControllerInterface|PluginControllerInterface|HookControllerInterface
+   * @return StateControllerInterface|PluginControllerInterface|Drupal
    */
   protected function createControllerFromConfig($key) {
     $controller_info = $this->getConfigController()->get($key);
@@ -152,13 +152,13 @@ class Manager {
   /**
    * store the hook controller
    *
-   * @param \Drupal\sps\HookControllerInterface $controller
+   * @param \Drupal\sps\Drupal $controller
    *   The control to use when accessing drupal invoke and alter function
    * @return \Drupal\sps\Manager
    *   Self
    */
-  protected function setHookController(HookControllerInterface $controller) {
-    $this->hook_controller = $controller;
+  protected function setDrupalController(Drupal $controller) {
+    $this->drupal_controller = $controller;
     return $this;
   }
 
@@ -379,7 +379,7 @@ class Manager {
    */
   public function getPreviewForm() {
     $root_condition = $this->getRootCondition();
-    return $this->getHookController()->drupalGetForm('sps_condition_preview_form', $root_condition);
+    return $this->getDrupalController()->drupal_get_form('sps_condition_preview_form', $root_condition);
   }
 
   /**
@@ -557,10 +557,11 @@ class Manager {
   /**
    * Get the hook controller
    *
-   * @return HookControllerInterface
+   * @return  
+   *   Drupal object
    */
-  public function getHookController() {
-    return $this->hook_controller;
+  public function getDrupalController() {
+    return $this->drupal_controller;
   }
 
   /**

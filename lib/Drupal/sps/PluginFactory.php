@@ -118,9 +118,8 @@ class PluginFactory implements PluginControllerInterface {
       $this->plugin_info[$plugin_type] = array();
       
       $hook = "sps_{$plugin_type}_plugins";
-      foreach ($this->getHookController()->moduleImplements($hook) as $module) {
-        $module_infos = $this->getHookController()->moduleInvoke($module, $hook);
-
+      foreach ($this->getDrupalController()->module_implements($hook) as $module) {
+        $module_infos = $this->getDrupalController()->module_invoke($module, $hook);
         foreach ($module_infos as $plugin_name => $plugin_info) {
           if(!is_array($this->plugin_type_info[$plugin_type]['defaults'])) {
           }
@@ -131,7 +130,7 @@ class PluginFactory implements PluginControllerInterface {
             'instance_settings' => array(),
           );
 
-          $this->getHookController()->drupalAlter("sps_plugin_info_{$plugin_type}_{$plugin_info['name']}", $plugin_info);
+          $this->getDrupalController()->ref['drupal_alter']("sps_plugin_info_{$plugin_type}_{$plugin_info['name']}", $plugin_info);
           $this->validatePluginInfo($plugin_info);
 
           $this->plugin_info[$plugin_type][$plugin_name] = $plugin_info;
@@ -161,7 +160,7 @@ class PluginFactory implements PluginControllerInterface {
       $this->validatePluginClass($plugin_info);
     }
 
-    $this->getHookController()->moduleInvokeAll("sps_validate_plugin_info",
+    $this->getDrupalController()->module_invoke_all("sps_validate_plugin_info",
       $plugin_info, $plugin_info['plugin_type'],
       $this->getPluginTypeInfo($plugin_info['plugin_type']));
 
@@ -270,9 +269,8 @@ class PluginFactory implements PluginControllerInterface {
    */
   protected function loadPluginTypeInfo() {
     if (empty($this->plugin_type_info)) {
-      foreach ($this->getHookController()->moduleImplements('sps_plugin_types') as $module) {
-        $function = $module . '_sps_plugin_types';
-        $module_infos = $this->getHookController()->moduleInvoke($module, 'sps_plugin_types');
+      foreach ($this->getDrupalController()->module_implements('sps_plugin_types') as $module) {
+        $module_infos = $this->getDrupalController()->module_invoke($module, 'sps_plugin_types');
 
         foreach ($module_infos as $plugin_type_name => $plugin_type_info) {
           $plugin_type_info += array(
@@ -281,8 +279,8 @@ class PluginFactory implements PluginControllerInterface {
             'requires' => array(),
           );
 
-          $this->getHookController()->drupalAlter("sps_plugin_type_info_{$plugin_type_info['name']}", $plugin_type_info);
-          $this->getHookController()->moduleInvokeAll("sps_validate_plugin_type_info", $plugin_type_info);
+          $this->getDrupalController()->ref['drupal_alter']("sps_plugin_type_info_{$plugin_type_info['name']}", $plugin_type_info);
+          $this->getDrupalController()->module_invoke_all("sps_validate_plugin_type_info", $plugin_type_info);
 
           $this->plugin_type_info[$plugin_type_name] = $plugin_type_info;
         }
@@ -364,11 +362,11 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * Get the Hook Controller for SPS
+   * Get the Drupal Controller for SPS
    *
-   * @return HookControllerInterface
+   * @return Drupal 
    */
-  protected function getHookController() {
-    return $this->manager->getHookController();
+  protected function getDrupalController() {
+    return $this->manager->getDrupalController();
   }
 }
