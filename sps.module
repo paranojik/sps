@@ -3,6 +3,7 @@
 define('SPS_CONFIG_ROOT_CONDITION', "root_condition_settings");
 define('SPS_CONFIG_PLUGIN_CONTROLLER', "plugin_controller_settings");
 define('SPS_CONFIG_HOOK_CONTROLLER', "hook_controller_settings");
+define('SPS_CONFIG_DRUPAL_CONTROLLER', "drupal_controller_settings");
 define('SPS_CONFIG_STATE_CONTROLLER', "state_controller_settings");
 define('SPS_CONFIG_SITESTATE', "sitestate_settings");
 define('SPS_CONFIG_OVERRIDE_CONTROLLERS', "override_controllers_settings");
@@ -302,11 +303,7 @@ function sps_wrapper_condition_ajax_callback($form, $form_state) {
  * test_drupal_get_form instead.
  */
 function sps_drupal() {
-  $drupal = &drupal_static(__FUNCTION__);
-  if(!$drupal) {
-    $drupal = new \Drupal\sps\Drupal();
-  }
-  return $drupal;
+  return sps_get_manager()->getDrupalController();
 }
 
 /**

@@ -16,8 +16,8 @@ class DrupalVariableController implements \Drupal\sps\StorageControllerInterface
       'class' => '\Drupal\sps\PluginFactory',
       'instance_settings' => array(),
     ),
-    SPS_CONFIG_HOOK_CONTROLLER => array(
-      'class' => '\Drupal\sps\DrupalHookController',
+    SPS_CONFIG_DRUPAL_CONTROLLER => array(
+      'class' => '\Drupal\sps\Drupal',
       'instance_settings' => array(),
     ),
     SPS_CONFIG_STATE_CONTROLLER => array(

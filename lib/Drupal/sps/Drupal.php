@@ -11,7 +11,7 @@ namespace Drupal\sps;
  */
 class Drupal implements \ArrayAccess {
 
-  protected $overrides = array();
+  public $overrides = array();
   public $ref;
 
   /**
@@ -31,8 +31,7 @@ class Drupal implements \ArrayAccess {
   *
   */
   public function __call($name, $args) {
-    $call = isset($this->overrides[$name]) ? $this->overrides[$name] : $name;
-    return call_user_func_array($call, $args);
+    return call_user_func_array($this[$name], $args);
   }
 
 
