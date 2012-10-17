@@ -1,0 +1,55 @@
+diff --git a/css/sps.css b/css/sps.css
+index a0fa6b4..4d27f74 100644
+--- a/css/sps.css
++++ b/css/sps.css
+@@ -68,3 +68,49 @@
+   left:0px;
+   position: absolute;
+ }
++
++.sps-preview-form {
++  font-size: 14px;
++}
++
++.sps-preview-form .form-item-label {
++  font-size: 0.929em;
++  line-height: 1.5;
++}
++
++.sps-preview-form select.form-select {
++  border: 1px solid #ccc;
++  padding: 4px;
++  font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
++}
++
++.sps-preview-buttons .fieldset-wrapper {
++  padding: 0 10px;
++  font-family: Georgia, "Times New Roman", Times, serif;
++}
++
++.sps-preview-buttons input.form-submit {
++  background: white url(images/buttons.png) 0 0 repeat-x;
++  border: 1px solid #e4e4e4;
++  border-bottom: 1px solid #b4b4b4;
++  border-left-color: #d2d2d2;
++  border-right-color: #d2d2d2;
++  color: #3a3a3a;
++  cursor: pointer;
++  font-size: 0.929em;
++  font-weight: normal;
++  text-align: center;
++  margin-bottom: 1em;
++  margin-right: 0.6em;
++  padding: 4px 17px;
++  
++  -khtml-border-radius: 15px;
++  -moz-border-radius: 20px;
++  -webkit-border-radius: 15px;
++  border-radius: 15px;
++}
++
++.sps-preview-buttons input.form-submit:hover,
++.sps-preview-buttons input.form-submit:focus {
++  background: #dedede;
++}
+\ No newline at end of file

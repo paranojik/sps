@@ -1,6 +1,6 @@
 <?php
-/** 
- * @file 
+/**
+ * @file
  *
  * The sps module allows a set of plugins to expand what entities can be
  * overridden in preview mode, and how those overrides should be chosen.
@@ -38,7 +38,7 @@
  *  | based on what is in the     |
  *  | Override Controllers        |
  *  '-----------------------------'
- * 
+ *
  * There are two other Plugins Widgets and Overrides, This are used by
  * Condition that use the BasicCondition class.  Condition of this class
  * search the plugin system for the correct widget and overrides to use @see
@@ -53,8 +53,8 @@
  * then use that information to query what overrides should be in effect.
  * There is a default class for conditions
  * (Drupal\sps\Plugins\Condition\BasicCondition) which can be use in most
- * case.  
- * 
+ * case.
+ *
  * The hook should return an array of plugin arrays keyed by the name of the condition.
  * There are no required fields for condition plugins, if one is going to use
  * the default value for class (which is
@@ -71,8 +71,8 @@
  * condition sps implements (default_root_condition).  This should be use if
  * one is planing on replacing the default_root_condition.
  *
- * BasicCondition 
- * 
+ * BasicCondition
+ *
  *   This base condition use widget and override plugins.  The widget to use
  *   is passed in as a instance setting and the name is use to find all
  *   override plugins that should be used by the condition.
@@ -84,7 +84,7 @@
  *   |   widget : date_widget -------------------------> date_widget            |
  *   |   name : date_condition  <------.    |-----------------------------------|
  *   '----------------------------'    |    | class : Drupal\sps\...\DateWidget |
- *                                     |    '-----------------------------------'    
+ *                                     |    '-----------------------------------'
  *                                     |
  *                                     |    .------------------------------------.
  *                                     |    |            ers_override            |
@@ -92,12 +92,12 @@
  *                                     |    | class : Drupal\sps_ers\ERSOverride |
  *                                     '------condition : date_condition         |
  *                                          '------------------------------------'
- *  
+ *
  *  @see hook_sps_widget_plugins
  *  @see Drupal\sps\Plugins\WidgetInterface
  *  @see hook_sps_override_plugins
  *  @see Drupal\sps\Plugins\OverrideInterface
- * 
+ *
  */
 function hook_sps_condition_plugins() {
   return array(
@@ -113,15 +113,15 @@ function hook_sps_condition_plugins() {
 
 /*
  * Define Override Controller (override storage objects) for the SPS System
- * 
+ *
  * The override controllers provide an interface for reaction plugins to access
  * override information. Each plugin must say which api it implements and what
  * class is used.  There are two api and two plugins provided by sps.
- * 
+ *
  * They system will only use one override controller per api key.  The system
  * first looks to a map table in the sps config, under the key
  * SPS_CONFIG_OVERRIDE_CONTROLLER, then it finds the first plugin that
- * implements a particular api. 
+ * implements a particular api.
  *
  * The two override controller provide by sps are the simple_cache and
  * temp_table plugins they implement the controller_api simple_cache and
@@ -137,7 +137,7 @@ function hook_sps_condition_plugins() {
  * @see Drupal\sps\plugins\OverrideControllerInterface
  * @see Drupal\sps\plugins\OverrideController\SimpleCacheOverrideControllerInterface
  * @see Drupal\sps\plugins\OverrideController\TableOverrideStorageControllerInterface
- * 
+ *
  */
 function hook_sps_override_controller_plugins() {
   return array(
@@ -177,7 +177,7 @@ function hook_sps_override_controller_plugins() {
  * Drupal\sps\Plugins\ReactionInterface.  Also the use_controller_api is
  * mandatory, not if there are no override controllers that implement the api
  * stated then the reaction will not be run.
- * 
+ *
  * @see hook_sps_override_controller_plugins
  * @see Drupal\sps\Plugins\ReactionInterface
  */
@@ -191,14 +191,14 @@ function hook_sps_reaction_plugins() {
   );
   return $reactions;
 }
- 
+
 /**
- * Define Wdiget plugins for use by sps conditions
- * 
+ * Define Wddget plugins for use by sps conditions
+ *
  * Widget plugins are used by the BasicCondition class, they provide a widget
  * to be used in the sps preview form, this includes validation and a
  * transformation of the form data in to a array of data to be used by the
- * condition.  
+ * condition.
  *
  * The class used should implement the Drupal\sps\Plugins\WidgetInterface
  *

@@ -1,5 +1,3 @@
-Please documentation here for the framework
-
 ## Running Tests:
 
 Run the following command from Drupal root replacing http://lsd.dev:9999/ with your URL
