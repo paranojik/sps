@@ -22,17 +22,17 @@ class EntityLoadReaction implements \Drupal\sps\Plugins\ReactionInterface {
   /**
    * Return the revision id for a passed in id for the type stored from the constructor
    *
-   * @param $data
-   *   and object with the following properies
+   * @param \StdClass $data
+   *   and object with the following properties
    *   revision_id_key
    *   base_id_key
    *   base_table
-   *   ids : the
-   * @param $override_controller
+   *   ids : the ids
+   * @param \Drupal\sps\Plugins\OverrideControllerInterface $override_controller
    *   This is an override controller to use to find
    *   override data
    *
-   * @return
+   * @return array|mixed
    *  array of revision ids;
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
