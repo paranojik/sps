@@ -104,6 +104,10 @@ function sps_hook_info() {
 function sps_condition_preview_form($form, &$form_state) {
   drupal_add_css(drupal_get_path('module', 'sps').'/css/sps.css');
 
+  $form['title'] = array(
+    '#markup' =>  '<div class="sps-preview-form-title">' . t('Site Preview') . '</div>',
+  );
+
   if (!empty($form_state['build_info']['args'][0])) {
     $condition = $form_state['build_info']['args'][0];
     $form_state['root_condition'] = $condition;
@@ -117,17 +121,21 @@ function sps_condition_preview_form($form, &$form_state) {
       ),
     );
 
+    $form['buttons']['preview'] = array(
+      '#type' => 'submit',
+      '#value' => t('Enable Preview'),
+      '#weight' => 2,
+    );
+
     if (!empty($form_state['values'])) {
       $form['buttons']['cancel'] = array(
         '#type' => 'submit',
-        '#value' => t('Cancel'),
+        '#value' => t('Disable Preview'),
+        '#weight' => 1,
       );
+      $form['buttons']['preview']['#value'] = t('Update Preview');
     }
 
-    $form['buttons']['preview'] = array(
-      '#type' => 'submit',
-      '#value' => t('Preview'),
-    );
 
     $form['#prefix'] = '<div class="sps-preview-form clearfix">';
     $form['#suffix'] = '</div>';
@@ -144,10 +152,11 @@ function sps_condition_preview_form($form, &$form_state) {
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
   // if cancel was press blow away the site state and refresh
-  if($form_state['clicked_button']['#id'] == 'edit-cancel') {
+  if ($form_state['clicked_button']['#id'] == 'edit-cancel') {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
   }
+
   if (!empty($form_state['build_info']['args'][0])) {
     $condition = $form_state['build_info']['args'][0];
     $form_state['root_condition'] = $condition;

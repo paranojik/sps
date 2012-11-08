@@ -1,24 +1,3 @@
-.sps-preview-form {
-  padding:15px;
-  max-width:800px;
-}
-
-.sps-preview-form label,
-.sps-preview-form input {
-  display:inline;
-}
-
-.sps-preview-form .sps-change-condition {
-  float: left;
-  margin:11px 0 0 10px;
-}
-
-.sps-preview-form .form-item {
-  float:left;
-  padding:3px;
-  margin-top: 1em;
-}
-
 .sps-date-widget {
   max-width:700px;
 }
@@ -49,29 +28,42 @@
   margin:0;
 }
 
-.sps-preview-form .sps-preview-buttons {
-  padding: 10px 0 4px 0;
-}
-
-
-.sps-overridden {
-  border : 2px solid #79bf9d !important;
-  position:relative;
-}
-.sps-overridden:before {
-  background-image : url(eye.png);
-  background-repeat: no-repeat;
-  content: ' ';
-  width:38px;
-  height:38px;
-  top: 0px;
-  left:0px;
-  position: absolute;
-}
-
 .sps-preview-form {
-  font-size: 14px;
+    font-size: 14px;
 }
+
+.sps-preview-form label,
+.sps-preview-form input,
+.sps-preview-form .sps-preview-form-title{
+    display:inline;
+}
+
+.sps-preview-form .sps-change-condition {
+    float: left;
+    margin:11px 0 0 10px;
+}
+
+.sps-preview-form .form-item,
+.sps-preview-form .sps-preview-form-title {
+    float:left;
+    padding:3px;
+    margin-top: 1em;
+}
+
+.sps-preview-form .sps-preview-form-title {
+    padding-right: 50px;
+}
+
+.sps-preview-form .form-item-active-condition-container-active-condition-selector {
+    border-right: 1px solid #ccc;
+    padding-right: 20px;
+    margin-right: 20px;
+}
+
+.sps-preview-form .sps-preview-buttons {
+  padding: 15px 0 4px 0;
+}
+
 
 .sps-preview-form .form-item-label {
   font-size: 0.929em;
@@ -79,7 +71,6 @@
 }
 
 .sps-preview-form select.form-select {
-  border: 1px solid #ccc;
   padding: 4px;
   font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
 }
@@ -113,4 +104,19 @@
 .sps-preview-form input.form-submit:hover,
 .sps-preview-form input.form-submit:focus {
   background: #dedede;
+}
+
+.sps-overridden {
+    border : 2px solid #79bf9d !important;
+    position:relative;
+}
+.sps-overridden:before {
+    background-image : url(eye.png);
+    background-repeat: no-repeat;
+    content: ' ';
+    width:38px;
+    height:38px;
+    top: 0px;
+    left:0px;
+    position: absolute;
 }

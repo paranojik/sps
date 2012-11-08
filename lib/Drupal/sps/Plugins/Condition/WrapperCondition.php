@@ -109,19 +109,19 @@ class WrapperCondition extends BasicCondition {
   * @return String
   */
   public function getActiveConditionKey() {
-    return 'active_condition';
+    return 'active-condition';
   }
   public function getContainerId() {
-    return $this->getActiveConditionKey() .'_container';
+    return $this->getActiveConditionKey() .'-container';
   }
   public function getSelectorId() {
-    return $this->getActiveConditionKey() .'_selector';
+    return $this->getActiveConditionKey() .'-selector';
   }
   public function getResetId() {
-    return $this->getActiveConditionKey() .'_wrapper_reset';
+    return $this->getActiveConditionKey() .'-wrapper-reset';
   }
   public function getContainerWrapperId() {
-    return $this->getContainerId() .'_wrapper';
+    return $this->getContainerId() .'-wrapper';
 
   }
 
@@ -149,12 +149,31 @@ class WrapperCondition extends BasicCondition {
     $element[$container_id] = array(
       '#type' => 'container',
       '#tree' => TRUE,
-      '#prefix' => "<div id = '".$this->getCOntainerwrapperId()."'>",
+      '#prefix' => "<div id = '".$this->getContainerwrapperId()."'>",
       '#suffix' => "</div>",
     );
 
+    $element[$container_id][$selector_id] = array(
+      '#type' => 'select',
+      '#title' => $this->getTitle(),
+      '#options' => array(),
+      '#required' => TRUE,
+      '#ajax' => array(
+        'callback' => 'sps_wrapper_condition_ajax_callback',
+        'wrapper' => $this->getContainerWrapperId(),
+        'method' => 'replace',
+        'effect' => 'fade',
+      ),
+      '#tree' => TRUE,
+    );
+    foreach($this->conditions as $name => $condition) {
+      if ($condition->hasOverrides()) {
+        $element[$container_id][$selector_id]['#options'][$name] = $condition->getTitle();
+      }
+    }
+
     // this should be set after an ajax call to select a condition
-    if(isset($form_state['values'][$container_id][$selector_id])) {
+    if (isset($form_state['values'][$container_id][$selector_id])) {
       $this->active_condition = $form_state['values'][$container_id][$selector_id];
       $condition = $this->conditions[$this->active_condition];
       $sub_state = $form_state;
@@ -162,44 +181,14 @@ class WrapperCondition extends BasicCondition {
       $element[$container_id][$this->active_condition] = $condition->getElement(array(), $sub_state);
       $element[$container_id][$this->active_condition]['#tree'] = TRUE;
 
-      $element[$container_id][$this->getResetId()] = array(
-        '#type' => 'button',
-        '#value' => t('Change Condition'),
-        '#ajax' => array(
-          'callback' => 'sps_wrapper_condition_ajax_callback',
-          'wrapper' => $this->getContainerWrapperId(),
-          'method' => 'replace',
-          'effect' => 'fade',
-        ),
-        '#attributes' => array(
-          'class' => array('sps-change-condition'),
-        ),
-      );
+      $element[$container_id][$selector_id]['#default_value'] = $this->active_condition;
     }
-    else {
-      $element[$container_id][$selector_id] = array(
-        '#type' => 'select',
-        '#title' => $this->getTitle(),
-        '#options' => array('none' => 'Select Condition'),
-        '#ajax' => array(
-          'callback' => 'sps_wrapper_condition_ajax_callback',
-          'wrapper' => $this->getCOntainerWrapperId(),
-          'method' => 'replace',
-          'effect' => 'fade',
-        ),
-        '#tree' => TRUE,
-      );
-      foreach($this->conditions as $name => $condition) {
-        if ($condition->hasOverrides()) {
-          $element[$container_id][$selector_id]['#options'][$name] = $condition->getTitle();
-        }
-      }
-    }
+
     return $element;
   }
 
   public function getTitle() {
-    return t('Condition');
+    return t('Select a Condition');
   }
 
   /**
@@ -232,7 +221,7 @@ class WrapperCondition extends BasicCondition {
    */
   public function validateElement($element, &$form_state) {
     list($sub_element, $sub_state) = $this->extractSubState($element, $form_state);
-    if($this->active_condition) {
+    if ($this->active_condition) {
       $this->conditions[$this->active_condition]->validateElement($sub_element, $sub_state);
     }
 
