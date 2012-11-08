@@ -34,7 +34,7 @@
 
 .sps-preview-form label,
 .sps-preview-form input,
-.sps-preview-form .sps-preview-form-title{
+.sps-preview-form .sps-preview-form-title {
     display:inline;
 }
 
@@ -51,7 +51,12 @@
 }
 
 .sps-preview-form .sps-preview-form-title {
-    padding-right: 50px;
+    padding-right: 40px;
+    padding-left: 20px;
+    color: #333333;
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: none;
 }
 
 .sps-preview-form .form-item-active-condition-container-active-condition-selector {
@@ -64,15 +69,22 @@
   padding: 15px 0 4px 0;
 }
 
-
-.sps-preview-form .form-item-label {
-  font-size: 0.929em;
+.sps-preview-form .form-item label {
   line-height: 1.5;
+  color: #666666;
+  font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  font-size: 13px;
+  text-transform: uppercase;
 }
 
 .sps-preview-form select.form-select {
-  padding: 4px;
   font-family: "Lucida Grande", "Lucida Sans Unicode", Verdana, sans-serif;
+  background: none repeat scroll 0 0 #ffffff;
+  width: 140px;
+  color: #666666;
+  border: 1px solid #cccccc;
+  font-size: 13px;
+  padding: 3px;
 }
 
 .sps-preview-form .fieldset-wrapper {
