@@ -41,19 +41,19 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $element = $condition->getElement($form,$form_state);
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
-      array('none' => 'Select Condition', 'condition_test' => 'Condition Test'),
+      array('condition_test' => 'Condition Test'),
       '::getElement should have a select with each condition in the system, the name should be from the default config of the plugin if there is no config'
     );
 
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#type'],
       'select',
-      '::getElement should havea selector of type select'
+      '::getElement should have a selector of type select'
     );
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#title'],
-      'Condition',
-      '::getElement should havea selector of title Condition'
+      'Select a Condition',
+      '::getElement should have a selector of title Condition'
     );
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#ajax']['callback'],
@@ -121,7 +121,6 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
       array(
-        'none' => 'Select Condition', 
         'condition_test' => 'test 1',
         'condition_test2' => 'test 2',
         'condition_test3' => 'test 3'
@@ -132,12 +131,12 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#type'],
       'select',
-      '::getElement should havea selector of type select'
+      '::getElement should have a selector of type select'
     );
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#title'],
-      'Condition',
-      '::getElement should havea selector of title Condition'
+      'Select a Condition',
+      '::getElement should have a selector of title Select a Condition'
     );
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#ajax']['callback'],
@@ -183,7 +182,7 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $element = $condition->getElement($form,$form_state);
     $this->assertEqual(
       $element[$condition->getContainerId()][$condition->getSelectorId()]['#options'],
-      array('none' => 'Select Condition'),
+      array(),
       '::getElement should have a select with each condition in the system, if a conditions ::hasOverrides() is FALSE it should not be listed.'
     );
   }
@@ -269,7 +268,7 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $form = array();
     $form_state = array();
     $form_state['values'][$condition->getContainerId()][$condition->getSelectorId()] = 'condition_test';
-    
+
     //first submit the form with values
     $element = $condition->getElement($form,$form_state);
     $condition->submitElement($element,$form_state);
@@ -315,7 +314,7 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $form_state = array();
     $form_state['values'][$condition->getContainerId()][$condition->getSelectorId()] = 'condition_test';
     $form_state['values'][$condition->getContainerId()]['condition_test']['test'] = 'bob';
-    
+
     function testWrapperCondition_getElement_withSelectioniform_set_error($name= NULL, $message = NULL) {
       static $form_set_error;
       if($name) {
@@ -365,7 +364,7 @@ class SPSWrapperConditionUnitTest extends SPSBaseUnitTest {
     $form_state = array();
     $form_state['values'][$condition->getContainerId()][$condition->getSelectorId()] = 'condition_test';
     $form_state['values'][$condition->getContainerId()]['condition_test']['test'] = 'bob';
-    
+
     $element = $condition->getElement($form,$form_state);
 
 

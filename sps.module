@@ -216,7 +216,7 @@ function sps_get_manager() {
  */
 function sps_query_alter($query) {
   $data = new stdClass();
-  $data->query=$query;
+  $data->query = $query;
   sps_get_manager()->react('entity_select_query_alter', $data);
 }
 

@@ -211,7 +211,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    * @return  \Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction
    *  Self
    */
-  protected function recusiveReplace(&$data, $alias, $override_property_map = array()) {
+  protected function recursiveReplace(&$data, $alias, $override_property_map = array()) {
     $reorder = array();
     foreach($data as $key => &$datum) {
 
@@ -224,16 +224,16 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
 
       //if an array lets run the kids
       if (is_array($datum)) {
-        $this->recusiveReplace($datum, $alias, $override_property_map);
+        $this->recursiveReplace($datum, $alias, $override_property_map);
       }
       //@TODO this is for exceptions basicly
-      else if (is_object($datum)) {
-        if(in_array("QueryConditionInterface", class_implements($datum))){
-
+      elseif (is_object($datum)) {
+        if (is_a($datum, 'DatabaseCondition')) {
+        //if ($this->checkInterface($datum, 'QueryConditionInterface')) {
           $this->upgradeCondition($datum);
           $sub_condition =& $datum->conditions();
 
-          $this->recusiveReplace($sub_condition, $alias, $override_property_map);
+          $this->recursiveReplace($sub_condition, $alias, $override_property_map);
         }
       }
       //ok we have a single datum lets work on it.
@@ -500,26 +500,26 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
 
       $expressions =& $query->getExpressions();
 
-      $this->recusiveReplace($expressions, $alias, $property_map);
+      $this->recursiveReplace($expressions, $alias, $property_map);
 
       $tables =& $query->getTables();
-      $this->recusiveReplace($tables, $alias, $property_map);
+      $this->recursiveReplace($tables, $alias, $property_map);
 
       $where =& $query->conditions();
       $this->encapCondition($where);
 
-      $this->recusiveReplace($where, $alias, $property_map);
+      $this->recursiveReplace($where, $alias, $property_map);
 
       $order =& $query->getOrderBy();
-      $this->recusiveReplace($order, $alias, $property_map);
+      $this->recursiveReplace($order, $alias, $property_map);
 
       $group =& $query->getGroupBy();
-      $this->recusiveReplace($group, $alias, $property_map);
+      $this->recursiveReplace($group, $alias, $property_map);
 
       $having =& $query->havingConditions();
-      $this->recusiveReplace($having, $alias, $property_map);
+      $this->recursiveReplace($having, $alias, $property_map);
       /*
-      $this->recusiveReplace($fields);
+      $this->recursiveReplace($fields);
 
       */
     }

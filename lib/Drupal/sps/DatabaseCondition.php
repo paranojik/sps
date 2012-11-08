@@ -51,7 +51,7 @@ class DatabaseCondition extends \DatabaseCondition {
             $operator += $operator_defaults;
 
             $placeholders = array();
-            if ($condition['value'] instanceof SelectQueryInterface) {
+            if ($condition['value'] instanceof \SelectQueryInterface) {
               $condition['value']->compile($connection, $queryPlaceholder);
               $placeholders[] = (string) $condition['value'];
               $arguments += $condition['value']->arguments();
