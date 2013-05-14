@@ -409,7 +409,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
   protected function upgradeCondition(&$condition) {
     $sub_condition =& $condition->conditions();
     foreach($sub_condition as $key => $item) {
-      if(!isset($item['operator'])) {
+      if(!isset($item['operator']) && isset($item['field'])) {
         $item['field'] = $this->escapeField($item['field']);
       }
     }
