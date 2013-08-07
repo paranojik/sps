@@ -207,7 +207,7 @@ class WrapperCondition extends BasicCondition {
     $sub_state['values'] = isset($form_state['values'][$container_id][$this->active_condition]) ?
       $form_state['values'][$container_id][$this->active_condition] : array();
 
-    $sub_element = $element[$container_id][$this->active_condition];
+    $sub_element = isset($element[$container_id][$this->active_condition]) ? $element[$container_id][$this->active_condition] : array();
 
     return array($sub_element, $sub_state);
   }
