@@ -1,6 +1,7 @@
 <?php
 /**
  * @file
+ * SPS Plugins API Documentation.
  *
  * The sps module allows a set of plugins to expand what entities can be
  * overridden in preview mode, and how those overrides should be chosen.
@@ -43,11 +44,10 @@
  * Condition that use the BasicCondition class.  Condition of this class
  * search the plugin system for the correct widget and overrides to use @see
  * hook_sps_condition_plugins()
- *
  */
 
 /**
- * Used to define Condition for the SPS System
+ * Used to define Condition for the SPS System.
  *
  * The condition plugin is used to collect, store condition information, and
  * then use that information to query what overrides should be in effect.
@@ -55,9 +55,9 @@
  * (Drupal\sps\Plugins\Condition\BasicCondition) which can be use in most
  * case.
  *
- * The hook should return an array of plugin arrays keyed by the name of the condition.
- * There are no required fields for condition plugins, if one is going to use
- * the default value for class (which is
+ * The hook should return an array of plugin arrays keyed by the name of the
+ * condition. There are no required fields for condition plugins, if one is
+ * going to use the default value for class (which is
  * Drupal\sps\plugins\Condition\BasicCondition) then the they should provide
  * instance_settings with items for name, widget and title.
  * if the class is stated it must be a class that implements
@@ -76,32 +76,31 @@
  *   This base condition use widget and override plugins.  The widget to use
  *   is passed in as a instance setting and the name is use to find all
  *   override plugins that should be used by the condition.
- *   .----------------------------.
- *   |       date_condition       |
- *   |----------------------------|
- *   | class : BasicCondition     |
- *   | instance_settings :        |         .-----------------------------------.
- *   |   widget : date_widget -------------------------> date_widget            |
- *   |   name : date_condition  <------.    |-----------------------------------|
- *   '----------------------------'    |    | class : Drupal\sps\...\DateWidget |
- *                                     |    '-----------------------------------'
- *                                     |
- *                                     |    .------------------------------------.
- *                                     |    |            ers_override            |
- *                                     |    |------------------------------------|
- *                                     |    | class : Drupal\sps_ers\ERSOverride |
- *                                     '------condition : date_condition         |
- *                                          '------------------------------------'
+ *  .----------------------------.
+ *  |       date_condition       |
+ *  |----------------------------|
+ *  | class : BasicCondition     |
+ *  | instance_settings :        |        .-----------------------------------.
+ *  |   widget : date_widget ------------------------> date_widget            |
+ *  |   name : date_condition  <------.   |-----------------------------------|
+ *  '----------------------------'   |    | class : Drupal\sps\...\DateWidget |
+ *                                   |    '-----------------------------------'
+ *                                   |
+ *                                   |    .------------------------------------.
+ *                                   |    |            ers_override            |
+ *                                   |    |------------------------------------|
+ *                                   |    | class : Drupal\sps_ers\ERSOverride |
+ *                                   '------condition : date_condition         |
+ *                                        '------------------------------------'
  *
- *  @see hook_sps_widget_plugins
- *  @see Drupal\sps\Plugins\WidgetInterface
- *  @see hook_sps_override_plugins
- *  @see Drupal\sps\Plugins\OverrideInterface
- *
+ * @see hook_sps_widget_plugins
+ * @see Drupal\sps\Plugins\WidgetInterface
+ * @see hook_sps_override_plugins
+ * @see Drupal\sps\Plugins\OverrideInterface
  */
 function hook_sps_condition_plugins() {
   return array(
-    'date_condition'=> array(
+    'date_condition' => array(
       'instance_settings' => array(
         'name' => 'date_condition',
         'widget' => 'date_widget',
@@ -111,7 +110,7 @@ function hook_sps_condition_plugins() {
   );
 }
 
-/*
+/**
  * Define Override Controller (override storage objects) for the SPS System
  *
  * The override controllers provide an interface for reaction plugins to access
@@ -137,7 +136,6 @@ function hook_sps_condition_plugins() {
  * @see Drupal\sps\plugins\OverrideControllerInterface
  * @see Drupal\sps\plugins\OverrideController\SimpleCacheOverrideControllerInterface
  * @see Drupal\sps\plugins\OverrideController\TableOverrideStorageControllerInterface
- *
  */
 function hook_sps_override_controller_plugins() {
   return array(
@@ -153,7 +151,7 @@ function hook_sps_override_controller_plugins() {
 }
 
 /**
- * Define Reactions for the SPS System
+ * Define Reactions for the SPS System.
  *
  * The reaction plugins use current override data to react to the fact that
  * some entity values are overridden.  Each reaction must specify what
@@ -171,6 +169,7 @@ function hook_sps_override_controller_plugins() {
  * One should put all logic in to the react and not in to the hook use to call
  * it.  This why the manager can issue the the reaction should occur before
  * calling any of that logic.
+ *
  * @see Drupal\sps\Manager::react
  *
  * The class is a mandatory value in the plugin and should implement
@@ -183,9 +182,9 @@ function hook_sps_override_controller_plugins() {
  */
 function hook_sps_reaction_plugins() {
   $reactions = array(
-    'entity_load'=> array(
+    'entity_load' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntityLoadReaction',
-      'use_controller_api' =>'simple_cache',
+      'use_controller_api' => 'simple_cache',
       'instance_settings' => array(),
     ),
   );
@@ -193,7 +192,7 @@ function hook_sps_reaction_plugins() {
 }
 
 /**
- * Define Wddget plugins for use by sps conditions
+ * Define Wddget plugins for use by sps conditions.
  *
  * Widget plugins are used by the BasicCondition class, they provide a widget
  * to be used in the sps preview form, this includes validation and a
@@ -207,10 +206,10 @@ function hook_sps_reaction_plugins() {
  */
 function hook_sps_widget_plugins() {
   return array(
-    'date_widget'=> array(
+    'date_widget' => array(
       'class' => 'Drupal\sps\Plugins\Widget\DateWidget',
       'instance_settings' => array(
-        'title' => 'Preview Date'
+        'title' => 'Preview Date',
       ),
     ),
   );
@@ -218,7 +217,7 @@ function hook_sps_widget_plugins() {
 
 
 /**
- * Define Override Object for use by sps Conditions
+ * Define Override Object for use by sps Conditions.
  *
  * Override Plugins do the heavy lifting for Conditions that use the
  * BasicCondition Class. Each Override Plugin should say which condition should
@@ -229,7 +228,7 @@ function hook_sps_widget_plugins() {
  */
 function hook_sps_override_plugins() {
   return array(
-    'ers_override'=> array(
+    'ers_override' => array(
       'class' => 'Drupal\sps_ers\ERSOverride',
       'condition' => 'date_condition',
     ),
