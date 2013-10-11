@@ -152,10 +152,6 @@ function sps_condition_preview_form($form, &$form_state) {
  * Also if we have a cancel selected we clear the site state.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
-  $errors = form_get_errors();
-  if ($errors) {
-    return;
-  }
 
   // If cancel was press blow away the site state and refresh.
   if ($form_state['clicked_button']['#id'] == 'edit-cancel') {
@@ -224,6 +220,39 @@ function sps_query_alter($query) {
   $data = new stdClass();
   $data->query = $query;
   sps_get_manager()->react('entity_select_query_alter', $data);
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ */
+function sps_module_implements_alter(&$implementations, $hook){
+  if($hook == 'entity_info_alter' && isset($implementations['sps'])){
+    $group = $implementations['sps'];
+    unset($implementations['sps']);
+    $implementations['sps'] = $group;
+  }
+}
+
+/**
+ * Implements hook_entitycache_load_alter().
+ */
+function sps_entitycache_load_alter(&$entities) {
+  $state = sps_get_manager()->getSiteState();
+  if ($state !== NULL) {
+    // If the state is not empty, do not let entitycache load things from cache.
+    $entities = array();
+  }
+}
+
+/**
+ * Implements hook_entitycache_save_alter().
+ */
+function sps_entitycache_save_alter(&$entities){
+    $state = sps_get_manager()->getSiteState();
+    if ($state !== NULL) {
+    // If the state is not empty, do not let entitycache save things in cache.
+    $entities = array();
+  }
 }
 
 /**
