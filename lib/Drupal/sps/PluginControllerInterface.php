@@ -1,7 +1,9 @@
 <?php
+
 namespace Drupal\sps;
 
 interface PluginControllerInterface {
+
   /**
    * Factory for building a plugin object.
    *
@@ -37,7 +39,7 @@ interface PluginControllerInterface {
    * @param $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
    * @param $property
-   *   the meta property to compare to the value
+   *   the
    * @param $value
    *   the value to compare to the meta property
    *

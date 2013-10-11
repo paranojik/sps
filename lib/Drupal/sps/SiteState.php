@@ -7,13 +7,13 @@ class SiteState {
   protected $override_controllers;
 
   /**
-  * Constructor for SiteState
-  *
-  * @param $condition
-  *   The current condition in use
-  * @param $controller_map
-  *   A map of controller api's to OVerride Controller Plugin obj
-  */
+   * Constructor for SiteState
+   *
+   * @param $condition
+   *   The current condition in use
+   * @param $controller_map
+   *   A map of controller api's to OVerride Controller Plugin obj
+   */
   public function __construct(Plugins\ConditionInterface $condition, $controller_map) {
 
     $this->setOverrideControllers($controller_map);
@@ -22,14 +22,14 @@ class SiteState {
   }
 
   /**
-  * Set the Controller for storing overrrides
-  *
-  * @param $controller_map
-  *   The Map of overrides controllers
-  *
-  * @return \Drupal\sps\SiteState
-  *   Self
-  */
+   * Set the Controller for storing overrrides.
+   *
+   * @param $controller_map
+   *   The Map of overrides controllers
+   *
+   * @return \Drupal\sps\SiteState
+   *   Self
+   */
   protected function setOverrideControllers($controller_map) {
     $this->override_controllers = $controller_map;
 
@@ -37,17 +37,17 @@ class SiteState {
   }
 
   /**
-  * get the condtion stored in the state
-  *
-  * @return \Drupal\sps\Plugins\ConditionInterface
-  *   the stored condition
-  */
+   * Get the condtion stored in the state.
+   *
+   * @return \Drupal\sps\Plugins\ConditionInterface
+   *   the stored condition
+   */
   public function getCondition() {
     return $this->condition;
   }
 
   /**
-   * Store the Override to use for generating overrides
+   * Store the Override to use for generating overrides.
    *
    * @param Plugins\ConditionInterface $condition
    *
@@ -61,12 +61,12 @@ class SiteState {
   }
 
   /**
-  * Retrieve Stored Overrides
-  *
-  * @return array
-  *   Array of overrides
-  *   @TODO make this a iterator?
-  */
+   * Retrieve Stored Overrides.
+   *
+   * @return array
+   *   Array of overrides
+   *   @TODO make this a iterator?
+   */
   public function getOverrideController($api) {
     if (isset($this->override_controllers[$api])) {
       return $this->override_controllers[$api];
@@ -84,7 +84,7 @@ class SiteState {
    *   Self
    */
   protected function setOverrides() {
-    foreach($this->override_controllers as $api => $controller) {
+    foreach ($this->override_controllers as $api => $controller) {
       $controller->set($this->condition->getOverride()->getOverrides());
     }
     return $this;

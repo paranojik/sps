@@ -1,37 +1,39 @@
 <?php
+
 namespace Drupal\sps;
 
 interface StorageControllerInterface {
+
   /**
-   * Cache away a object
+   * Cache away a object.
    *
-   * @param $name
+   * @param string $name
    *   A string name use for retrieval
    * @param $cache
    *   an object to be cached
-   * @return 
-   *   NULL
+   *
+   * @return NULL
    */
   public function set($name, $cache);
- 
+
   /**
-   * Test if we have an object cached
+   * Test if we have an object cached.
    *
    * This should be less expensive then using get
    *
-   * @param $name
+   * @param string $name
    *   A string name use for retrieval
-   * @return 
+   * @return
    *   bool
    */
   public function exists($name);
- 
+
   /**
    * Retrieve a cached object
    *
    * @param $name
    *   A string name use for retrieval
-   * @return 
+   * @return
    *   the object that was cached
    */
   public function get($name);

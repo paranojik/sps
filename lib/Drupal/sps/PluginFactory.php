@@ -11,11 +11,11 @@ use Drupal\sps\Exception\DoesNotImplementException;
  * The plugin factory will load the plugins objects and info
  */
 class PluginFactory implements PluginControllerInterface {
-  // Array of plugin info
+  // Array of plugin info.
   protected $plugin_info = array();
-  // The info array for the plugin type info
+  // The info array for the plugin type info.
   protected $plugin_type_info = array();
-  // control for invoking drupal hooks
+  // control for invoking drupal hooks.
   protected $manager;
 
   /**
@@ -28,7 +28,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * get meta info on a plugin
+   * get meta info on a plugin.
    *
    * @param $plugin_type
    *   the type of plugin as defined in hook_sps_plugin_types_info
@@ -60,7 +60,7 @@ class PluginFactory implements PluginControllerInterface {
 
 
   /**
-   * factory for building a plugin object
+   * Factory for building a plugin object.
    *
    * @param $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
@@ -81,13 +81,12 @@ class PluginFactory implements PluginControllerInterface {
    */
   public function getPlugin($type, $name, Manager $manager, $settings = NULL) {
     $plugin_info = $this->getPluginInfo($type, $name);
-    //start with settings for our instance settings
+    // Start with settings for our instance settings.
     $settings = $settings ?: array();
     $plugin_info['instance_settings'] = $settings + $plugin_info['instance_settings'];
 
     if (isset($plugin_info['class'])) {
       $plugin_type_info = $this->getPluginInfo($type);
-
 
       $class_name = isset($plugin_info['class']) ? $plugin_info['class'] : $plugin_type_info['class'];
 
@@ -105,7 +104,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * Load the Plugin info into the objects cache
+   * Load the Plugin info into the objects cache.
    *
    * @param $plugin_type
    *
@@ -121,7 +120,7 @@ class PluginFactory implements PluginControllerInterface {
       foreach ($this->getDrupalController()->module_implements($hook) as $module) {
         $module_infos = $this->getDrupalController()->module_invoke($module, $hook);
         foreach ($module_infos as $plugin_name => $plugin_info) {
-          if(!is_array($this->plugin_type_info[$plugin_type]['defaults'])) {
+          if (!is_array($this->plugin_type_info[$plugin_type]['defaults'])) {
           }
           $plugin_info += $this->plugin_type_info[$plugin_type]['defaults'] + array(
             'plugin_type' => $plugin_type,
@@ -142,7 +141,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * Validate a plugin info array
+   * Validate a plugin info array.
    *
    * @param $plugin_info
    *
@@ -152,7 +151,7 @@ class PluginFactory implements PluginControllerInterface {
    */
   protected function validatePluginInfo($plugin_info) {
     $type_info = $this->getPluginTypeInfo($plugin_info['plugin_type']);
-    if(isset($type_info['requires'])) {
+    if (isset($type_info['requires'])) {
       $this->validatePluginInfoRequirements($plugin_info, $type_info['requires']);
     }
 
@@ -168,7 +167,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * Validate that the plugin class is valid
+   * Validate that the plugin class is valid.
    *
    * @param $plugin_info
    *
@@ -191,7 +190,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * Validate that the plugin info array contains the all of the required keys
+   * Validate that the plugin info array contains the all of the required keys.
    *
    * @param $plugin_info
    *   an array of plugin data
@@ -213,18 +212,18 @@ class PluginFactory implements PluginControllerInterface {
    */
   protected function validatePluginInfoRequirements($plugin_info, $requirements, $parents = '', $name = NULL) {
     $name = $name ?: $plugin_info['name'];
-    foreach($requirements as $r_key => $r_type) {
+    foreach ($requirements as $r_key => $r_type) {
       if (!isset($plugin_info[$r_key])) {
         throw new InvalidPluginException(
           "Plugin $name does not contain required element $parents$r_key");
       }
       else {
-        if(is_array($r_type)) {
-          $parents .="$r_key=>";
+        if (is_array($r_type)) {
+          $parents .= "$r_key=>";
           $this->validatePluginInfoRequirements($plugin_info[$r_key], $r_type, $parents, $name);
         }
         else {
-          //TODO add type checking based on the value of $r_type
+          // TODO add type checking based on the value of $r_type.
         }
       }
     }
@@ -261,7 +260,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * Load the plugin type info
+   * Load the plugin type info.
    *
    * @return PluginFactory
    *  self
@@ -306,7 +305,7 @@ class PluginFactory implements PluginControllerInterface {
   }
 
   /**
-   * get meta info on a plugin
+   * Get meta info on a plugin.
    *
    * @param $type
    *   the type of plugin as defined in hook_sps_plugin_types_info
