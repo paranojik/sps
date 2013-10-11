@@ -1,32 +1,33 @@
 <?php
 
 /**
- * implements hook_sps_reaction_plugins()
+ * Implements hook_sps_reaction_plugins().
  */
 function sps_sps_reaction_plugins() {
   $reactions = array(
-    'entity_load'=> array(
+    'entity_load' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntityLoadReaction',
-      'use_controller_api' =>'simple_cache',
+      'use_controller_api' => 'simple_cache',
       'instance_settings' => array(),
     ),
-    'add_class'=> array(
+    'add_class' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\AddClassReaction',
-      'use_controller_api' =>'simple_cache',
+      'use_controller_api' => 'simple_cache',
       'instance_settings' => array(),
     ),
-   'entity_select_query_alter' => array(
+    'entity_select_query_alter' => array(
       'class' => 'Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction',
-      'use_controller_api' =>'mysql_table',
+      'use_controller_api' => 'mysql_table',
       'instance_settings' => array(
         'entities' => array(),
       ),
     ),
   );
-  //Lets add all of the entites that have revisions to the query_alter
-  //and then lets add in the node revision fields
-  foreach(module_invoke_all('entity_info') as $type => $info) {
-    if(isset($info['revision table'])) {
+
+  // Lets add all of the entities that have revisions to the query_alter
+  // and then lets add in the node revision fields.
+  foreach (module_invoke_all('entity_info') as $type => $info) {
+    if (isset($info['revision table'])) {
       $reactions['entity_select_query_alter']['instance_settings']['entities'][$type] = array(
         'base_table' => $info['base table'],
         'revision_table' => $info['revision table'],
@@ -41,7 +42,7 @@ function sps_sps_reaction_plugins() {
           ),
           array(
             $info['entity keys']['id'],
-            $info['entity keys']['revision']
+            $info['entity keys']['revision'],
           )
         )
       );
@@ -51,7 +52,7 @@ function sps_sps_reaction_plugins() {
 }
 
 /**
- * implements hook_sps_override_controller_plugins()
+ * Implements hook_sps_override_controller_plugins().
  */
 function sps_sps_override_controller_plugins() {
   return array(
@@ -73,10 +74,10 @@ function sps_sps_override_controller_plugins() {
  */
 function sps_sps_widget_plugins() {
   return array(
-    'date_widget'=> array(
+    'date_widget' => array(
       'class' => 'Drupal\sps\Plugins\Widget\DateWidget',
       'instance_settings' => array(
-        'title' => 'Preview Date'
+        'title' => 'Preview Date',
       ),
     ),
   );
@@ -89,17 +90,16 @@ function sps_sps_widget_plugins() {
  */
 function sps_sps_condition_plugins() {
   return array(
-    'date_condition'=> array(
+    'date_condition' => array(
       'instance_settings' => array(
         'name' => 'date_condition',
         'widget' => 'date_widget',
         'title' => 'Site as of ...',
       ),
     ),
-    'default_root_condition'=> array(
+    'default_root_condition' => array(
       'class' => '\Drupal\sps\Plugins\Condition\WrapperCondition',
-      'instance_settings' => array(
-      ),
+      'instance_settings' => array(),
       'root_condition' => 'True',
     ),
   );
