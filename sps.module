@@ -152,6 +152,11 @@ function sps_condition_preview_form($form, &$form_state) {
  * Also if we have a cancel selected we clear the site state.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
+  $errors = form_get_errors();
+  if ($errors) {
+    return;
+  }
+
   // If cancel was press blow away the site state and refresh.
   if ($form_state['clicked_button']['#id'] == 'edit-cancel') {
     sps_get_manager()->clearSiteState();
