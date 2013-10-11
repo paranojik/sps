@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\sps;
 
 /**
@@ -32,7 +33,7 @@ namespace Drupal\sps;
  *
  * Accessing Plugins
  *
- * SPS plugins are the abstact tool used to extend the what, when and how of
+ * SPS plugins are the abstract tool used to extend the what, when and how of
  * overrides.
  *
  * @see getPlugin()
@@ -50,7 +51,6 @@ namespace Drupal\sps;
  * @see getPluginController()
  * @see getStateController()
  * @see getConfigController()
- *
  */
 class Manager {
   protected $state_controller;
@@ -61,7 +61,7 @@ class Manager {
   protected $override_controller;
 
   /**
-   * Constructor for \Drupal\sps\Manager
+   * Constructor for \Drupal\sps\Manager.
    *
    * Load the Drupal, Plugin and State controller form the configuration.
    *
@@ -79,10 +79,11 @@ class Manager {
   }
 
   /**
-   * Create a Controller Object based upon a configuration key
+   * Create a Controller Object based upon a configuration key.
    *
    * @param $key
-   *  The key from the configuration array that contains the controller information.
+   *  The key from the configuration array that contains the controller
+   *  information.
    *
    * @return StateControllerInterface|PluginControllerInterface|Drupal
    */
@@ -94,7 +95,7 @@ class Manager {
   }
 
   /**
-   * store the state controller
+   * Store the state controller.
    *
    * @param \Drupal\sps\StateControllerInterface $controller
    *   The control to use when accessing State info (like site state)
@@ -108,13 +109,13 @@ class Manager {
   }
 
   /**
-   * store the config controller
+   * Store the config controller.
    *
    * @param \Drupal\sps\StorageControllerInterface $controller
-   *  the control to be used when accessing config
+   *   The control to be used when accessing config.
    *
    * @return \Drupal\sps\Manager
-   *           Self
+   *   Self
    */
   protected function setConfigController(StorageControllerInterface $controller) {
     $this->config_controller = $controller;
@@ -122,7 +123,7 @@ class Manager {
   }
 
   /**
-   * store the override controller
+   * Store the override controller.
    *
    * @param \Drupal\sps\StorageControllerInterface $controller
    *   the control to use when accessing overrides
@@ -136,7 +137,7 @@ class Manager {
   }
 
   /**
-   * store the override controller
+   * Store the override controller.
    *
    * @param \Drupal\sps\PluginControllerInterface $controller
    *   The control to use when accessing plugins
@@ -150,7 +151,7 @@ class Manager {
   }
 
   /**
-   * store the hook controller
+   * Store the hook controller.
    *
    * @param \Drupal\sps\Drupal $controller
    *   The control to use when accessing drupal invoke and alter function
@@ -163,9 +164,10 @@ class Manager {
   }
 
   /**
-   * Pull the site state form site state controller
+   * Pull the site state form site state controller.
    *
-   * Note the state controller is responsible for reasonable caching of the site state
+   * Note the state controller is responsible for reasonable caching of the
+   * site state.
    *
    * @return \Drupal\sps\SiteState | NULL
    */
@@ -179,6 +181,7 @@ class Manager {
 
   /**
    * Create A SiteState form an override, and store it.
+   *
    *   _________________________
    *   \                        \
    *    \  Manager::setSiteState \
@@ -223,6 +226,7 @@ class Manager {
    *       /________________/                     '-------------------'
    *
    * @param \Drupal\sps\Plugins\ConditionInterface $condition
+   *
    * @return \Drupal\sps\Manager
    *   Self
    */
@@ -325,38 +329,36 @@ class Manager {
     $controllers_instances = array();
     $instances = array();
 
-    //find all need apis
-    foreach($this->getActiveReactionInfo() as $info) {
+    // Find all need apis.
+    foreach ($this->getActiveReactionInfo() as $info) {
       $controllers[$info['use_controller_api']] = NULL;
     }
     $config = $this->getConfigController()->exists(SPS_CONFIG_OVERRIDE_CONTROLLERS) ?
       $this->getConfigController()->get(SPS_CONFIG_OVERRIDE_CONTROLLERS) : array();
     $infos = $this->getPluginInfo('override_controller');
 
-    //if the config has valid controllers use them
-    foreach($config as $api=>$name) {
+    // If the config has valid controllers use them.
+    foreach ($config as $api => $name) {
       if (isset($infos[$name])) {
         $controllers[$api]  = $name;
       }
     }
-    foreach($controllers as $api => $name) {
-      if(!$name) {
-        foreach($infos as $info_name => $info) {
-          //if we have not found a controller yet lets
-          //see if this one implements the api
-          if(!$name) {
-            $imp = is_array($info['implements_controller_api'])
-              ? $info['implements_controller_api']
-              : array($info['implements_controller_api']);
+    foreach ($controllers as $api => $name) {
+      if (!$name) {
+        foreach ($infos as $info_name => $info) {
+          // If we have not found a controller yet lets see if this one
+          // implements the api.
+          if (!$name) {
+            $imp = is_array($info['implements_controller_api']) ? $info['implements_controller_api'] : array($info['implements_controller_api']);
             foreach ($imp as $imp_api) {
-              if($imp_api == $api) {
+              if ($imp_api == $api) {
                 $name = $info_name;
               }
             }
           }
         }
       }
-      if($name) {
+      if ($name) {
         if (!isset($instances[$name])) {
           $instances[$name] = $this->getPlugin('override_controller', $name);
         }
