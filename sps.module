@@ -11,8 +11,8 @@ define('SPS_CONFIG_PREFIX', "sps_config");
 define('SPS_NO_ALTER_QUERY_TAG', "sps_no_alter");
 
 /**
-* implements hook_menu()
-*/
+ * Implements hook_menu().
+ */
 function sps_menu_alter(&$items) {
   $items['node/%node/revisions/%/view']['page callback'] = 'sps_node_revision';
   $items['node/%node/revisions/%/view']['page arguments'] = array(1, 3);
@@ -23,7 +23,7 @@ function sps_menu_alter(&$items) {
 }
 
 /**
- *  Implements hook_sps_plugin_types()
+ * Implements hook_sps_plugin_types().
  */
 function sps_sps_plugin_types() {
   return array(
@@ -61,8 +61,7 @@ function sps_sps_plugin_types() {
         'class' => 'Drupal\sps\Plugins\Condition\BasicCondition',
         'instance_settings' => array(),
       ),
-      'requires' => array(
-      ),
+      'requires' => array(),
     ),
     'widget' => array(
       'interface' => 'Drupal\sps\Plugins\WidgetInterface',
@@ -70,8 +69,7 @@ function sps_sps_plugin_types() {
         'class' => 'Drupal\sps\Plugins\Widget\Widget',
         'instance_settings' => array(),
       ),
-      'requires' => array(
-      ),
+      'requires' => array(),
     ),
   );
 }
@@ -80,7 +78,8 @@ function sps_sps_plugin_types() {
  * Implements hook_hook_info().
  */
 function sps_hook_info() {
-  foreach(sps_sps_plugin_types() as $name => $type) {
+  $hooks = array();
+  foreach (sps_sps_plugin_types() as $name => $type) {
     $hooks["sps_{$name}_plugins"] = array('group' => 'sps_plugins');
   }
   return $hooks;
@@ -104,7 +103,7 @@ function sps_hook_info() {
 function sps_condition_preview_form($form, &$form_state) {
 
   $form['title'] = array(
-    '#markup' =>  '<div class="sps-preview-form-title">' . t('Site Preview') . '</div>',
+    '#markup' => '<div class="sps-preview-form-title">' . t('Site Preview') . '</div>',
   );
 
   $form['#attached']['css'] = array(
@@ -150,11 +149,10 @@ function sps_condition_preview_form($form, &$form_state) {
  * A validate will find the root condition (from the build args)
  * and call its validateElement method
  *
- * also if we have a cancel selected we clear the site state
- *
+ * Also if we have a cancel selected we clear the site state.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
-  // if cancel was press blow away the site state and refresh
+  // If cancel was press blow away the site state and refresh.
   if ($form_state['clicked_button']['#id'] == 'edit-cancel') {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
@@ -172,7 +170,6 @@ function sps_condition_preview_form_validate($form, &$form_state) {
  * and call its submitElement method
  *
  * Then the manager is notified that the submit happened.
- *
  */
 function sps_condition_preview_form_submit($form, &$form_state) {
 
@@ -185,7 +182,7 @@ function sps_condition_preview_form_submit($form, &$form_state) {
 }
 
 /**
- * Get the default Storage Controller
+ * Get the default Storage Controller.
  *
  * @return \Drupal\sps\StorageController\DrupalVariableController
  */
@@ -199,7 +196,7 @@ function sps_get_default_config_controller() {
 }
 
 /**
- * Get the default Manager
+ * Get the default Manager.
  *
  * @return \Drupal\sps\Manager
  */
@@ -212,6 +209,7 @@ function sps_get_manager() {
 
   return $manager;
 }
+
 /**
  * Implements hook_query_alter().
  *
@@ -229,30 +227,30 @@ function sps_query_alter($query) {
  * changing the node controller on behalf of the node_load Reaction
  */
 function sps_entity_info_alter(&$entity_info) {
-  foreach($entity_info as $name => &$info) {
-    if(isset($info['revision table'])) {
-      $info['controller class base'] = '\Drupal\sps\EntityController\\' .$info['controller class'];
+  foreach ($entity_info as $name => &$info) {
+    if (isset($info['revision table'])) {
+      $info['controller class base'] = '\Drupal\sps\EntityController\\' . $info['controller class'];
       $info['controller class base'] = $info['controller class'];
       $info['controller class'] = '\Drupal\sps\EntityController\EntityControllerWrapper';
       $info['creation callback'] = 'sps_entity_create';
     }
   }
-  //$entity_info['node']['controller class'] = '\Drupal\sps\EntityController\NodeController';
-  //$entity_info['bean']['controller class'] = '\Drupal\sps\EntityController\BeanEntityAPIController';
 }
 
 /**
  * Create a new entity object.
  *
  * We need a custom creation callback because the entity API module requires
- * the EntityAPIControllerInterface and \Drupal\sps\EntityController\EntityControllerWrapper
- * does not contain EntityAPIControllerInterface.
+ * the EntityAPIControllerInterface and
+ * \Drupal\sps\EntityController\EntityControllerWrapper does not contain
+ * EntityAPIControllerInterface.
  *
- * @param $entity_type
- *   The type of the entity.
- * @param $values
+ * @param array $values
  *   An array of values to set, keyed by property name. If the entity type has
  *   bundles the bundle key has to be specified.
+ * @param string $entity_type
+ *   The type of the entity.
+ *
  * @return
  *   A new instance of the entity type or FALSE if there is no information for
  *   the given entity type.
@@ -290,7 +288,7 @@ function sps_iib_page_item() {
 */
 function sps_wrapper_condition_ajax_callback($form, $form_state) {
   array_pop($form_state['triggering_element']['#parents']);
-  foreach($form_state['triggering_element']['#parents'] as $key) {
+  foreach ($form_state['triggering_element']['#parents'] as $key) {
     $form = $form[$key];
   }
   return $form;
