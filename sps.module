@@ -189,7 +189,7 @@ function sps_condition_preview_form_submit($form, &$form_state) {
 function sps_get_default_config_controller() {
   $controller = &drupal_static(__FUNCTION__);
 
-  if(!isset($controller)) {
+  if (!isset($controller)) {
     $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
   }
   return $controller;
@@ -203,7 +203,7 @@ function sps_get_default_config_controller() {
 function sps_get_manager() {
   $manager = &drupal_static(__FUNCTION__);
 
-  if(!isset($manager)) {
+  if (!isset($manager)) {
     $manager = new \Drupal\sps\Manager(sps_get_default_config_controller());
   }
 
@@ -317,17 +317,22 @@ function sps_drupal() {
 }
 
 /**
- * Override of the node/%node/revisions/%/view page callback
+ * Override of the node/%node/revisions/%/view page callback.
  *
  * set a override for this version and go to node view page
  *
- * @param $node
+ * @param Node $node
  * @param $revision_id
  *
  * @return string
  */
 function sps_node_revision($node, $revision_id) {
-  $message = array('#markup' => t('Viewing %title; revision %date', array('%date' => format_date($node->revision_timestamp), '%title' => $node->title)));
+  $message = array(
+    '#markup' => t('Viewing %title; revision %date', array(
+      '%date' => format_date($node->revision_timestamp),
+      '%title' => $node->title)
+    ),
+  );
   sps_add_override($message, $node->nid, 'node', array('revision_id' => $revision_id));
   drupal_goto("node/{$node->nid}");
 
@@ -343,7 +348,7 @@ function sps_bean_revision($node, $revision_id) {
 }
 
 /**
- * Set the SiteState to a single Override
+ * Set the SiteState to a single Override.
  *
  * @param $message
  *   a render array that should be used by the sps form to say what is showing
