@@ -1,4 +1,5 @@
 <?php
+
 namespace Drupal\sps;
 
 class DatabaseCondition extends \DatabaseCondition {
@@ -25,8 +26,8 @@ class DatabaseCondition extends \DatabaseCondition {
           $arguments += $condition['value'];
         }
         else {
-          // It's a structured condition, so parse it out accordingly.
-          // Note that $condition['field'] will only be an object for a dependent
+          // It's a structured condition, so parse it out accordingly. Note that
+          // $condition['field'] will only be an object for a dependent
           // DatabaseCondition object, not for a dependent subquery.
           if ($condition['field'] instanceof \QueryConditionInterface) {
             // Compile the sub-condition recursively and add it to the list.
@@ -35,7 +36,7 @@ class DatabaseCondition extends \DatabaseCondition {
             $arguments += $condition['field']->arguments();
           }
           else {
-            // For simplicity, we treat all operators as the same data structure.
+            // For simplicity,we treat all operators as the same data structure.
             // In the typical degenerate case, this won't get changed.
             $operator_defaults = array(
               'prefix' => '',
@@ -61,7 +62,8 @@ class DatabaseCondition extends \DatabaseCondition {
             }
             // We assume that if there is a delimiter, then the value is an
             // array. If not, it is a scalar. For simplicity, we first convert
-            // up to an array so that we can build the placeholders in the same way.
+            // up to an array so that we can build the placeholders in the same
+            // way.
             elseif (!$operator['delimiter']) {
               $condition['value'] = array($condition['value']);
             }
