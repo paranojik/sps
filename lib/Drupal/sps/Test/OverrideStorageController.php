@@ -1,5 +1,5 @@
 <?php
-namespace \Drupal\sps\Test
+namespace \Drupal\sps\Test;
 
 class TableOverrideStorageController implements TableOverrideStorageControllerInterface{
 
