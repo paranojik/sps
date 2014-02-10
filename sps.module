@@ -146,15 +146,17 @@ function sps_condition_preview_form($form, &$form_state) {
 }
 
 /**
- * A validate will find the root condition (from the build args)
- * and call its validateElement method
+ * Form validation handler for sps_condition_preview_form().
  *
- * Also if we have a cancel selected we clear the site state.
+ * Find the root condition (from the build args) and call its
+ * validateElement() method.
+ *
+ * Also if we click cancel then clear the site state.
  */
 function sps_condition_preview_form_validate($form, &$form_state) {
 
-  // If cancel was press blow away the site state and refresh.
-  if ($form_state['clicked_button']['#id'] == 'edit-cancel') {
+  // If cancel was pressed blow away the site state and refresh.
+  if (isset($form_state['clicked_button']['#id']) && $form_state['clicked_button']['#id'] == 'edit-cancel') {
     sps_get_manager()->clearSiteState();
     drupal_goto(current_path());
   }
