@@ -225,17 +225,6 @@ function sps_query_alter($query) {
 }
 
 /**
- * Implements hook_module_implements_alter().
- */
-function sps_module_implements_alter(&$implementations, $hook){
-  if($hook == 'entity_info_alter' && isset($implementations['sps'])){
-    $group = $implementations['sps'];
-    unset($implementations['sps']);
-    $implementations['sps'] = $group;
-  }
-}
-
-/**
  * Implements hook_entitycache_load_alter().
  */
 function sps_entitycache_load_alter(&$entities) {
@@ -258,14 +247,40 @@ function sps_entitycache_save_alter(&$entities){
 }
 
 /**
+ * Implements hook_module_implements_alter().
+ *
+ * Make sure SPS entity_info_alter runs last, this guarantee that any module
+ * that alters the controller class (ex. EntityCache) still works as expected.
+ */
+function sps_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'entity_info_alter' && isset($implementations['sps'])) {
+    $group = $implementations['sps'];
+    unset($implementations['sps']);
+    $implementations['sps'] = $group;
+  }
+}
+
+/**
  * Implements hook_entity_info_alter().
  *
- * changing the node controller on behalf of the node_load Reaction
+ * Changing the Entity Controller on behalf of the entity_load Reaction.
+ *
+ * @see sps_module_implements_alter()
  */
 function sps_entity_info_alter(&$entity_info) {
-  foreach ($entity_info as $name => &$info) {
-    if (isset($info['revision table'])) {
-      $info['controller class base'] = '\Drupal\sps\EntityController\\' . $info['controller class'];
+  // Add SPS support to Nodes.
+  if (isset($entity_info['node'])) {
+    $entity_info['node']['previewable'] = TRUE;
+  }
+  // Add SPS support to Beans.
+  if (isset($entity_info['bean'])) {
+    $entity_info['bean']['previewable'] = TRUE;
+  }
+
+
+  // Change controller class for previewable entities.
+  foreach ($entity_info as &$info) {
+    if (isset($info['revision table']) && isset($info['previewable']) && $info['previewable'] === TRUE) {
       $info['controller class base'] = $info['controller class'];
       $info['controller class'] = '\Drupal\sps\EntityController\EntityControllerWrapper';
       $info['creation callback'] = 'sps_entity_create';
