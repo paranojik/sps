@@ -4,7 +4,7 @@ namespace Drupal\sps\EntityController;
 
 
 class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
-  
+
   protected $controller;
   protected $info;
   protected $type;
@@ -19,7 +19,6 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
     $class = $this->info['controller class base'];
     $this->controller = new $class($entityType);
     $this->type = $entityType;
-     
   }
 
   /**
@@ -67,4 +66,26 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
     return call_user_func_array(array($this->controller, $name), $args);
   }
 
+  /**
+   * Create a new entity.
+   *
+   * We need a creation callback because the entity API module requires
+   * the EntityAPIControllerInterface. That way we ensure the controller wrapper
+   * works with controllers that don't implement EntityAPIControllerInterface.
+   *
+   * @see EntityAPIControllerInterface::create()
+   *
+   * @param array $values
+   *   An array of values to set, keyed by property name.
+   *
+   * @return object
+   *   A new instance of the entity type.
+   */
+  public function create($values) {
+    if (method_exists($this->controller, 'create')) {
+      return $this->controller->create($values);
+    }
+    // If there's no create method just convert the values to an object.
+    return (object) $values;
+  }
 }
