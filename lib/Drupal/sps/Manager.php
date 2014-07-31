@@ -497,12 +497,18 @@ class Manager {
    */
   public function react($reaction, $data) {
     $infos = $this->getActiveReactionInfo();
-    if(isset($infos[$reaction]) &&
-       !sps_drupal()->path_is_admin(sps_drupal()->current_path()) &&
+    if (isset($infos[$reaction]) &&
        ($site_state = $this->getSiteState()) &&
        ($controller = $site_state->getOverrideController($infos[$reaction]['use_controller_api']))
       ) {
-      return $this->getPlugin("reaction", $reaction)->react($data, $controller);
+      // Calling path_is_admin() to early can lead to cache poisoning of
+      // entity_get_info() - which means a whole bunch of entity information is
+      // missing. Thus check it as separated final condition.
+      // @TODO Find a better way to deal with this. This is just a lucky shot
+      // and not a proper solution.
+      if (!sps_drupal()->path_is_admin(sps_drupal()->current_path())) {
+        return $this->getPlugin("reaction", $reaction)->react($data, $controller);
+      }
     }
   }
 
