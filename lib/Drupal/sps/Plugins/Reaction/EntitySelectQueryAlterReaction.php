@@ -51,7 +51,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    * @return \Drupal\sps\Plugins\Reaction\EntitySelectQueryAlterReaction
    *  Self
    */
-  protected function fieldReplace(&$fields, $alias) {
+  protected function fieldReplace(&$fields, $alias, $property_map) {
     foreach($fields as &$field) {
       foreach($this->entities as $entity) {
         if(isset($alias[$entity['base_table']])) {
@@ -70,6 +70,13 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
             ($field['field'] == $entity['revision_id'])
              && FALSE
             ){
+            $field['table'] = $this->getOverrideAlias($entity);
+          }
+
+          // Ensure mapped properties are fetched from the override alias and
+          // us the override name.
+          if (isset($property_map[$field['field']])) {
+            $field['field'] = $property_map[$field['field']];
             $field['table'] = $this->getOverrideAlias($entity);
           }
         }
