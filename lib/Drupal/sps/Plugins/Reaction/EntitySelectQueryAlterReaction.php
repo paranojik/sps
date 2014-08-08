@@ -164,7 +164,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       if(isset($alias[$entity['base_table']])) {
         //replace revision_id
         if(isset($override_property_map['revision_id'])) {
-          $datum = preg_replace("/\b(".$alias[$entity['base_table']]."\.{$entity['revision_id']})/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
+          $datum = preg_replace("/\b(".$alias[$entity['base_table']]."\.{$entity['revision_id']})\b/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
         }
 
 
@@ -265,7 +265,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    * @return mixed
    */
   protected function replaceTableSwitch($datum, $fields, $base_alias, $revision_alias) {
-    return preg_replace("/".$base_alias."\.(".implode("|", $fields).")/", $revision_alias.'.$1', $datum);
+    return preg_replace("/\b".$base_alias."\.(".implode("|", $fields).")\b/", $revision_alias.'.$1', $datum);
   }
 
 
@@ -286,7 +286,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   protected function replaceCoalesce($datum, $fields_map, $base_alias, $override_alias) {
     return preg_replace_callback(
-      "/".$base_alias."\.(".implode("|", array_keys($fields_map)).")/",
+      "/\b".$base_alias."\.(".implode("|", array_keys($fields_map)).")\b/",
       function ($m) use ($override_alias, $base_alias, $fields_map) {
         return 'COALESCE('.$override_alias .'.'. $fields_map[$m[1]]  .', '. $base_alias.'.'.$m[1] .')';
       },
