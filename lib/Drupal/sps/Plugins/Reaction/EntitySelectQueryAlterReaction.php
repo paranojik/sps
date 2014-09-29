@@ -74,7 +74,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
           }
 
           // Ensure mapped properties are fetched from the override alias and
-          // us the override name.
+          // use the override name.
           if (isset($property_map[$field['field']])) {
             $field['field'] = $property_map[$field['field']];
             $field['table'] = $this->getOverrideAlias($entity);
