@@ -81,7 +81,7 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
    * @return object
    *   A new instance of the entity type.
    */
-  public function create($values) {
+  public function create(array $values = array()) {
     if (method_exists($this->controller, 'create')) {
       return $this->controller->create($values);
     }
