@@ -1,4 +1,5 @@
 <?php
+
 namespace \Drupal\sps\Test;
 
 class TableOverrideStorageController implements TableOverrideStorageControllerInterface {
@@ -23,7 +24,7 @@ class TableOverrideStorageController implements TableOverrideStorageControllerIn
     }
     $tables = $new_tables;
 
-    return $alias
+    return $alias;
   }
 }
 
