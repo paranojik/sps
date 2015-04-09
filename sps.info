@@ -4,6 +4,9 @@ package = "Site Preview System"
 core = 7.x
 php = 5.3
 
-dependencies[] = xautoload
+; Use PSR-0 and registry_autoload
+;dependencies[] = xautoload
+dependencies[] = registry_autoload
+registry_autoload[] = PSR-0
 
 files[] = tests/*.test
