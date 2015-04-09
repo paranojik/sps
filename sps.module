@@ -207,6 +207,10 @@ function sps_get_manager() {
   $manager = &drupal_static(__FUNCTION__);
 
   if (!isset($manager)) {
+    // If the main class isn't found the registry needs to be updated.
+    if (!class_exists('\Drupal\sps\Manager')) {
+      registry_rebuild();
+    }
     $manager = new \Drupal\sps\Manager(sps_get_default_config_controller());
   }
 
