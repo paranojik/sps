@@ -10,28 +10,28 @@ class SPSCToolsObjectCacheWebTest extends SPSBaseWebTest {
   }
 
   public function testCToolsObjectCache_exists() {
-    $control = new \Drupal\sps\StorageController\CToolsObjectCache('test1');
+    $control = new Drupal\sps\StorageController\CToolsObjectCache('test1');
     $control->clear();
 
     $obj = new stdClass();
     $obj->param = "test";
-    $this->assertFalse($control->exists(), "::exists is False before being set"); 
+    $this->assertFalse($control->exists(), "::exists is False before being set");
     $control->set($obj);
-    $this->assertTrue($control->exists(), "::exists is True after a ::set is run"); 
+    $this->assertTrue($control->exists(), "::exists is True after a ::set is run");
     $this->assertEqual($control->get(), $obj, '::get retrives what is set in ::set');
     $control->clear();
-    $this->assertFalse($control->exists(), "::exists is False after running clear"); 
- 
+    $this->assertFalse($control->exists(), "::exists is False after running clear");
+
     $account = $this->drupalCreateUser(array());
     $this->drupalLogin($account);
-    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test");$c->set("TESTSTRING");return "iset";';
+    $rtn = '$c = new Drupal\sps\StorageController\CToolsObjectCache("test");$c->set("TESTSTRING");return "iset";';
     sps_test_call_set('SPSCToolsObjectCacheWebTestSet', $rtn);
     $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestSet");
 
-    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->exists() ? "SiteController is Set" : "SiteController is not Set";';
+    $rtn = '$c = new Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->exists() ? "SiteController is Set" : "SiteController is not Set";';
     sps_test_call_set('SPSCToolsObjectCacheWebTestExists', $rtn);
 
-    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->get();';
+    $rtn = '$c = new Drupal\sps\StorageController\CToolsObjectCache("test"); return $c->get();';
     sps_test_call_set('SPSCToolsObjectCacheWebTestGet', $rtn);
 
     $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestExists");
@@ -40,7 +40,7 @@ class SPSCToolsObjectCacheWebTest extends SPSBaseWebTest {
     $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestGet");
     $this->assertText("TESTSTRING", "::get should be persistent");
 
-    $rtn = '$c = new \Drupal\sps\StorageController\CToolsObjectCache("test");$c->clear() ;return "iset";';
+    $rtn = '$c = new Drupal\sps\StorageController\CToolsObjectCache("test");$c->clear() ;return "iset";';
     sps_test_call_set('SPSCToolsObjectCacheWebTestClear', $rtn);
     $this->drupalGet("sps_test_call/SPSCToolsObjectCacheWebTestClear");
 

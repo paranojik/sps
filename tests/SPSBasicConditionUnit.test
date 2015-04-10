@@ -13,10 +13,10 @@ class SPSBasicConditionUnitTest extends SPSBaseUnitTest {
 
     $settings = array(
       'name' => 'basic',
-      'widget' => new \Drupal\sps\Test\Widget(array(), $manager)
+      'widget' => new Drupal\sps\Test\Widget(array(), $manager)
     );
 
-    $condition = new \Drupal\sps\Plugins\Condition\BasicCondition($settings, $manager);
+    $condition = new Drupal\sps\Plugins\Condition\BasicCondition($settings, $manager);
 
     $state = array();
     $element = $condition->getElement(array(), $state);

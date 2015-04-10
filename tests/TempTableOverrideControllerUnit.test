@@ -12,13 +12,13 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
     $query = $this->join_start();
     $expected = $this->join_start();
     $expected->tables = array(
-      'b' => 
+      'b' =>
       array (
         'join type' => NULL,
         'table' => 'node',
         'alias' => 'b',
         'condition' => NULL,
-        'arguments' => 
+        'arguments' =>
         array (
         ),
       ),
@@ -29,20 +29,20 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
         'condition' => 'b.nid = node_overrides.id',
         'arguments' => array (),
       ),
-      'r' => 
+      'r' =>
       array (
         'join type' => 'INNER',
         'table' => 'node_revision',
         'alias' => 'r',
         'condition' => 'r.vid = b.vid',
-        'arguments' => 
+        'arguments' =>
         array (
         ),
       ),
     );
 
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
     sps_drupal()->set('db_query_temporary', function() { return 'temporary_1';});
     $controller->addOverrideJoin($query, 'b', 'nid', 'node_overrides', 'node');
 
@@ -56,8 +56,8 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
 
   public function testTableTempOverrideController_tempTableCreate() {
     $query = $this->join_start();
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
 
     $overrides = array(
       array(
@@ -78,7 +78,7 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
    function testTableTempOverrideController_tempTableCreate($query = NULL) {
      static $q;
      $q = $query ?: $q;
-     if($query) { 
+     if($query) {
        return 'temporary1';
      }
      return $q;
@@ -93,8 +93,8 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
    );
   }
   public function testTableTempOverrideController_getPropertyMap() {
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
 
     $overrides = array(
       array(
@@ -119,8 +119,8 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
   }
 
   public function testTableTempOverrideController_getPropertyMapNoRevisionId() {
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\TempTableOverrideController(array(), $manager);
 
     $overrides = array(
       array(
@@ -143,8 +143,8 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
   }
 
   public function testSimpleCacheOverrideController_validateRow() {
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
 
    $overrides = array(
       array(
@@ -175,106 +175,106 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
 
   protected function join_start() {
      return Drupal\sps\Test\SelectQuery::__set_state(array(
-       'fields' => 
+       'fields' =>
       array (
-        'sticky' => 
+        'sticky' =>
         array (
           'field' => 'sticky',
           'table' => 'b',
           'alias' => 'sticky',
         ),
-        'title' => 
+        'title' =>
         array (
           'field' => 'title',
           'table' => 'b',
           'alias' => 'title',
         ),
-        'status' => 
+        'status' =>
         array (
           'field' => 'status',
           'table' => 'b',
           'alias' => 'status',
         ),
-        'uid' => 
+        'uid' =>
         array (
           'field' => 'uid',
           'table' => 'b',
           'alias' => 'uid',
         ),
-        'promote' => 
+        'promote' =>
         array (
           'field' => 'promote',
           'table' => 'b',
           'alias' => 'promote',
         ),
       ),
-       'expressions' => 
+       'expressions' =>
       array (
-        'expression' => 
+        'expression' =>
         array (
           'expression' => 'b.title is NULL',
           'alias' => 'expression',
-          'arguments' => 
+          'arguments' =>
           array (
           ),
         ),
       ),
-       'tables' => 
+       'tables' =>
       array (
-        'b' => 
+        'b' =>
         array (
           'join type' => NULL,
           'table' => 'node',
           'alias' => 'b',
           'condition' => NULL,
-          'arguments' => 
+          'arguments' =>
           array (
           ),
         ),
-        'r' => 
+        'r' =>
         array (
           'join type' => 'INNER',
           'table' => 'node_revision',
           'alias' => 'r',
           'condition' => 'r.vid = b.vid',
-          'arguments' => 
+          'arguments' =>
           array (
           ),
         ),
       ),
-       'order' => 
+       'order' =>
       array (
         'b.sticky' => 'ASC',
         'b.title' => 'ASC',
       ),
-       'group' => 
+       'group' =>
       array (
       ),
-       'where' => 
+       'where' =>
       Drupal\sps\Test\DatabaseCondition::__set_state(array(
-         'conditions' => 
+         'conditions' =>
         array (
           '#conjunction' => 'AND',
-          0 => 
+          0 =>
           array (
             'field' => 'b.status',
             'value' => 1,
             'operator' => '=',
           ),
         ),
-         'arguments' => 
+         'arguments' =>
         array (
         ),
          'changed' => true,
          'queryPlaceholderIdentifier' => NULL,
       )),
-       'having' => 
+       'having' =>
       Drupal\sps\Test\DatabaseCondition::__set_state(array(
-         'conditions' => 
+         'conditions' =>
         array (
           '#conjunction' => 'AND',
         ),
-         'arguments' => 
+         'arguments' =>
         array (
         ),
          'changed' => true,
@@ -282,24 +282,24 @@ class SPSTempTableOverrideControllerUnitTest extends SPSBaseUnitTest {
       )),
        'distinct' => false,
        'range' => NULL,
-       'union' => 
+       'union' =>
       array (
       ),
        'prepared' => false,
        'forUpdate' => false,
        'connectionTarget' => 'default',
        'connectionKey' => 'default',
-       'queryOptions' => 
+       'queryOptions' =>
       array (
         'target' => 'default',
         'return' => 1,
       ),
        'uniqueIdentifier' => '5004e873f40640.15709914',
        'nextPlaceholder' => 0,
-       'comments' => 
+       'comments' =>
       array (
       ),
-    )); 
+    ));
   }
 
 }

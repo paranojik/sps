@@ -29,7 +29,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
     $this->overrides_info = $manager->getPluginByMeta('override', 'condition', $config['name']);
 
     if(empty($this->overrides_info)) {
-      throw new \Drupal\sps\Exception\NonoperativePluginException(
+      throw new Drupal\sps\Exception\NonoperativePluginException(
         "condition {$config['name']} does not have any overrides avaiable");
     }
 
@@ -60,7 +60,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   public function getOverride() {
     if ($this->override_set) {
-      $override = new \Drupal\sps\Plugins\Override\AggregatorOverride($this->settings, $this->manager);
+      $override = new Drupal\sps\Plugins\Override\AggregatorOverride($this->settings, $this->manager);
 
       $override->setData($this->overrides);
       return $override;
@@ -78,7 +78,7 @@ class BasicCondition extends AbstractPlugin implements ConditionInterface {
    */
   public function getElement($element, &$form_state) {
     if (empty($this->widget)) {
-      throw new \Drupal\sps\Exception\ClassLoadException(
+      throw new Drupal\sps\Exception\ClassLoadException(
         'Element requested but no valid Widget found for the Condition.');
     }
 

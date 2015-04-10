@@ -13,11 +13,11 @@ class Condition extends \Drupal\sps\Plugins\AbstractPlugin implements \Drupal\sp
     $this->element_form = isset($settings['element_form']) ? $settings['element_form'] : array();
     $this->validate_fail_message = isset($settings['validate_fail_message']) ? $settings['validate_fail_message'] : NULL;
     $this->validate_fail_name = isset($settings['validate_fail_name']) ? $settings['validate_fail_name'] : NULL;
-    $this->override = isset($settings['override']) ? $settings['override'] : new \Drupal\sps\Test\Override(array(), $manager);
+    $this->override = isset($settings['override']) ? $settings['override'] : new Drupal\sps\Test\Override(array(), $manager);
     $this->has_overrides = isset($settings['has_overrides']) ? $settings['has_overrides'] : TRUE;
 
     if(!$this->has_overrides) {
-      throw new \Drupal\sps\Exception\NonoperativePluginException("condition test condition does not have any overrides avaiable");
+      throw new Drupal\sps\Exception\NonoperativePluginException("condition test condition does not have any overrides avaiable");
     }
     $this->title = isset($settings['title']) ? $settings['title'] : '';
   }

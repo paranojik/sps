@@ -145,14 +145,14 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
 
   public function testLoadPluginFactory() {
     try {
-      $manager = new \Drupal\sps\Test\Manager();
+      $manager = new Drupal\sps\Test\Manager();
       $factory = new PluginFactory(array(), $manager);
       $this->pass('Plugin Factory Loaded');
     } catch (Exception $e) {
       $this->fail('Plugin Factory Loaded');
     }
   }
-  
+
   public function testPluginTypeInfo() {
 
     $default_plugin_type_info = array(
@@ -185,7 +185,7 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
         'name' => 'test_type_2',
       ),
     );
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $manager->getDrupalController()->set('module_implements', function() {
       return array('sps_test');
     });
@@ -270,7 +270,7 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
       ),
     );
 
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $test = $this;
     $manager->getDrupalController()->set('module_implements', function()  {
       return array('sps_test');
@@ -298,7 +298,7 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
       'Plugin info for Test Type 2 loaded', 'SPS');
   }
   public function testPluginFactory_getPluginInfo_RequirementEx() {
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $manager->getDrupalController()->set('module_implements', function()  {
       return array('sps_test_mrs');
     });
@@ -318,12 +318,12 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     };
     $this->assertThrows($missing_required_settings,
       "Drupal\\sps\\Exception\\InvalidPluginException",
-      "Plugin missing_required_settings does not contain required element required field", 
-      'Missing Required Settings Plugin Failed to Load');  
+      "Plugin missing_required_settings does not contain required element required field",
+      'Missing Required Settings Plugin Failed to Load');
   }
 
   public function testPluginFactory_getPluginInfo_RequirementExWithDepth() {
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
 
     $manager->getDrupalController()->set('module_implements', function()  {
       return array('sps_test_mrs');
@@ -348,12 +348,12 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     };
     $this->assertThrows($missing_required_settings_in_child,
       "Drupal\\sps\\Exception\\InvalidPluginException",
-      "Plugin missing_required_settings_in_child does not contain required element parent=>other required field", 
-      'Missing Required Settings in Depth Plugin Failed to Load');  
+      "Plugin missing_required_settings_in_child does not contain required element parent=>other required field",
+      'Missing Required Settings in Depth Plugin Failed to Load');
   }
 
   public function testPluginFactory_getPluginInfo_InvalidClass() {
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $manager->getDrupalController()->set('module_implements', function()  {
       return array('sps_test_mrs');
     });
@@ -384,9 +384,9 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   //@TODO need test for plugin that does not impelment Drupal\\sps\\Plugins\\PluginInterface
 
   public function testGetPlugin() {
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
 
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $manager->getDrupalController()->set('module_implements', function()  {
       return array('sps_test');
     });
@@ -428,7 +428,7 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     //  $correct_interface, 'The correct interface is being used in the Plugin Class');
 
   /*
-   * @TODO the getSettings Method has been removed from the Plugin 
+   * @TODO the getSettings Method has been removed from the Plugin
    * Interfacefor the moment
     $custom_instance_settings = $factory->getPlugin('test_type_2', 'normal_plugin', $manager);
     $this->assertEqual($custom_instance_settings->getSetting('instance_setting_1'), '123',
@@ -453,7 +453,7 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
     */
   }
   public function testPlugin_getPluginByMeta() {
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $manager->getDrupalController()->set('module_implements', function()  {
       return array('sps_test_by_meta');
     });
@@ -491,4 +491,4 @@ class SPSPluginFactoryUnitTest extends SPSBaseUnitTest {
   //@TODO add test for hook_sps_validate_plguin_type_info
   //@TODO add test for hook_sps_validate_plguin_info
 }
- 
+

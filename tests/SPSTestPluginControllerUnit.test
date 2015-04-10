@@ -18,8 +18,8 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
         ),
       ),
     );
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Test\PluginController($info, $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Test\PluginController($info, $manager);
     $this->assertEqual(
       $controller->getPluginInfo('widget'),
       $info['widget'],
@@ -31,10 +31,10 @@ class SPSTestPluginControllerUnitTest extends SPSBaseUnitTest {
       'TestStorageController::getPluginInfo should get the plugin info for  the plugin when passed two param', 'SPS'
     );
 
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $this->assertEqual(
-      $controller->getPlugin('widget', 'test_widget', $manager), 
-      new \Drupal\sps\Test\Override(array(), $manager),
+      $controller->getPlugin('widget', 'test_widget', $manager),
+      new Drupal\sps\Test\Override(array(), $manager),
       'TestStorageController::getPlugin should build a obj from the plugin info', 'SPS'
     );
 

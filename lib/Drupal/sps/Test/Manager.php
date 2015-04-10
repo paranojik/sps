@@ -12,7 +12,7 @@ class Manager extends \Drupal\sps\Manager{
     \Drupal\sps\StorageControllerInterface $config_controller = NULL) {
 
 
-    $config_controller = $config_controller ?: new \Drupal\sps\Test\ConfigController();
+    $config_controller = $config_controller ?: new Drupal\sps\Test\ConfigController();
     parent::__construct($config_controller);
 
   }

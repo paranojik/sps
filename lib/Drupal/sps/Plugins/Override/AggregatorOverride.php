@@ -26,7 +26,7 @@ class AggregatorOverride implements OverrideInterface {
       $overrides = $override->getOverrides();
       foreach ($overrides as $type => $items) {
         if (!empty($this->override_table[$type]) && !empty($items)) {
-          throw new \Drupal\sps\Exception\InvalidOverrideException(
+          throw new Drupal\sps\Exception\InvalidOverrideException(
             'AggregatorOverride may not be passed two overrides that handle the same type.');
         }
         $this->override_table[$type] = $items;

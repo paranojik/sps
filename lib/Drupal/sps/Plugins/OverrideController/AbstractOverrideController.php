@@ -4,10 +4,10 @@ namespace Drupal\sps\Plugins\OverrideController;
 abstract class AbstractOverrideController implements \Drupal\sps\Plugins\OverrideControllerInterface {
 
   /**
-  * @brief 
+  * @brief
   *
   * @param $row
-  *   an override dictionary 
+  *   an override dictionary
   *
   * @return
   * NULL
@@ -15,12 +15,12 @@ abstract class AbstractOverrideController implements \Drupal\sps\Plugins\Overrid
   */
   public function validateRow($row) {
     if (!isset($row['id'])) {
-      throw new \Drupal\sps\Exception\InvalidOverrideRowException("Override row must have id field");
+      throw new Drupal\sps\Exception\InvalidOverrideRowException("Override row must have id field");
     }
     if (!isset($row['type'])) {
-      throw new \Drupal\sps\Exception\InvalidOverrideRowException("Override row must have type field");
+      throw new Drupal\sps\Exception\InvalidOverrideRowException("Override row must have type field");
     }
-  
+
   }
 
 }

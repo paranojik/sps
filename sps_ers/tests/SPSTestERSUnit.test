@@ -34,7 +34,7 @@ class SPSTestERSUnitTest extends SPSBaseUnitTest {
       ),
     );
 
-    $ers_override = new \Drupal\sps_ers\Test\ERSTestOverride(array(), new Drupal\sps\Test\Manager());
+    $ers_override = new Drupal\sps_ers\Test\ERSTestOverride(array(), new Drupal\sps\Test\Manager());
     $ers_override->setResults($data);
 
     $overrides = $ers_override->getOverrides();

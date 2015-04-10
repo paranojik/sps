@@ -9,7 +9,7 @@ class SPSDrupalUnitTest extends SPSBaseUnitTest {
   }
 
   public function testDrupal_overrideWithMethod() {
-    $drupal = new \Drupal\sps\Drupal();
+    $drupal = new Drupal\sps\Drupal();
 
     function org($param1) {
       return $param1 +1;
@@ -34,7 +34,7 @@ class SPSDrupalUnitTest extends SPSBaseUnitTest {
   }
 
   public function testDrupal_overrideWithArray() {
-    $drupal = new \Drupal\sps\Drupal();
+    $drupal = new Drupal\sps\Drupal();
 
     function testDrupal_overrideWithArray_org($param1) {
       return $param1 +1;
@@ -58,7 +58,7 @@ class SPSDrupalUnitTest extends SPSBaseUnitTest {
     );
   }
   public function testDrupal_overrideWithArrayAndRef() {
-    $drupal = new \Drupal\sps\Drupal();
+    $drupal = new Drupal\sps\Drupal();
 
     function testDrupal_overrideWithArrayAndRef_org(&$param1) {
       $param1 ++;

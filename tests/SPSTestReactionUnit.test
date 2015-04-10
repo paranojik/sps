@@ -9,12 +9,12 @@ class SPSTestReactionUnitTest extends SPSBaseUnitTest {
   }
 
   public function testTestReaction() {
-    $manager =  new \Drupal\sps\Test\Manager();
+    $manager =  new Drupal\sps\Test\Manager();
     $settings = array(
       'callback' => function($data) { return $data + 1;},
     );
-    $reaction = new \Drupal\sps\Test\Reaction($settings, $manager);
-    $override_controller = new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
+    $reaction = new Drupal\sps\Test\Reaction($settings, $manager);
+    $override_controller = new Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
     $this->assertEqual(
       $reaction->react(4, $override_controller),
       5,

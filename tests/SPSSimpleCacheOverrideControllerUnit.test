@@ -8,8 +8,8 @@ class SPSSimpleCacheOverrideControllerUnitTest extends SPSBaseUnitTest {
     );
   }
   public function testSimpleCacheOverrideController_getAndSet() {
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
 
     $overrides = array(
       array(
@@ -33,8 +33,8 @@ class SPSSimpleCacheOverrideControllerUnitTest extends SPSBaseUnitTest {
 
   }
   public function testSimpleCacheOverrideController_validateRow() {
-    $manager = new \Drupal\sps\Test\Manager();
-    $controller = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
+    $manager = new Drupal\sps\Test\Manager();
+    $controller = new Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
 
    $overrides = array(
       array(

@@ -420,7 +420,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
         $item['field'] = $this->escapeField($item['field']);
       }
     }
-    $replacement = new \Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
+    $replacement = new Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
     $replacement_c = &$replacement->conditions();
     $replacement_c = $sub_condition;
     $condition = $replacement;

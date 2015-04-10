@@ -8,7 +8,7 @@ class sps_add_override_UnitTest extends SPSBaseUnitTest {
     );
   }
   function test_sps_add_override() {
-    $manager = new \Drupal\sps\Test\Manager();
+    $manager = new Drupal\sps\Test\Manager();
     $message = array( '#markup' => 'This is the message');
     $entity_id = 5;
     $entity_type = 'node';

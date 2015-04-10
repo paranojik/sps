@@ -9,9 +9,9 @@ class SPSAddClassReactionUnitTest extends SPSBaseUnitTest {
   }
 
   public function testTestReaction() {
-    $manager =  new \Drupal\sps\Test\Manager();
-    $reaction = new \Drupal\sps\Plugins\Reaction\AddClassReaction(array(), $manager);
-    $override_controller = new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
+    $manager =  new Drupal\sps\Test\Manager();
+    $reaction = new Drupal\sps\Plugins\Reaction\AddClassReaction(array(), $manager);
+    $override_controller = new Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
     $override_controller->set(array(array('id' => 1, 'type' => 'node')));
 
     $this->assertEqual(

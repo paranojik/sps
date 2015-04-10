@@ -9,8 +9,8 @@ class SPSEntityLoadReactionWebTest extends SPSBaseWebTest {
   }
 
   public function testEntityLoadReaction_react() {
-    $manager =  new \Drupal\sps\Test\Manager();
-    $reaction = new \Drupal\sps\Plugins\Reaction\EntityLoadReaction(array(), $manager);
+    $manager =  new Drupal\sps\Test\Manager();
+    $reaction = new Drupal\sps\Plugins\Reaction\EntityLoadReaction(array(), $manager);
     $data =  (object) array(
       'base_id_key' => 'nid',
       'revision_id_key' => 'vid',
@@ -18,7 +18,7 @@ class SPSEntityLoadReactionWebTest extends SPSBaseWebTest {
       'type' => 'node',
       'ids' => array(1,2),
     );
-    $override_controller = new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
+    $override_controller = new Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
     $override_controller->set(array(
       array('id' => 1, 'revision_id' => 12, 'type' =>'node'),
       array('id' => 3, 'revision_id' => 31, 'type' =>'node'),
@@ -30,8 +30,8 @@ class SPSEntityLoadReactionWebTest extends SPSBaseWebTest {
     );
   }
   public function testEntityLoadReaction_react_no_overrides() {
-    $manager =  new \Drupal\sps\Test\Manager();
-    $reaction = new \Drupal\sps\Plugins\Reaction\EntityLoadReaction(array(), $manager);
+    $manager =  new Drupal\sps\Test\Manager();
+    $reaction = new Drupal\sps\Plugins\Reaction\EntityLoadReaction(array(), $manager);
     $data =  (object) array(
       'base_id_key' => 'nid',
       'revision_id_key' => 'vid',
@@ -39,7 +39,7 @@ class SPSEntityLoadReactionWebTest extends SPSBaseWebTest {
       'type' => 'node',
       'ids' => array('4,2'),
     );
-    $override_controller = new \Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
+    $override_controller = new Drupal\sps\Test\SimpleCacheOverrideController(array(), $manager);
     $override_controller->set(array(
       array('id' => 1, 'revision_id' => 12, 'type' =>'node'),
       array('id' => 3, 'revision_id' => 31, 'type' =>'node'),

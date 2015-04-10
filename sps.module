@@ -193,7 +193,7 @@ function sps_get_default_config_controller() {
   $controller = &drupal_static(__FUNCTION__);
 
   if (!isset($controller)) {
-    $controller = new \Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
+    $controller = new Drupal\sps\StorageController\DrupalVariableController(SPS_CONFIG_PREFIX);
   }
   return $controller;
 }
@@ -211,7 +211,7 @@ function sps_get_manager() {
     if (!class_exists('\Drupal\sps\Manager')) {
       registry_rebuild();
     }
-    $manager = new \Drupal\sps\Manager(sps_get_default_config_controller());
+    $manager = new Drupal\sps\Manager(sps_get_default_config_controller());
   }
 
   return $manager;
@@ -425,10 +425,10 @@ function sps_add_override($message, $entity_id, $entity_type, $overrides = array
     'id' => $entity_id,
   ) + $overrides);
 
-  $condition = new \Drupal\sps\Plugins\Condition\FixedOverrideCondition(
+  $condition = new Drupal\sps\Plugins\Condition\FixedOverrideCondition(
     array(
       'message' => $message,
-      'override' => new \Drupal\sps\Plugins\Override\FixedOverride(array('overrides' => $overrides), $manager),
+      'override' => new Drupal\sps\Plugins\Override\FixedOverride(array('overrides' => $overrides), $manager),
     ),
     $manager
   );

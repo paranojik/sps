@@ -12,7 +12,7 @@ class SPSDrupalVariableControllerWebTest extends SPSBaseWebTest {
   public function testDrupalVariableController() {
     $prefix = "test_prefix";
 
-    $control = new \Drupal\sps\StorageController\DrupalVariableController($prefix);
+    $control = new Drupal\sps\StorageController\DrupalVariableController($prefix);
     $data = array(
       "get" => array("name" => "get name", 'value' => 'get value'),
       "set" => array("name" => "set name", 'value' => 'set value'),

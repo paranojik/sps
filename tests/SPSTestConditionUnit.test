@@ -18,9 +18,9 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
       ),
       'validate_fail_message' => "There was an error",
       'validate_fail_name' => "error_item",
-      'override' => new \Drupal\sps\Test\Override(array(), $manager),
+      'override' => new Drupal\sps\Test\Override(array(), $manager),
     );
-    $condition = new \Drupal\sps\Test\Condition($settings, $manager);
+    $condition = new Drupal\sps\Test\Condition($settings, $manager);
     $form = array();
     $form_state = array();
     $this->assertEqual(
@@ -54,15 +54,15 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
 
     $settings = array(
       'name' => 'basic',
-      'widget' => new \Drupal\sps\Test\Widget(array(), $manager)
+      'widget' => new Drupal\sps\Test\Widget(array(), $manager)
     );
 
     //BasicCondition should take configuration and the manager in constructor i.e. implement PluginInterface
-    $condition = new \Drupal\sps\Plugins\Condition\BasicCondition($settings, $manager);
+    $condition = new Drupal\sps\Plugins\Condition\BasicCondition($settings, $manager);
     $this->assertCheckInterface('Drupal\sps\Plugins\PluginInterface', $condition, "BasicCondition should implement Drupal\sps\Plugins\PluginInterface");
 
     //BasicCondition should construct the correct widget and properly get its form
-    $test_widget = new \Drupal\sps\Test\Widget(array(), $manager);
+    $test_widget = new Drupal\sps\Test\Widget(array(), $manager);
     $state = array();
     $widget = $test_widget->getPreviewForm(array(), $state);
 
@@ -150,23 +150,23 @@ class SPSTestConditionUnitTest extends SPSBaseUnitTest {
 
     $manager = self::getManager();
 
-    $override1 = new \Drupal\sps\Test\Override(array(), $manager);
-    $override2 = new \Drupal\sps\Test\Override(array(), $manager);
-    $override3 = new \Drupal\sps\Test\Override(array(), $manager);
+    $override1 = new Drupal\sps\Test\Override(array(), $manager);
+    $override2 = new Drupal\sps\Test\Override(array(), $manager);
+    $override3 = new Drupal\sps\Test\Override(array(), $manager);
 
     $override1->setData($table1);
     $override2->setData($table2);
     $override3->setData($table3);
 
-    $aggregator = new \Drupal\sps\Plugins\Override\AggregatorOverride();
+    $aggregator = new Drupal\sps\Plugins\Override\AggregatorOverride();
     $aggregator->setData(array($override1, $override2, $override3));
     $this->assertEqual($aggregator->getOverrides(), $endGoal, 'AggregatorOverride should combine overrides.');
 
-    $override4 = new \Drupal\sps\Test\Override(array(), $manager);
+    $override4 = new Drupal\sps\Test\Override(array(), $manager);
     $override4->setData($table1);
 
     $this->assertThrows(function() use ($override1, $override2, $override3, $override4) {
-      $aggregator2 = new \Drupal\sps\Plugins\Override\AggregatorOverride();
+      $aggregator2 = new Drupal\sps\Plugins\Override\AggregatorOverride();
       $aggregator2->setData(array($override1, $override2, $override3, $override4));
     }, '\Drupal\sps\Exception\InvalidOverrideException',
     'AggregatorOverride may not be passed two overrides that handle the same type.',

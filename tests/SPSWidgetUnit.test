@@ -16,7 +16,7 @@ class SPSWidgetUnitTest extends SPSBaseUnitTest {
     );
     $manager = self::getManager();
 
-    $widget = new \Drupal\sps\Test\Widget(array(), $manager);
+    $widget = new Drupal\sps\Test\Widget(array(), $manager);
     $form = $widget->getPreviewForm(array(), $state);
     $this->assertEqual($form['text_input']['#default_value'], 'default', 'Widget properly sets default value.');
 
@@ -49,7 +49,7 @@ class SPSWidgetUnitTest extends SPSBaseUnitTest {
   public function testDateWidget() {
     $manager = self::getManager();
 
-    $widget = new \Drupal\sps\Plugins\Widget\DateWidget(array(), $manager);
+    $widget = new Drupal\sps\Plugins\Widget\DateWidget(array(), $manager);
 
     //we're cheating by passing a timezone to make this not depend on server time
     $state = array(

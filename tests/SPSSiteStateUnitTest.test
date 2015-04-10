@@ -13,19 +13,19 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
       array('type' => 'thing', 'id' => 1, 'revision_id' => 5),
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
     );
-    $manager =  new \Drupal\sps\Test\Manager();
-    $override = new \Drupal\sps\Test\Override(array(), $manager);
+    $manager =  new Drupal\sps\Test\Manager();
+    $override = new Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
-    $condition = new \Drupal\sps\Test\Condition(array(
+    $condition = new Drupal\sps\Test\Condition(array(
         'override' => $override,
       ), $manager);
     $condition->override_set = TRUE;
     $map = array(
-      'api1' => new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager),
+      'api1' => new Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager),
     );
-    $site_state = new \Drupal\sps\SiteState($condition, $map);
+    $site_state = new Drupal\sps\SiteState($condition, $map);
 
-    $testController = new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
+    $testController = new Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager);
     $testController->set($table);
 
     $this->assertEqual(
@@ -40,24 +40,24 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
       array('type' => 'thing', 'id' => 1, 'revision_id' => 5),
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
     );
-    $manager =  new \Drupal\sps\Test\Manager();
-    $override = new \Drupal\sps\Test\Override(array(), $manager);
+    $manager =  new Drupal\sps\Test\Manager();
+    $override = new Drupal\sps\Test\Override(array(), $manager);
     $override->setData($table);
-    $condition = new \Drupal\sps\Test\Condition(array(
+    $condition = new Drupal\sps\Test\Condition(array(
         'override' => $override,
       ), $manager);
     $condition->override_set = TRUE;
     $map = array(
-      'api1' => new \Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager),
+      'api1' => new Drupal\sps\Plugins\OverrideController\SimpleCacheOverrideController(array(), $manager),
     );
-    $site_state = new \Drupal\sps\SiteState($condition, $map);
+    $site_state = new Drupal\sps\SiteState($condition, $map);
     $this->assertEqual(
       $site_state->getCondition(),
       $condition,
       '::getCondition should return the condtion pass at creation (param 1).'
     );
 
-  
+
   }
 
 
@@ -68,8 +68,8 @@ class SPSSiteStateUnitTest extends SPSBaseUnitTest {
       array('type' => 'thing', 'id' => 3, 'revision_id' => 7),
       array('type' => 'thing', 'id' => 2, 'revision_id' => 97),
     );
-    $manager =  new \Drupal\sps\Test\Manager();
-    $override_a = new \Drupal\sps\Test\Override(array(), $manager);
+    $manager =  new Drupal\sps\Test\Manager();
+    $override_a = new Drupal\sps\Test\Override(array(), $manager);
     $override_a->setData($table);
     $site_state = new Drupal\sps\SiteState($control, $override_a);
     $this->assertEqual($site_state->getOverride(), $table, "SiteState::getOverrides should return table given up by controller");

@@ -19,7 +19,7 @@ class FixedOverrideCondition extends BasicCondition {
       $this->override = $config['override'];
     }
     else {
-      throw new \Drupal\sps\Exception\NonoperativePluginException("condition does not have an override");
+      throw new Drupal\sps\Exception\NonoperativePluginException("condition does not have an override");
     }
   }
 
