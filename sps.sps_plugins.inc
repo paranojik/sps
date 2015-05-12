@@ -26,7 +26,8 @@ function sps_sps_reaction_plugins() {
 
   // Lets add all of the entities that have revisions to the query_alter
   // and then lets add in the node revision fields.
-  foreach (module_invoke_all('entity_info') as $type => $info) {
+  //foreach (module_invoke_all('entity_info') as $type => $info) {
+  foreach (entity_get_info() as $type => $info) {
     if (isset($info['revision table'])) {
       $reactions['entity_select_query_alter']['instance_settings']['entities'][$type] = array(
         'base_table' => $info['base table'],
