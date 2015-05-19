@@ -19,6 +19,7 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
     $class = $this->info['controller class base'];
     $this->controller = new $class($entityType);
     $this->type = $entityType;
+
   }
 
   /**
