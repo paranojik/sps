@@ -26,10 +26,18 @@ function sps_sps_reaction_plugins() {
 
   // Lets add all of the entities that have revisions to the query_alter
   // and then lets add in the node revision fields.
-  // We can't use entity_get_info() since this can be triggered during
-  // entity_get_info().
-  foreach (module_invoke_all('entity_info') as $type => $info) {
-  // foreach (entity_get_info() as $type => $info) {
+  // We can't use entity_get_info() since this function can be triggered during
+  // entity_get_info(). However, we can try to fetch the data from the
+  // persistent cache to avoid a duplicated hook invocation. We can't use the
+  // static cache since this could be available but incomplete.
+  global $language;
+  if ($cache = cache_get('entity_info:' . $language->language)) {
+    $entity_info = $cache->data;
+  }
+  else {
+    $entity_info = module_invoke_all('entity_info');
+  }
+  foreach ($entity_info as $type => $info) {
     if (isset($info['revision table'])) {
       $reactions['entity_select_query_alter']['instance_settings']['entities'][$type] = array(
         'base_table' => $info['base table'],
