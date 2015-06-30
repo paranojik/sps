@@ -56,7 +56,7 @@ class EntityControllerWrapper implements  \DrupalEntityControllerInterface {
       $data->base_table = $this->info['base table'];
       $data->type = $this->type;
       $data->ids = $ids;
-      if($revision_ids  = sps_drupal()->sps_get_manager()->react('entity_load', $data)) {
+      if(($drupal = sps_drupal()) && $revision_ids = $drupal->sps_get_manager()->react('entity_load', $data)) {
         $conditions[$revision_id_key] = $revision_ids;
       }
     }

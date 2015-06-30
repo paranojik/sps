@@ -180,7 +180,9 @@ function sps_condition_preview_form_submit($form, &$form_state) {
     $condition = $form_state['build_info']['args'][0];
     $form_state['root_condition'] = $condition;
     $condition->submitElement($form, $form_state);
-    sps_get_manager()->previewFormSubmitted($condition);
+    if (($manager = sps_get_manager())) {
+      $manager->previewFormSubmitted($condition);
+    }
   }
 }
 
@@ -211,6 +213,11 @@ function sps_get_manager() {
     if (!class_exists('\Drupal\sps\Manager')) {
       registry_rebuild();
     }
+    // If the rebuild didn't help try to fail gracefully.
+    if (!class_exists('\Drupal\sps\Manager')) {
+      watchdog('SPS', 'Could not load the manager class. SPS is disabled!', array(), WATCHDOG_ALERT);
+      return FALSE;
+    }
     $manager = new Drupal\sps\Manager(sps_get_default_config_controller());
   }
 
@@ -225,14 +232,19 @@ function sps_get_manager() {
 function sps_query_alter($query) {
   $data = new stdClass();
   $data->query = $query;
-  sps_get_manager()->react('entity_select_query_alter', $data);
+  if (($manager = sps_get_manager())) {
+    $manager->react('entity_select_query_alter', $data);
+  }
 }
 
 /**
  * Implements hook_entitycache_load_alter().
  */
 function sps_entitycache_load_alter(&$entities) {
-  $state = sps_get_manager()->getSiteState();
+  $state = NULL;
+  if (($manager = sps_get_manager())) {
+    $state = $manager->getSiteState();
+  }
   if ($state !== NULL) {
     // If the state is not empty, do not let entitycache load things from cache.
     $entities = array();
@@ -243,8 +255,11 @@ function sps_entitycache_load_alter(&$entities) {
  * Implements hook_entitycache_save_alter().
  */
 function sps_entitycache_save_alter(&$entities){
-    $state = sps_get_manager()->getSiteState();
-    if ($state !== NULL) {
+  $state = NULL;
+  if (($manager = sps_get_manager())) {
+    $state = $manager->getSiteState();
+  }
+  if ($state !== NULL) {
     // If the state is not empty, do not let entitycache save things in cache.
     $entities = array();
   }
@@ -320,12 +335,14 @@ function sps_entity_create($values, $entity_type) {
  * Implements hook_iib_page_item().
  */
 function sps_iib_page_item() {
-  $manager = sps_get_manager();
-  $preview_form = $manager->getPreviewForm();
-  $items['left'] = array(
-    '#weight' => -10,
-    'form' => $preview_form,
-  );
+  $items = array();
+  if ($manager = sps_get_manager()) {
+    $preview_form = $manager->getPreviewForm();
+    $items['left'] = array(
+      '#weight' => -10,
+      'form' => $preview_form,
+    );
+  }
   return $items;
 }
 
@@ -368,7 +385,10 @@ function sps_wrapper_condition_ajax_callback($form, $form_state) {
  * test_drupal_get_form instead.
  */
 function sps_drupal() {
-  return sps_get_manager()->getDrupalController();
+  if ($manager = sps_get_manager()) {
+    return $manager->getDrupalController();
+  }
+  return FALSE;
 }
 
 /**
@@ -420,20 +440,24 @@ function sps_bean_revision($node, $revision_id) {
  */
 function sps_add_override($message, $entity_id, $entity_type, $overrides = array(), $manager = NULL) {
   $manager = $manager ?: sps_get_manager();
-  $overrides = array(array(
-    'type' => $entity_type,
-    'id' => $entity_id,
-  ) + $overrides);
+  if ($manager) {
+    $overrides = array(
+      array(
+        'type' => $entity_type,
+        'id' => $entity_id,
+      ) + $overrides
+    );
 
-  $condition = new Drupal\sps\Plugins\Condition\FixedOverrideCondition(
-    array(
-      'message' => $message,
-      'override' => new Drupal\sps\Plugins\Override\FixedOverride(array('overrides' => $overrides), $manager),
-    ),
-    $manager
-  );
+    $condition = new Drupal\sps\Plugins\Condition\FixedOverrideCondition(
+      array(
+        'message' => $message,
+        'override' => new Drupal\sps\Plugins\Override\FixedOverride(array('overrides' => $overrides), $manager),
+      ),
+      $manager
+    );
 
-  $manager->setSiteState($condition);
+    $manager->setSiteState($condition);
+  }
 }
 
 
@@ -442,7 +466,9 @@ function sps_add_override($message, $entity_id, $entity_type, $overrides = array
 * implements hook_preprocess()
 */
 function sps_preprocess(&$vars, $hook) {
-  _sps_preprocess($vars, $hook, sps_get_manager());
+  if ($manager = sps_get_manager()) {
+    _sps_preprocess($vars, $hook, $manager);
+  }
 }
 
 /**
