@@ -379,7 +379,13 @@ class Manager {
    *  A drupal form array created by the root condition
    */
   public function getPreviewForm() {
-    $root_condition = $this->getRootCondition();
+    try {
+      $root_condition = $this->getRootCondition();
+    }
+    catch (\Drupal\sps\Exception\InvalidPluginException $e) {
+      watchdog_exception('SPS', $e);
+      return array();
+    }
     return $this->getDrupalController()->drupal_get_form('sps_condition_preview_form', $root_condition);
   }
 
