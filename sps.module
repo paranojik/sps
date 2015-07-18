@@ -209,9 +209,10 @@ function sps_get_manager() {
   $manager = &drupal_static(__FUNCTION__);
 
   if (!isset($manager)) {
-    // If the main class isn't found the registry needs to be updated.
-    if (!class_exists('\Drupal\sps\Manager')) {
-      registry_rebuild();
+    // If the main class isn't found the registry needs to be updated, if this
+    // run isn't already a registry update.
+    if (!class_exists('\Drupal\sps\Manager') && lock_may_be_available('registry_update')) {
+      //registry_rebuild();
     }
     // If the rebuild didn't help try to fail gracefully.
     if (!class_exists('\Drupal\sps\Manager')) {
