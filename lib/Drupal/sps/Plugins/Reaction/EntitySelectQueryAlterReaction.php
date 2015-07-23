@@ -140,17 +140,97 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   protected function addRevisionTables($query) {
     $alias = $this->extractAlias($query);
-    $tables = $query->getTables();
-    $aliases = array();
+    $tables =& $query->getTables();
+    $new_aliases = array();
     foreach($this->entities as $entity) {
       if(isset($alias[$entity['base_table']]) && !isset($alias[$entity['revision_table']])) {
-        $query->join($entity['revision_table'], 'override_' . $entity['revision_table'], "{$alias[$entity['base_table']]}.{$entity['revision_id']} = override_{$entity['revision_table']}.{$entity['revision_id']}");
+        $new_aliases[$alias[$entity['base_table']]] = $query->join($entity['revision_table'], 'override_' . $entity['revision_table'], "{$alias[$entity['base_table']]}.{$entity['revision_id']} = override_{$entity['revision_table']}.{$entity['revision_id']}");
+
+        // Rewrite all possible cases where column ambiguity could be introduced.
+        $this->prefixFields($query, $entity['base_table'], $alias[$entity['base_table']]);
       }
     }
 
+    if (!empty($new_aliases)) {
+      $ordered = array();
+      foreach ($tables as $table => $data) {
+        $ordered[$table] = $data;
+        if (isset($new_aliases[$table])) {
+          $ordered[$new_aliases[$table]] = $tables[$new_aliases[$table]];
+          unset($tables[$new_aliases[$table]]);
+        }
+      }
+      $tables = $ordered;
+    }
     return $this;
   }
 
+  /**
+   * Recursively iterate over the query conditions and prefix fields with their
+   * original table alias.
+   *
+   * @param $conditions
+   * @param $original_fields
+   * @param $table_alias
+   */
+  protected function prefixConditionFieldsRecursive($conditions, $original_fields, $table_alias) {
+    $where =& $conditions->conditions();
+    foreach($where as $key => &$where_item) {
+      if(isset($where_item['field'])) {
+        if ($where_item['field'] instanceof \DatabaseCondition) {
+          $this->prefixConditionFieldsRecursive($where_item['field'], $original_fields, $table_alias);
+        }
+        else {
+          if (in_array($where_item['field'], $original_fields)) {
+            $where_item['field'] = $table_alias . "." . $where_item['field'];
+          }
+        }
+      }
+    }
+  }
+
+  /**
+   * Prefix all unprefixed fields with their original table alias. This has to be
+   * done in order to prevent column name ambiguity when joining with a revision
+   * table.
+   *
+   * @param $query
+   * @param $table
+   * @param $table_alias
+   */
+  protected function prefixFields($query, $table, $table_alias) {
+    $original_fields = drupal_schema_fields_sql($table);
+
+    $this->prefixConditionFieldsRecursive($query, $original_fields, $table_alias);
+
+    $order =& $query->getOrderBy();
+    if (!empty($order)) {
+      $new_order = array();
+      foreach ($order as $key => $item) {
+        if (in_array($key, $original_fields)) {
+          $new_order["$table_alias.$key"] = $item;
+        }
+        else {
+          $new_order[$key] = $item;
+        }
+      }
+      $order = $new_order;
+    }
+
+    $group =& $query->getGroupBy();
+    if (!empty($group)) {
+      $new_group = array();
+      foreach ($group as $item) {
+        if (in_array($item, $original_fields)) {
+          $new_group[] = "$table_alias.$item";
+        }
+        else {
+          $new_group[] = $item;
+        }
+      }
+      $group = $new_group;
+    }
+  }
 
   /**
    * @param       $datum
@@ -213,13 +293,12 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   protected function recursiveReplace(&$data, $alias, $override_property_map = array()) {
     $reorder = array();
-    foreach($data as $key => &$datum) {
-
+    foreach ($data as $key => &$datum) {
       //check to see if we need to rewrite the keys.
-          //$new_key = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $key);
-          $new_key = $this->replaceDatum($key, $alias, $override_property_map);
-          if($new_key != $key) {
-            $reorder[$key] = $new_key;
+      //$new_key = preg_replace("/".$alias[$entity['base_table']]."\.(".implode("|", $entity['revision_fields']).")/", $alias[$entity['revision_table']] .'.$1', $key);
+      $new_key = $this->replaceDatum($key, $alias, $override_property_map);
+      if ($new_key != $key) {
+        $reorder[$key] = $new_key;
       }
 
       //if an array lets run the kids
@@ -238,12 +317,12 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       }
       //ok we have a single datum lets work on it.
       else {
-        if($datum !== NULL) {
+        if ($datum !== NULL) {
           $datum = $this->replaceDatum($datum, $alias, $override_property_map);
         }
       }
     }
-    if($reorder) {
+    if ($reorder) {
       $data = $this->keyRename($data, $reorder);
     }
 
@@ -481,13 +560,12 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
    */
   public function react($data, \Drupal\sps\Plugins\OverrideControllerInterface $override_controller) {
     $query = $data->query;
-      $alias = $this->extractAlias($query);
     //exit prematurly if we ha a no alter tag
-    if($query->hasTag(SPS_NO_ALTER_QUERY_TAG)) {
+    if ($query->hasTag(SPS_NO_ALTER_QUERY_TAG)) {
       return;
     }
     $alias = $this->extractAlias($query);
-    if($alias) {
+    if ($alias) {
       $this->addRevisionTables($query);
       $alias = $this->extractAlias($query);
 
@@ -495,7 +573,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       $this->addOverrideTable($query, $override_controller);
 
       $fields =& $query->getFields();
-      $this->fieldsToExpressions($query,  array_keys($property_map), $alias);
+      $this->fieldsToExpressions($query, array_keys($property_map), $alias);
       $this->fieldReplace($fields, $alias, $property_map);
 
       $expressions =& $query->getExpressions();

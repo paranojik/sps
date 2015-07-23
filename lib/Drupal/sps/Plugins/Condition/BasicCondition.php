@@ -3,6 +3,7 @@ namespace Drupal\sps\Plugins\Condition;
 
 use Drupal\sps\Plugins\AbstractPlugin;
 use Drupal\sps\Plugins\ConditionInterface;
+use Drupal\sps\Plugins\Override;
 
 class BasicCondition extends AbstractPlugin implements ConditionInterface {
   protected $overrides;

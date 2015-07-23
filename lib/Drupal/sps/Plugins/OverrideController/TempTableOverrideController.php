@@ -18,17 +18,16 @@ class TempTableOverrideController extends AbstractTableOverrideStorageController
     foreach($this->table as $row) {
       if($row['type'] == $type) {
         $columns = array("{$row['id']} as id");
-        foreach($this->getPropertyMap() as $property => $field) {
+        foreach($this->getPropertyMap($type) as $property => $field) {
           $value = isset($row[$property]) ? $row[$property] : 'NULL';
           $columns[] = "$value as $field";
         }
         $querys[] = "SELECT " . implode(",", $columns);
       }
-
     }
     // if we do not have any overrides we need to add a dummy one so that the temp table can be created
     if(empty($querys)) {
-      $querys[] = "SELECT 0 as id, NULL as override_revision_id";
+      $querys[] = "SELECT 0 as id, NULL as override_revision_id, 1 as override_status";
     }
     return  sps_drupal()->db_query_temporary(implode(" UNION ", $querys));
   }
@@ -58,7 +57,6 @@ class TempTableOverrideController extends AbstractTableOverrideStorageController
     $new_tables = array();
     $found_base = FALSE;
     foreach($tables as $key => $table) {
-
       if ($table['alias'] == $base_alias) {
         $new_tables[$key] = $table;
         $new_tables[$alias] = $tables[$alias];
