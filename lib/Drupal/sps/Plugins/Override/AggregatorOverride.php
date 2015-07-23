@@ -3,6 +3,7 @@
 namespace Drupal\sps\Plugins\Override;
 
 use Drupal\sps\Plugins\OverrideInterface;
+use Drupal\sps\Exception\InvalidOverrideException;
 
 class AggregatorOverride implements OverrideInterface {
   protected $override_table = array();
