@@ -254,24 +254,26 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
           $datum = preg_replace("/\b(".$alias[$entity['base_table']]."\.{$entity['revision_id']})\b/", "COALESCE(". $this->getOverrideAlias($entity) ."." .$override_property_map['revision_id'] .", $1)", $datum);
         }
 
-
-        //filter the override_property_map to only inlcude items that in revision fields
+        //filter the override_property_map to only include items that in revision fields
         $coalesce_revision_map = array_intersect_key($override_property_map, array_fill_keys($entity['revision_fields'], TRUE));
 
         //we have a revision table so lets set values to use that table
         if(isset($alias[$entity['revision_table']])) {
-            $datum = $this->replaceTableSwitch($datum, $entity['revision_fields'],$alias[$entity['base_table']], $alias[$entity['revision_table']]);
-          // we have propties to override lets give the override table priority
+          if (!empty($entity['revision_fields'])) {
+            $datum = $this->replaceTableSwitch($datum, $entity['revision_fields'], $alias[$entity['base_table']], $alias[$entity['revision_table']]);
+          }
+
+          // we have properties to override lets give the override table priority
           // on those fields
           if(!empty($coalesce_revision_map)) {
-            $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['revision_table']],  $this->getOverrideAlias($entity));
+            $datum = $this->replaceCoalesce($datum, $coalesce_revision_map, $alias[$entity['revision_table']], $this->getOverrideAlias($entity));
           }
         }
         else {
           // we have propties to override lets give the override table priority
           // on those fields
           if(!empty($coalesce_revision_map)) {
-            $datum = $this->replaceCoalesce($datum, $coalesce_revision_map,$alias[$entity['base_table']],  $this->getOverrideAlias($entity));
+            $datum = $this->replaceCoalesce($datum, $coalesce_revision_map, $alias[$entity['base_table']], $this->getOverrideAlias($entity));
           }
         }
       }
@@ -499,7 +501,7 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
         $item['field'] = $this->escapeField($item['field']);
       }
     }
-    $replacement = new Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
+    $replacement = new \Drupal\sps\DatabaseCondition($sub_condition['#conjunction']);
     $replacement_c = &$replacement->conditions();
     $replacement_c = $sub_condition;
     $condition = $replacement;
@@ -605,7 +607,6 @@ class EntitySelectQueryAlterReaction implements \Drupal\sps\Plugins\ReactionInte
       $this->recursiveReplace($having, $alias, $property_map);
       /*
       $this->recursiveReplace($fields);
-
       */
     }
     return $this;
